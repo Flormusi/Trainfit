@@ -1,4 +1,27 @@
-# dependencias y build
+# dependencias
+node_modules/
+
+# build
+dist/
+build/
+.next/
+out/
+
+# sistema
+.DS_Store
+
+# env
+.env
+.env.local
+.env.*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# coverage
+coverage/# dependencias y build
 node_modules/
 .next/
 dist/

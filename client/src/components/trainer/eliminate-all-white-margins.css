@@ -1,0 +1,130 @@
+/* ELIMINACIÓN COMPLETA DE MÁRGENES BLANCOS - VERSIÓN DEFINITIVA */
+
+/* Reset completo para eliminar cualquier margen o padding blanco */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Eliminar márgenes del contenedor principal */
+#root {
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #121212 !important;
+  min-height: 100vh !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Eliminar márgenes de la aplicación */
+.app {
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #121212 !important;
+  min-height: 100vh !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Eliminar márgenes específicos de la página de clientes */
+.client-list-container {
+  margin: 0 !important;
+  padding: 24px !important;
+  background-color: #121212 !important;
+  min-height: 100vh !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Eliminar cualquier borde blanco de todos los elementos */
+* {
+  border-color: transparent !important;
+  outline-color: transparent !important;
+}
+
+/* Específicamente para elementos que podrían tener bordes blancos */
+*[style*="border: white"],
+*[style*="border-color: white"],
+*[style*="border-color: #fff"],
+*[style*="border-color: #ffffff"],
+*[style*="border-color: rgb(255, 255, 255)"],
+*[style*="border: 1px solid white"],
+*[style*="border: 2px solid white"],
+.border-white,
+.border-light {
+  border: none !important;
+  border-color: transparent !important;
+}
+
+/* Eliminar sombras blancas */
+*[style*="box-shadow"][style*="white"],
+*[style*="box-shadow"][style*="#fff"],
+*[style*="box-shadow"][style*="#ffffff"],
+*[style*="box-shadow"][style*="rgb(255, 255, 255)"] {
+  box-shadow: none !important;
+}
+
+/* Asegurar que las tarjetas tengan el fondo correcto */
+.client-card,
+.stat-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+  border: 1px solid #2a2a2a !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Eliminar márgenes de contenedores Bootstrap */
+.container,
+.container-fluid,
+.row,
+.col,
+.col-*,
+div[class*="col-"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Asegurar que los inputs tengan el estilo correcto */
+input,
+select,
+textarea {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border: 1px solid #2a2a2a !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Eliminar márgenes de modales */
+.modal,
+.modal-dialog,
+.modal-content {
+  border: 1px solid #2a2a2a !important;
+  background-color: #1e1e1e !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Forzar fondo oscuro en toda la página */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #121212;
+  z-index: -1;
+  pointer-events: none; /* ← AÑADIR ESTA LÍNEA */
+}

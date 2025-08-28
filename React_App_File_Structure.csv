@@ -1,0 +1,241 @@
+File Path,Content Preview
+src/components/Navbar.tsx,"import React from 'react';
+
+const Navbar = () => {
+  return (
+    <div>
+      <h1>Navbar Page</h1>
+    </div>
+  );
+};
+
+export default Navbar;
+"
+src/components/AdminSidebar.tsx,"import React from 'react';
+
+const AdminSidebar = () => {
+  return (
+    <div>
+      <h1>AdminSidebar Page</h1>
+    </div>
+  );
+};
+
+export default AdminSidebar;
+"
+src/components/StudentSidebar.tsx,"import React from 'react';
+
+const StudentSidebar = () => {
+  return (
+    <div>
+      <h1>StudentSidebar Page</h1>
+    </div>
+  );
+};
+
+export default StudentSidebar;
+"
+src/pages/LandingPage.tsx,"import React from 'react';
+
+const LandingPage = () => {
+  return (
+    <div>
+      <h1>LandingPage Page</h1>
+    </div>
+  );
+};
+
+export default LandingPage;
+"
+src/pages/Login.tsx,"import React from 'react';
+
+const Login = () => {
+  return (
+    <div>
+      <h1>Login Page</h1>
+    </div>
+  );
+};
+
+export default Login;
+"
+src/pages/Register.tsx,"import React from 'react';
+
+const Register = () => {
+  return (
+    <div>
+      <h1>Register Page</h1>
+    </div>
+  );
+};
+
+export default Register;
+"
+src/pages/Admin/Dashboard.tsx,"import React from 'react';
+
+const Dashboard = () => {
+  return (
+    <div>
+      <h1>Dashboard Page</h1>
+    </div>
+  );
+};
+
+export default Dashboard;
+"
+src/pages/Admin/Students.tsx,"import React from 'react';
+
+const Students = () => {
+  return (
+    <div>
+      <h1>Students Page</h1>
+    </div>
+  );
+};
+
+export default Students;
+"
+src/pages/Admin/StudentDetails.tsx,"import React from 'react';
+
+const StudentDetails = () => {
+  return (
+    <div>
+      <h1>StudentDetails Page</h1>
+    </div>
+  );
+};
+
+export default StudentDetails;
+"
+src/pages/Admin/Routines.tsx,"import React from 'react';
+
+const Routines = () => {
+  return (
+    <div>
+      <h1>Routines Page</h1>
+    </div>
+  );
+};
+
+export default Routines;
+"
+src/pages/Admin/Metrics.tsx,"import React from 'react';
+
+const Metrics = () => {
+  return (
+    <div>
+      <h1>Metrics Page</h1>
+    </div>
+  );
+};
+
+export default Metrics;
+"
+src/pages/Student/Dashboard.tsx,"import React from 'react';
+
+const Dashboard = () => {
+  return (
+    <div>
+      <h1>Dashboard Page</h1>
+    </div>
+  );
+};
+
+export default Dashboard;
+"
+src/pages/Student/Form.tsx,"import React from 'react';
+
+const Form = () => {
+  return (
+    <div>
+      <h1>Form Page</h1>
+    </div>
+  );
+};
+
+export default Form;
+"
+src/pages/Student/Routine.tsx,"import React from 'react';
+
+const Routine = () => {
+  return (
+    <div>
+      <h1>Routine Page</h1>
+    </div>
+  );
+};
+
+export default Routine;
+"
+src/pages/Student/Progress.tsx,"import React from 'react';
+
+const Progress = () => {
+  return (
+    <div>
+      <h1>Progress Page</h1>
+    </div>
+  );
+};
+
+export default Progress;
+"
+src/routes/AppRoutes.tsx,"import React from 'react';
+
+const AppRoutes = () => {
+  return (
+    <div>
+      <h1>AppRoutes Page</h1>
+    </div>
+  );
+};
+
+export default AppRoutes;
+"
+src/context/AuthContext.tsx,"import React from 'react';
+
+const AuthContext = () => {
+  return (
+    <div>
+      <h1>AuthContext Page</h1>
+    </div>
+  );
+};
+
+export default AuthContext;
+"
+src/utils/fakeAuth.ts,"import React from 'react';
+
+const fakeAuth = () => {
+  return (
+    <div>
+      <h1>fakeAuth Page</h1>
+    </div>
+  );
+};
+
+export default fakeAuth;
+"
+src/App.tsx,"import React from 'react';
+
+const App = () => {
+  return (
+    <div>
+      <h1>App Page</h1>
+    </div>
+  );
+};
+
+export default App;
+"
+src/main.tsx,"import React from 'react';
+
+const main = () => {
+  return (
+    <div>
+      <h1>main Page</h1>
+    </div>
+  );
+};
+
+export default main;
+"

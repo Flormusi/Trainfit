@@ -1,0 +1,297 @@
+/* Estilos para la pestaña de notas */
+
+.notes-tab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.notes-header {
+  margin-bottom: 20px;
+}
+
+.notes-header h2 {
+  margin: 0 0 5px 0;
+  font-size: 1.3rem;
+  color: #1d3557;
+}
+
+.notes-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.add-note-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.note-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-bottom: 10px;
+  font-family: inherit;
+}
+
+.note-input:focus {
+  outline: none;
+  border-color: #e63946;
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+}
+
+.note-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.note-category {
+  padding: 8px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #495057;
+  background-color: white;
+}
+
+.add-note-btn {
+  padding: 8px 16px;
+  background-color: #e63946;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-note-btn:hover {
+  background-color: #d32f2f;
+}
+
+.add-note-btn:disabled {
+  background-color: #ced4da;
+  cursor: not-allowed;
+}
+
+.notes-filter {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #e63946;
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+}
+
+.filter-category {
+  padding: 8px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #495057;
+  background-color: white;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.note-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  border-left: 4px solid #e63946;
+}
+
+.note-card.general {
+  border-left-color: #6c757d;
+}
+
+.note-card.training {
+  border-left-color: #e63946;
+}
+
+.note-card.nutrition {
+  border-left-color: #28a745;
+}
+
+.note-card.health {
+  border-left-color: #17a2b8;
+}
+
+.note-card.payment {
+  border-left-color: #ffc107;
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.note-date {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.note-category-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.note-text {
+  margin: 0 0 15px 0;
+  font-size: 0.95rem;
+  color: #212529;
+  line-height: 1.5;
+}
+
+.note-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.edit-note-btn,
+.delete-note-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-note-btn {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+
+.delete-note-btn {
+  background-color: transparent;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.edit-note-btn:hover {
+  background-color: #e9ecef;
+}
+
+.delete-note-btn:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.note-edit {
+  margin-bottom: 15px;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-bottom: 10px;
+  font-family: inherit;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #e63946;
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.save-edit-btn,
+.cancel-edit-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-edit-btn {
+  background-color: #e63946;
+  color: white;
+  border: none;
+}
+
+.cancel-edit-btn {
+  background-color: transparent;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.save-edit-btn:hover {
+  background-color: #d32f2f;
+}
+
+.cancel-edit-btn:hover {
+  background-color: #f8f9fa;
+}
+
+.save-edit-btn:disabled {
+  background-color: #ced4da;
+  cursor: not-allowed;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .note-actions {
+    flex-direction: column;
+  }
+  
+  .note-category {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .add-note-btn {
+    width: 100%;
+  }
+  
+  .notes-filter {
+    flex-direction: column;
+  }
+  
+  .filter-category {
+    width: 100%;
+  }
+}

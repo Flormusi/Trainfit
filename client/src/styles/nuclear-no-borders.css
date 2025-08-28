@@ -1,0 +1,131 @@
+/* NUCLEAR OPTION - ELIMINAR ABSOLUTAMENTE TODOS LOS BORDES */
+/* Este archivo es la opción nuclear para eliminar TODOS los bordes */
+/* EXCEPTO elementos del calendario unificado Y dashboard del cliente */
+
+/* Reglas universales con máxima especificidad y prioridad - EXCEPTO calendario y dashboard del cliente */
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *),
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):before,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):after,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):hover,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):focus,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):active,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):visited,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):focus-visible {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  border-left: 0 !important;
+  border-top-width: 0 !important;
+  border-right-width: 0 !important;
+  border-bottom-width: 0 !important;
+  border-left-width: 0 !important;
+  border-top-style: none !important;
+  border-right-style: none !important;
+  border-bottom-style: none !important;
+  border-left-style: none !important;
+  border-top-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  border-left-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *),
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):before,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):after,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):hover,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):focus,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):active,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):visited,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):not(.client-dashboard-page):not(.client-dashboard-page *):focus-visible {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  border-left: 0 !important;
+  border-top-width: 0 !important;
+  border-right-width: 0 !important;
+  border-bottom-width: 0 !important;
+  border-left-width: 0 !important;
+  border-top-style: none !important;
+  border-right-style: none !important;
+  border-bottom-style: none !important;
+  border-left-style: none !important;
+  border-top-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  border-left-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Específico para elementos comunes - EXCEPTO calendario */
+div:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+span:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+p:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+a:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+button:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+input:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+textarea:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+select:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+form:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+table:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+td:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+th:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+tr:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+ul:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+li:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+nav:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+header:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+footer:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+section:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+article:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+aside:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+main:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Excepciones específicas para mantener sombras en ciertos elementos */
+.client-card,
+.client-card *,
+.stat-card,
+.stat-card * {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}

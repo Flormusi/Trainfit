@@ -1,0 +1,77 @@
+/* ELIMINACIÓN ESPECÍFICA DE BORDES BLANCOS */
+/* Este archivo se enfoca específicamente en eliminar bordes blancos visibles */
+
+/* Eliminar solo bordes blancos específicos, no todos los bordes */
+*[style*="border: white"],
+*[style*="border-color: white"],
+*[style*="border-color: #fff"],
+*[style*="border-color: #ffffff"],
+*[style*="border-color: rgb(255, 255, 255)"],
+.border-white,
+.border-light {
+  border-color: transparent !important;
+}
+
+/* Eliminar sombras blancas */
+*[style*="box-shadow"][style*="white"],
+*[style*="box-shadow"][style*="#fff"],
+*[style*="box-shadow"][style*="#ffffff"],
+*[style*="box-shadow"][style*="rgb(255, 255, 255)"] {
+  box-shadow: none !important;
+}
+
+/* Asegurar que las tarjetas tengan sombras oscuras apropiadas */
+.client-card {
+  border: 1px solid #2a2a2a !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  background-color: #1e1e1e !important;
+}
+
+.stat-card {
+  border: 1px solid #2a2a2a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  background-color: #1e1e1e !important;
+}
+
+/* Eliminar bordes blancos de modales pero mantener estructura */
+.modal-content {
+  border: 1px solid #2a2a2a !important;
+  background-color: #1e1e1e !important;
+}
+
+.modal-header,
+.modal-footer,
+.modal-body {
+  border-color: #2a2a2a !important;
+}
+
+/* Mantener bordes redondeados en botones */
+.btn,
+.button,
+.action-btn,
+.add-client-btn,
+.retry-btn,
+.add-first-client-btn {
+  border-radius: 8px !important;
+  border: 1px solid #2a2a2a !important;
+}
+
+/* Inputs con bordes oscuros apropiados */
+.search-input,
+.filter-select,
+input,
+select,
+textarea {
+  border: 1px solid #2a2a2a !important;
+  border-radius: 6px !important;
+  background-color: #1e1e1e !important;
+}
+
+/* Contenedores principales sin bordes blancos */
+.client-list-container,
+.filters-section,
+.stats-section,
+.client-grid {
+  border: none !important;
+  background-color: #121212 !important;
+}

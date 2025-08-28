@@ -1,0 +1,810 @@
+/* Importar estilos de react-big-calendar */
+@import 'react-big-calendar/lib/css/react-big-calendar.css';
+
+.trainer-dashboard {
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 20px 0;
+  border-bottom: 1px solid #333;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.trainfit-logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+}
+
+.greeting h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  text-align: center;
+}
+
+.greeting p {
+  font-size: 1rem;
+  color: #aaa;
+  margin: 0;
+  text-align: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-btn {
+  background-color: #2a2a2a;
+  border: 1px solid #404040;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-btn:hover {
+  background-color: #333333;
+  border-color: #ff3b30;
+  transform: translateY(-1px);
+}
+
+.notification-icon {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.logout-btn {
+  background-color: #ff3b30;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: #e6342a;
+  transform: translateY(-1px);
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin-bottom: 20px;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Summary Section */
+.summary-section {
+  margin-bottom: 32px;
+}
+
+.summary-grid {
+  background-color: #2a2a2a;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Calendar Section */
+.calendar-section {
+  margin-bottom: 32px;
+  background-color: #2a2a2a;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.calendar-header {
+  margin-bottom: 20px;
+}
+
+.calendar-icon {
+  color: #ff9500;
+}
+
+.calendar-description {
+  color: #aaaaaa;
+  margin: 0 0 20px 0;
+  font-size: 0.9rem;
+}
+
+/* Sobrescribir estilos de react-big-calendar para modo oscuro */
+.calendar-section .rbc-calendar {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+.calendar-section .rbc-toolbar button {
+  color: #ffffff;
+  background-color: #333333;
+  border-color: #444444;
+}
+
+.calendar-section .rbc-toolbar button:hover {
+  background-color: #444444;
+}
+
+.calendar-section .rbc-toolbar button.rbc-active {
+  background-color: #ff9500;
+  border-color: #ff9500;
+}
+
+.calendar-section .rbc-header {
+  background-color: #333333;
+  color: #ffffff;
+  border-bottom: 1px solid #444444;
+}
+
+.calendar-section .rbc-month-view,
+.calendar-section .rbc-time-view {
+  border-color: #444444;
+}
+
+.calendar-section .rbc-day-bg + .rbc-day-bg,
+.calendar-section .rbc-month-row + .rbc-month-row {
+  border-color: #444444;
+}
+
+.calendar-section .rbc-off-range-bg {
+  background-color: #222222;
+}
+
+.calendar-section .rbc-off-range {
+  color: #666666;
+}
+
+.calendar-section .rbc-today {
+  background-color: rgba(255, 149, 0, 0.1);
+}
+
+.calendar-section .rbc-time-content {
+  border-top: 1px solid #444444;
+}
+
+.calendar-section .rbc-time-header-content {
+  border-left: 1px solid #444444;
+}
+
+.calendar-section .rbc-time-slot {
+  border-top: 1px solid #333333;
+}
+
+.calendar-section .rbc-current-time-indicator {
+  background-color: #ff9500;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+}
+
+.summary-label {
+  font-size: 1rem;
+  color: #ffffff;
+  margin-bottom: 0;
+}
+
+.summary-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Actions Section */
+.actions-section {
+  margin-bottom: 32px;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 4px; /* Para que las sombras no se corten */
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #333333 100%);
+  border: 1px solid #444;
+  border-radius: 16px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  min-height: 140px;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.action-btn:hover::before {
+  left: 100%;
+}
+
+.action-btn:hover {
+  background: linear-gradient(135deg, #333333 0%, #404040 100%);
+  border-color: #666;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos específicos para cada botón - Paleta TrainFit */
+.action-btn.add-client {
+  background: linear-gradient(135deg, #ff3b30 0%, #e6342a 100%);
+  border-color: #ff3b30;
+}
+
+.action-btn.add-client:hover {
+  background: linear-gradient(135deg, #e6342a 0%, #cc2e24 100%);
+  border-color: #e6342a;
+  box-shadow: 0 8px 25px rgba(255, 59, 48, 0.4);
+}
+
+.action-btn.view-clients {
+  background: linear-gradient(135deg, #4a4a4a 0%, #5a5a5a 100%);
+  border-color: #555555;
+}
+
+.action-btn.view-clients:hover {
+  background: linear-gradient(135deg, #5a5a5a 0%, #6a6a6a 100%);
+  border-color: #ff3b30;
+  box-shadow: 0 8px 25px rgba(255, 59, 48, 0.3);
+}
+
+.action-btn.create-routine {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border-color: #ff3b30;
+}
+
+.action-btn.create-routine:hover {
+  background: linear-gradient(135deg, #333333 0%, #222222 100%);
+  border-color: #ff3b30;
+  box-shadow: 0 8px 25px rgba(255, 59, 48, 0.3);
+}
+
+.action-btn.calendar-btn {
+  background: linear-gradient(135deg, #666666 0%, #555555 100%);
+  border-color: #777777;
+}
+
+.action-btn.calendar-btn:hover {
+  background: linear-gradient(135deg, #777777 0%, #666666 100%);
+  border-color: #888888;
+  box-shadow: 0 8px 25px rgba(102, 102, 102, 0.4);
+}
+
+.action-icon {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.action-btn:hover .action-icon {
+  transform: scale(1.1);
+}
+
+.action-btn span {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: visible;
+  width: 100%;
+  line-height: 1.2;
+}
+
+/* Clients Section */
+.clients-section {
+  margin-bottom: 32px;
+}
+
+.clients-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+/* Client Card - Layout completamente rediseñado con especificidad alta */
+.trainer-dashboard .client-card {
+  background-color: #2a2a2a !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 16px !important;
+  min-height: 80px !important;
+  position: relative !important;
+  z-index: auto !important;
+  isolation: isolate !important;
+  height: fit-content !important;
+  transition: all 0.2s ease !important;
+}
+
+.trainer-dashboard .client-card:hover {
+  background-color: #333333 !important;
+  transform: translateY(-2px) !important;
+}
+
+.trainer-dashboard .client-info {
+  flex: 1 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  position: static !important;
+  z-index: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.trainer-dashboard .client-name {
+  color: white !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  margin: 0 0 8px 0 !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  position: static !important;
+  z-index: auto !important;
+}
+
+.trainer-dashboard .client-status {
+  margin: 0 !important;
+}
+
+.trainer-dashboard .status-indicator {
+  font-size: 0.8rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  color: #22c55e !important;
+  width: fit-content !important;
+  position: static !important;
+  z-index: auto !important;
+  white-space: nowrap !important;
+  margin-top: 2px !important;
+}
+
+.trainer-dashboard .status-dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background-color: #22c55e !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+.trainer-dashboard .status-indicator.active {
+  color: #28a745 !important;
+  background-color: rgba(40, 167, 69, 0.1) !important;
+}
+
+.trainer-dashboard .status-indicator.overdue {
+  color: #dc3545 !important;
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.trainer-dashboard .client-goal {
+  font-size: 0.875rem !important;
+  color: #cccccc !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.trainer-dashboard .view-progress-btn {
+  grid-area: button !important;
+  background-color: #3a3a3a !important;
+  color: #ffffff !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 12px 20px !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+  min-width: 120px !important;
+  height: fit-content !important;
+  justify-self: end !important;
+  position: static !important;
+  z-index: auto !important;
+  margin: 0 !important;
+}
+
+.trainer-dashboard .view-progress-btn:hover {
+  background-color: #4a4a4a !important;
+  transform: translateY(-1px) !important;
+}
+
+.no-clients {
+  text-align: center;
+  padding: 32px;
+  color: #cccccc;
+}
+
+.no-clients p {
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.add-first-client-btn {
+  background-color: #2a2a2a;
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.add-first-client-btn:hover {
+  background-color: #333333;
+  transform: translateY(-2px);
+}
+
+/* Stats Section */
+.stats-section {
+  margin-bottom: 32px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 300px));
+  gap: 16px;
+  justify-content: center;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border: none;
+  outline: none;
+  box-shadow: none;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff3b30 0%, #ff6b5a 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+  background: linear-gradient(135deg, #2a2a2a 0%, #333333 100%);
+  border: none;
+  outline: none;
+  box-shadow: none;
+  transform: translateY(-4px);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card h3 {
+  font-size: 0.875rem;
+  color: #999999;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 4px;
+}
+
+/* Charts Section */
+.charts-section {
+  margin-bottom: 32px;
+}
+
+/* Analytics Section */
+.analytics-section {
+  margin-bottom: 32px;
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.analytics-header .section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.analytics-icon {
+  width: 24px;
+  height: 24px;
+  color: #ff3b30;
+}
+
+.period-selector {
+  display: flex;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.period-btn {
+  background-color: transparent;
+  border: none;
+  color: #aaaaaa;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.period-btn:hover {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.period-btn.active {
+  background-color: #ff3b30;
+  color: #ffffff;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.analytics-card {
+  background: linear-gradient(135deg, #2a2a2a 0%, #333333 100%);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.analytics-card:hover {
+  transform: translateY(-4px);
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.analytics-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.analytics-card-header h3 {
+  font-size: 1rem;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+}
+
+.analytics-period {
+  font-size: 0.75rem;
+  color: #ff3b30;
+  background-color: rgba(255, 59, 48, 0.1);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.analytics-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ff3b30;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.analytics-description {
+  font-size: 0.875rem;
+  color: #aaaaaa;
+  line-height: 1.4;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #333333;
+  border-top: 4px solid #ff4444;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+  color: #cccccc;
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .trainer-dashboard {
+    padding: 16px;
+  }
+  
+  .greeting {
+    font-size: 2rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .action-btn {
+    min-height: 120px;
+    padding: 20px 16px;
+  }
+  
+  .action-btn span {
+    font-size: 0.9rem;
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .clients-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .client-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .view-progress-btn {
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .action-btn {
+    min-height: 100px;
+    padding: 16px 12px;
+  }
+  
+  .action-btn span {
+    font-size: 0.85rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .summary-item {
+    background-color: #2a2a2a;
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

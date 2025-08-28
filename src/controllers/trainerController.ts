@@ -1,0 +1,9 @@
+// ... existing code ...
+// Change trainerId from number to string
+trainerId: String(trainerId),
+// ... existing code ...
+
+// For the description property, either add it to your Prisma schema
+// or remove it from your controller
+// description,
+// ... existing code ...

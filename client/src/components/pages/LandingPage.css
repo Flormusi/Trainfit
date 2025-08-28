@@ -1,0 +1,201 @@
+.landing-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  background-color: #f0f2f5; /* Un color de fondo claro por defecto */
+  color: #333; /* Color de texto oscuro por defecto */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.landing-header {
+  margin-bottom: 30px;
+}
+
+.logo {
+  max-width: 200px; /* Ajusta según el tamaño de tu logo */
+  height: auto;
+}
+
+.welcome-text {
+  font-size: 2.5rem;
+  color: #1a2b48; /* Un color más oscuro para el título */
+  margin-bottom: 10px;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px; /* Espacio entre botones */
+  justify-content: center;
+}
+
+.btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #007bff; /* Azul primario */
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Gris secundario */
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+.landing-main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-footer {
+  margin-top: 40px;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* Ejemplo de estilos oscuros (puedes activarlos o crear un tema) */
+/*
+body.dark-theme .landing-page-container {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+body.dark-theme .welcome-text {
+  color: #ffffff;
+}
+
+body.dark-theme .tagline {
+  color: #bbbbbb;
+}
+
+body.dark-theme .btn-primary {
+  background-color: #1e88e5; // Un azul más brillante para tema oscuro
+}
+body.dark-theme .btn-primary:hover {
+  background-color: #1565c0;
+}
+
+body.dark-theme .btn-secondary {
+  background-color: #37474f; // Un gris más oscuro
+  color: #eceff1;
+}
+body.dark-theme .btn-secondary:hover {
+  background-color: #263238;
+}
+
+body.dark-theme .landing-footer {
+  color: #999999;
+}
+*/
+
+.landing-container-dark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #000000; /* Fondo negro como en la imagen */
+  color: #ffffff; /* Texto blanco por defecto */
+  padding: 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.landing-logo-dark {
+  width: 250px; /* Ajusta el tamaño según sea necesario */
+  max-width: 80%;
+  margin-bottom: 40px; /* Espacio debajo del logo */
+}
+
+.landing-welcome-text-dark {
+  font-size: 2.8rem; /* Tamaño grande para el saludo */
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #ffffff; /* Texto blanco */
+}
+
+.landing-tagline-dark {
+  font-size: 1.1rem;
+  color: #e0e0e0; /* Un blanco un poco más suave para el subtítulo */
+  margin-bottom: 50px; /* Espacio antes de los botones */
+  max-width: 450px;
+  line-height: 1.6;
+}
+
+.landing-buttons-dark {
+  display: flex;
+  flex-direction: column; /* Botones uno debajo del otro en móviles */
+  gap: 20px; /* Espacio entre botones */
+  width: 100%;
+  max-width: 320px; /* Ancho máximo para los botones */
+}
+
+.btn-dark {
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  width: 100%;
+  border: 2px solid transparent; /* Borde base transparente */
+}
+
+.btn-register-dark {
+  background-color: #ff2d20; /* Rojo TrainFit */
+  color: #ffffff;
+  border-color: #ff2d20;
+}
+
+.btn-register-dark:hover {
+  background-color: #e60000; /* Rojo un poco más oscuro al pasar el mouse */
+  border-color: #e60000;
+}
+
+.btn-login-dark {
+  background-color: transparent;
+  color: #ff2d20; /* Texto rojo TrainFit */
+  border: 2px solid #ff2d20; /* Borde rojo TrainFit */
+}
+
+.btn-login-dark:hover {
+  background-color: rgba(255, 45, 32, 0.1); /* Un fondo rojo muy sutil al pasar el mouse */
+  color: #e60000;
+  border-color: #e60000;
+}
+
+/* Media query para pantallas más grandes si quieres los botones en línea */
+@media (min-width: 768px) {
+  /* Puedes mantenerlos en columna o ponerlos en fila si prefieres */
+  /* .landing-buttons-dark {
+    flex-direction: row;
+  } */
+}

@@ -1,0 +1,436 @@
+/* ===== VARIABLES CSS ===== */
+/* Nuevo diseño - tema oscuro moderno */
+:root {
+  /* Colores principales - Tema oscuro */
+  --primary-color: #dc2626;
+  --primary-light: #ef4444;
+  --primary-dark: #b91c1c;
+  
+  /* Colores de estado */
+  --success-color: #10b981;
+  --success-light: #34d399;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  
+  --warning-color: #f59e0b;
+  --warning-light: #fbbf24;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  
+  --danger-color: #dc2626;
+  --danger-light: #ef4444;
+  --danger-bg: rgba(220, 38, 38, 0.15);
+  
+  /* Fondo y texto - Modo oscuro */
+  --bg-primary: #000000;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+  --bg-quaternary: #3a3a3a;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #808080;
+  
+  /* Espaciado */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Bordes */
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  
+  /* Sombras */
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* ===== ESTILOS BASE ===== */
+.trainer-client-progress-page {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: var(--spacing-lg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.btn-back:hover {
+  color: var(--text-secondary);
+}
+
+.back-icon {
+  font-size: 1.2rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--success-color);
+}
+
+.status-dot.active {
+  background-color: var(--success-color);
+}
+
+/* ===== NAVEGACIÓN POR TABS ===== */
+.tab-navigation {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  padding: var(--spacing-md) 0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+}
+
+/* ===== TÍTULO PRINCIPAL ===== */
+.client-name-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-xl) 0;
+  color: var(--text-primary);
+}
+
+/* ===== CONTENIDO RESUMEN ===== */
+.resumen-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* ===== TARJETA RESUMEN DEL CLIENTE ===== */
+.client-summary-card {
+  background: var(--bg-secondary) !important;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.client-summary-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--text-primary);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.summary-item .label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.summary-item .value {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ===== LAYOUT DE DOS COLUMNAS ===== */
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+}
+
+/* ===== TARJETA RUTINA ACTUAL ===== */
+.routine-card {
+  background: var(--bg-secondary) !important;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.routine-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--text-primary);
+}
+
+.routine-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+}
+
+.routine-week {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.btn-view-progress {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-view-progress:hover {
+  background: #b91c1c;
+}
+
+/* ===== TARJETA INFORMACIÓN DE SALUD ===== */
+.health-info-card {
+  background: var(--bg-secondary) !important;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.health-info-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--text-primary);
+}
+
+.health-status {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.btn-send-reminder,
+.btn-edit-client {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-send-reminder:hover,
+.btn-edit-client:hover {
+  background: var(--bg-quaternary);
+}
+
+.btn-icon {
+  font-size: 1rem;
+}
+
+/* ===== ESTADOS DE CARGA Y ERROR ===== */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  gap: var(--spacing-lg);
+}
+
+.btn-back-to-dashboard {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-back-to-dashboard:hover {
+  background: var(--primary-dark);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .trainer-client-progress-page {
+    padding: var(--spacing-md);
+  }
+  
+  .client-name-title {
+    font-size: 2rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .two-column-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .tab-navigation {
+    gap: var(--spacing-md);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-sm);
+  }
+  
+  .tab-button {
+    white-space: nowrap;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .client-name-title {
+    font-size: 1.75rem;
+  }
+  
+  .action-buttons {
+    gap: var(--spacing-sm);
+  }
+}
+
+/* ===== ELIMINACIÓN FORZADA DE BORDES BLANCOS ===== */
+.trainer-client-progress-page * {
+  border: none !important;
+  outline: none !important;
+}
+
+.trainer-client-progress-page .client-summary-card,
+.trainer-client-progress-page .routine-card,
+.trainer-client-progress-page .health-info-card {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ===== ELIMINACIÓN ESPECÍFICA DE BORDES GRISES ===== */
+.trainer-client-progress-page *,
+.trainer-client-progress-page *::before,
+.trainer-client-progress-page *::after {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+}
+
+/* ===== FORZAR FONDO OSCURO EN TODAS LAS TARJETAS ===== */
+.trainer-client-progress-page .client-summary-card,
+.trainer-client-progress-page .routine-card,
+.trainer-client-progress-page .health-info-card {
+  background: #1a1a1a !important;
+  background-color: #1a1a1a !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  padding: 24px !important;
+}
+
+/* ===== ELIMINACIÓN ESPECÍFICA DE DIVS Y CONTENEDORES ===== */
+.trainer-client-progress-page div,
+.trainer-client-progress-page section,
+.trainer-client-progress-page article {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ===== ELIMINACIÓN DE BORDES EN ELEMENTOS ESPECÍFICOS ===== */
+.trainer-client-progress-page .resumen-content,
+.trainer-client-progress-page .two-column-layout,
+.trainer-client-progress-page .summary-grid {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}

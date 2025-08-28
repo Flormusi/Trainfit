@@ -1,0 +1,157 @@
+.trainer-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #fff;
+  background-color: #121212;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.summary-section,
+.quick-actions,
+.clients-list,
+.statistics-section {
+  margin-bottom: 30px;
+}
+
+h2 {
+  color: #ff3b30;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.summary-card,
+.statistics-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.summary-item p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+.actions-container {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.action-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 15px;
+  min-width: 120px;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+}
+
+.action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ff3b30;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+  font-size: 24px;
+}
+
+.clients-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.client-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.client-card h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.payment-status {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.payment-status.paid {
+  color: #34c759;
+}
+
+.payment-status.overdue {
+  color: #ff3b30;
+}
+
+.status-icon {
+  margin-right: 8px;
+}
+
+.send-reminder-btn {
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.send-reminder-btn:hover {
+  background-color: #e0301a;
+}
+
+.view-progress-btn {
+  display: block;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+.view-progress-btn:hover {
+  background-color: #444;
+}
+
+.loading, .error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+}
+
+.error {
+  color: #ff3b30;
+}
+
+@media (max-width: 768px) {
+  .clients-container {
+    grid-template-columns: 1fr;
+  }
+}

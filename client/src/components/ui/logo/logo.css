@@ -1,0 +1,11 @@
+/* Styles for the Logo component */
+.logo-image {
+  height: 50px; /* Default height */
+  width: auto;
+}
+
+.logo-text {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-left: 10px;
+}

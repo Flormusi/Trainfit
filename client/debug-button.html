@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug - Botón Editar Cliente</title>
+</head>
+<body>
+    <h1>Debug: Verificar Botón Editar Cliente</h1>
+    <p>Abre la consola del navegador (F12) y ejecuta este script en la página de Trainfit:</p>
+    
+    <textarea style="width: 100%; height: 200px; font-family: monospace;">
+// Script para verificar si el botón "Editar cliente" está presente
+console.log('🔍 Buscando botón "Editar cliente"...');
+
+// Buscar por clase
+const btnByClass = document.querySelector('.btn-edit-client');
+console.log('Botón por clase (.btn-edit-client):', btnByClass);
+
+// Buscar por texto
+const allButtons = document.querySelectorAll('button');
+const editButton = Array.from(allButtons).find(btn => 
+    btn.textContent.includes('Editar cliente') || 
+    btn.textContent.includes('Editar')
+);
+console.log('Botón por texto:', editButton);
+
+// Verificar tab activo
+const activeTabElement = document.querySelector('[style*="background: #dc2626"]');
+console.log('Tab activo:', activeTabElement?.textContent);
+
+// Verificar si estamos en la página correcta
+const currentPath = window.location.pathname;
+console.log('Ruta actual:', currentPath);
+
+// Buscar sección de información de salud
+const healthSection = Array.from(document.querySelectorAll('h2')).find(h2 => 
+    h2.textContent.includes('Información de Salud')
+);
+console.log('Sección de salud encontrada:', healthSection);
+
+if (healthSection) {
+    const parentDiv = healthSection.closest('div');
+    const buttonsInSection = parentDiv?.querySelectorAll('button');
+    console.log('Botones en sección de salud:', buttonsInSection);
+}
+    </textarea>
+    
+    <h2>Instrucciones:</h2>
+    <ol>
+        <li>Ve a la aplicación Trainfit en tu navegador</li>
+        <li>Navega a la página de un cliente específico (debería ser algo como /trainer/clients/[id])</li>
+        <li>Asegúrate de estar en el tab "Resumen" (debería estar activo por defecto)</li>
+        <li>Abre la consola del navegador (F12)</li>
+        <li>Copia y pega el script de arriba en la consola</li>
+        <li>Presiona Enter para ejecutarlo</li>
+        <li>Revisa los resultados en la consola</li>
+    </ol>
+</body>
+</html>

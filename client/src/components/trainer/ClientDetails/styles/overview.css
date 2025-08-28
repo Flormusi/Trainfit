@@ -1,0 +1,166 @@
+/* Estilos para la pestaña de resumen */
+
+.overview-tab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Header con botones de acción */
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.overview-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.overview-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.refresh-btn, .edit-client-btn {
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.refresh-btn:hover {
+  background-color: #0056b3 !important;
+  transform: translateY(-1px);
+}
+
+.edit-client-btn:hover {
+  background-color: #218838 !important;
+  transform: translateY(-1px);
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* Estilos para la información personal */
+.personal-info-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* Estilos para la información de salud */
+.health-info-content {
+  padding: 10px 0;
+}
+
+.health-info-content p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #212529;
+}
+
+/* Estilos para la actividad reciente */
+.activity-content {
+  padding: 10px 0;
+}
+
+.activity-description {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #212529;
+}
+
+/* Estilos para los objetivos de fitness */
+.goals-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.goal-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.95rem;
+  color: #212529;
+  display: flex;
+  align-items: center;
+}
+
+.goal-item:last-child {
+  border-bottom: none;
+}
+
+.goal-item:before {
+  content: "✓";
+  color: #e63946;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+/* Estilos para la rutina actual */
+.current-plan {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plan-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+  margin-bottom: 5px;
+}
+
+.plan-details {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.view-progress {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #e63946 !important;
+  color: white !important;
+  text-decoration: none !important;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.view-progress:hover {
+  background-color: #d32f2f !important;
+  text-decoration: none !important;
+  color: white !important;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .personal-info-content {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .current-plan {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .view-progress {
+    margin-top: 10px;
+  }
+}

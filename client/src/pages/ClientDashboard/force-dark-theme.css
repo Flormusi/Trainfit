@@ -1,0 +1,121 @@
+/* ELIMINAR COMPLETAMENTE EL CUADRADO BLANCO */
+/* Reglas CSS ultra-específicas para eliminar cualquier fondo blanco */
+
+/* Eliminar fondos blancos globalmente en métricas de progreso */
+.progress-metrics *,
+.progress-metrics *[style*="background-color: white"],
+.progress-metrics *[style*="background-color: #fff"],
+.progress-metrics *[style*="background-color: #ffffff"],
+.progress-metrics *[style*="background: white"],
+.progress-metrics *[style*="background: #fff"],
+.progress-metrics *[style*="background: #ffffff"],
+.client-dashboard-page *[style*="background-color: white"],
+.client-dashboard-page *[style*="background-color: #fff"],
+.client-dashboard-page *[style*="background-color: #ffffff"],
+.client-dashboard-page *[style*="background: white"],
+.client-dashboard-page *[style*="background: #fff"],
+.client-dashboard-page *[style*="background: #ffffff"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Clases CSS específicas que causan fondos blancos */
+.progress-metrics .bg-white,
+.progress-metrics .background-white,
+.progress-metrics .white-bg,
+.progress-metrics .widget,
+.client-dashboard-page .bg-white,
+.client-dashboard-page .background-white,
+.client-dashboard-page .white-bg,
+.client-dashboard-page .widget {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Elementos específicos que pueden tener fondo blanco */
+.progress-metrics .card[style*="background-color: white"],
+.progress-metrics .metric-item[style*="background-color: white"],
+.progress-metrics div[style*="background-color: white"],
+.progress-metrics div[style*="background: white"],
+.client-dashboard-page .card[style*="background-color: white"],
+.client-dashboard-page .metric-item[style*="background-color: white"],
+.client-dashboard-page div[style*="background-color: white"],
+.client-dashboard-page div[style*="background: white"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Restaurar el fondo gris de las métricas de progreso como el de "Tu rutina del mes" */
+.client-dashboard-page .progress-metrics .card {
+  background: #1a1a1a !important;
+}
+
+/* ELIMINAR COMPLETAMENTE CUALQUIER FONDO BLANCO */
+.progress-metrics,
+.progress-metrics *,
+.client-dashboard-page .progress-metrics,
+.client-dashboard-page .progress-metrics *,
+.dashboard-section.progress-metrics,
+.dashboard-section.progress-metrics * {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Restaurar solo los fondos específicos que necesitamos */
+.client-dashboard-page .progress-metrics .card,
+.progress-metrics .card {
+  background: #1a1a1a !important;
+}
+
+.client-dashboard-page .progress-metrics .metric-item,
+.progress-metrics .metric-item {
+  background: linear-gradient(145deg, #1a1a1a 0%, #1e1e1e 100%) !important;
+}
+
+/* Eliminar TODOS los fondos blancos en métricas de progreso */
+.client-dashboard-page .progress-metrics *[style*="background-color: white"],
+.client-dashboard-page .progress-metrics *[style*="background: white"],
+.client-dashboard-page .progress-metrics *[style*="background-color: #fff"],
+.client-dashboard-page .progress-metrics *[style*="background: #fff"],
+.client-dashboard-page .progress-metrics *[style*="background-color: #ffffff"],
+.client-dashboard-page .progress-metrics *[style*="background: #ffffff"],
+/* Permitir que los nuevos estilos de metric-item se apliquen */
+.client-dashboard-page .progress-metrics .bg-white {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Mantener estilos específicos para metric-item */
+.client-dashboard-page .progress-metrics .metric-item {
+  /* Permitir que los estilos del CSS principal se apliquen */
+}
+
+/* Asegurar que metric-trend mantenga su color de fondo específico */
+.client-dashboard-page .progress-metrics .metric-trend,
+.progress-metrics .metric-trend {
+  background: rgba(34, 197, 94, 0.1) !important;
+}
+
+/* REGLAS ESPECÍFICAS PARA ELEMENTOS QUE NECESITAN FONDO TRANSPARENTE */
+.progress-metrics .bg-white,
+.progress-metrics *[style*="background: white"],
+.progress-metrics *[style*="background-color: white"] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Permitir que metric-item y metric-icon mantengan sus estilos personalizados */
+.progress-metrics .metric-item,
+.progress-metrics .metric-icon {
+  /* Los estilos se aplicarán desde ClientDashboard.css */
+}
+
+/* Restaurar solo el fondo de la tarjeta principal */
+.progress-metrics .card {
+  background: #1a1a1a !important;
+}
+
+/* Restaurar solo el fondo del metric-trend */
+.progress-metrics .metric-trend {
+  background: rgba(34, 197, 94, 0.1) !important;
+}

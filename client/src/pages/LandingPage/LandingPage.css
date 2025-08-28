@@ -1,0 +1,109 @@
+/* LandingPage.css */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Arial', sans-serif; /* Considera usar una fuente más moderna si la tienes */
+}
+
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #000000; /* Fondo negro */
+  color: #FFFFFF; /* Texto blanco */
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.landing-header {
+  margin-bottom: 30px; /* Espacio debajo del logo */
+  /* Puedes ajustar el tamaño del header si es necesario para el logo */
+}
+
+/* Estilos para la imagen del logo */
+.landing-logo-image {
+  max-width: 300px; /* Ajusta el tamaño máximo según necesites */
+  height: auto; /* Mantiene la proporción de la imagen */
+  margin-bottom: 20px; /* Espacio adicional si el header no lo cubre */
+}
+
+/* Comentamos o eliminamos los estilos anteriores para .landing-logo-text si ya no se usan */
+/*
+.landing-logo-text {
+  font-size: 3.5rem; 
+  font-weight: bold;
+  color: #FF0000; 
+  margin: 0;
+}
+*/
+
+.landing-main-content {
+  max-width: 500px;
+  width: 100%;
+}
+
+.landing-welcome-title {
+  font-size: 2.8rem; /* Tamaño grande para el título de bienvenida */
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.landing-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #E0E0E0; /* Un gris claro para el subtítulo */
+  margin-bottom: 40px;
+}
+
+.landing-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espacio entre botones */
+}
+
+.landing-button {
+  padding: 15px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px; /* Bordes redondeados */
+  cursor: pointer;
+  text-transform: uppercase;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.landing-button.primary {
+  background-color: #FF0000; /* Botón de registro rojo */
+  color: #FFFFFF;
+}
+
+.landing-button.primary:hover {
+  background-color: #D60000; /* Rojo un poco más oscuro al pasar el mouse */
+  transform: translateY(-2px);
+}
+
+.landing-button.secondary {
+  background-color: transparent;
+  color: #FF0000; /* Texto rojo */
+  border: 2px solid #FF0000; /* Borde rojo */
+}
+
+.landing-button.secondary:hover {
+  background-color: rgba(255, 0, 0, 0.1); /* Fondo rojo muy sutil al pasar el mouse */
+  transform: translateY(-2px);
+}
+
+/* Opcional: Estilos para el pie de página si decides añadirlo */
+/*
+.landing-footer {
+  position: absolute;
+  bottom: 20px;
+  font-size: 0.8rem;
+  color: #AAAAAA;
+}
+*/

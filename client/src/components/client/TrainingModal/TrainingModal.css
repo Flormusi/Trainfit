@@ -1,0 +1,304 @@
+.training-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.training-modal {
+  background: #1a1a1a;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid #333;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background: #333;
+  color: #fff;
+}
+
+.modal-content {
+  padding: 24px;
+}
+
+.training-section {
+  margin-bottom: 32px;
+}
+
+.training-section:last-child {
+  margin-bottom: 0;
+}
+
+.training-section h3 {
+  margin: 0 0 16px 0;
+  color: #ff4757;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.training-card,
+.google-event-card {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #333;
+  transition: all 0.2s ease;
+}
+
+.training-card:hover,
+.google-event-card:hover {
+  border-color: #ff4757;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 71, 87, 0.1);
+}
+
+.google-event-card:hover {
+  border-color: #42a5f5;
+  box-shadow: 0 8px 20px rgba(66, 165, 245, 0.1);
+}
+
+.training-header,
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.training-header h4,
+.event-header h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.training-time,
+.event-time {
+  background: #ff4757;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.event-time {
+  background: #42a5f5;
+}
+
+.training-details {
+  margin-bottom: 16px;
+}
+
+.training-details p {
+  margin: 8px 0;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.exercises-list {
+  margin: 8px 0 0 20px;
+  padding: 0;
+}
+
+.exercises-list li {
+  color: #cccccc;
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.event-description {
+  color: #cccccc;
+  font-size: 0.9rem;
+  margin: 8px 0;
+  font-style: italic;
+}
+
+.training-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-create {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-edit {
+  background: #ffa502;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #ff9500;
+  transform: translateY(-1px);
+}
+
+.btn-delete {
+  background: #ff4757;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #ff3742;
+  transform: translateY(-1px);
+}
+
+.btn-create {
+  background: #2ed573;
+  color: white;
+  padding: 12px 24px;
+  font-size: 0.9rem;
+}
+
+.btn-create:hover {
+  background: #26d065;
+  transform: translateY(-1px);
+}
+
+.no-events {
+  text-align: center;
+  padding: 40px 20px;
+  color: #aaa;
+}
+
+.no-events p {
+  margin: 0 0 20px 0;
+  font-size: 1rem;
+}
+
+.create-training-section {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .training-modal {
+    width: 95%;
+    max-height: 90vh;
+    margin: 20px;
+  }
+
+  .modal-header {
+    padding: 20px 20px 12px 20px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .training-card,
+  .google-event-card {
+    padding: 16px;
+  }
+
+  .training-header,
+  .event-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .training-time,
+  .event-time {
+    align-self: flex-start;
+  }
+
+  .training-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Scrollbar Styling */
+.training-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.training-modal::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.training-modal::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.training-modal::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}

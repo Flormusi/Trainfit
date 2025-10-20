@@ -1,0 +1,418 @@
+/* Estilos para la pestaña de pagos */
+
+.payments-tab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.payments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.payments-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #1d3557;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.payment-nav {
+  display: flex;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.nav-btn {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  color: #6c757d;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  color: #e63946;
+}
+
+.nav-btn.active {
+  color: #e63946;
+  font-weight: 500;
+  box-shadow: inset 0 -3px 0 #e63946;
+}
+
+.payment-status-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.status-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1d3557;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.paid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-details {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 15px 20px;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.status-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+}
+
+.payment-history,
+.payment-plans,
+.payment-invoices {
+  margin-bottom: 20px;
+}
+
+.payment-history h3,
+.payment-plans h3,
+.payment-invoices h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  color: #1d3557;
+}
+
+.payment-table-container,
+.invoices-table-container {
+  overflow-x: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.payment-table,
+.invoices-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payment-table th,
+.payment-table td,
+.invoices-table th,
+.invoices-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.payment-table th,
+.invoices-table th {
+  background-color: #f8f9fa;
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.payment-table td,
+.invoices-table td {
+  font-size: 0.9rem;
+  color: #212529;
+}
+
+.payment-status,
+.invoice-status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.payment-status.completed,
+.invoice-status.paid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.payment-status.pending,
+.invoice-status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.payment-status.failed,
+.invoice-status.overdue {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.payment-actions-cell,
+.invoice-actions-cell {
+  display: flex;
+  gap: 5px;
+}
+
+.view-payment-btn,
+.download-receipt-btn,
+.view-invoice-btn,
+.download-invoice-btn,
+.send-invoice-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.view-payment-btn:hover,
+.download-receipt-btn:hover,
+.view-invoice-btn:hover,
+.download-invoice-btn:hover,
+.send-invoice-btn:hover {
+  background-color: #f8f9fa;
+  color: #e63946;
+}
+
+.active-plan-section,
+.available-plans-section {
+  margin-bottom: 30px;
+}
+
+.active-plan-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.plan-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1d3557;
+}
+
+.plan-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e63946;
+}
+
+.plan-details {
+  padding: 15px 20px;
+}
+
+.plan-description {
+  margin: 0 0 15px 0;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.plan-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+
+.feature-item {
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: #495057;
+  display: flex;
+  align-items: center;
+}
+
+.feature-item:before {
+  content: "✓";
+  color: #e63946;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.plan-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px 20px 20px;
+}
+
+.change-plan-btn,
+.cancel-plan-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex: 1;
+}
+
+.change-plan-btn {
+  background-color: #e63946;
+  color: white;
+  border: none;
+}
+
+.cancel-plan-btn {
+  background-color: transparent;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.change-plan-btn:hover,
+.cancel-plan-btn:hover {
+  opacity: 0.9;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.plan-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.plan-card.active {
+  border: 2px solid #e63946;
+}
+
+.plan-card.active:before {
+  content: "Plan Actual";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #e63946;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.assign-plan-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #e63946;
+  color: white;
+  border: none;
+  border-radius: 0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.assign-plan-btn:hover {
+  background-color: #d32f2f;
+}
+
+.assign-plan-btn.disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .payments-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .payment-actions {
+    width: 100%;
+  }
+  
+  .action-btn {
+    flex: 1;
+  }
+  
+  .status-details {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-nav {
+    overflow-x: auto;
+  }
+  
+  .nav-btn {
+    padding: 10px 15px;
+  }
+}

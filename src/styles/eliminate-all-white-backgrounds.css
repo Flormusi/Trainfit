@@ -1,0 +1,93 @@
+/* ELIMINACIÓN GLOBAL DE TODOS LOS FONDOS BLANCOS */
+/* Este archivo debe importarse al final para tener máxima prioridad */
+
+/* Eliminar fondos blancos específicos */
+*[style*="background-color: white"],
+*[style*="background-color: #fff"],
+*[style*="background-color: #ffffff"],
+*[style*="background-color: rgb(255, 255, 255)"],
+*[style*="background: white"],
+*[style*="background: #fff"],
+*[style*="background: #ffffff"],
+*[style*="background: rgb(255, 255, 255)"] {
+  background-color: #1e1e1e !important;
+  background: #1e1e1e !important;
+}
+
+/* Clases CSS con fondos blancos */
+.bg-white,
+.bg-light,
+.background-white,
+.white-bg,
+*[class*="bg-white"],
+*[class*="white"] {
+  background-color: #1e1e1e !important;
+  background: #1e1e1e !important;
+}
+
+/* Elementos específicos que suelen tener fondo blanco */
+.modal-content,
+.card,
+.card-body,
+.container,
+.container-fluid,
+.row,
+.col,
+div[class*="col-"],
+.form-control,
+.btn-light,
+.dropdown-menu,
+.nav-tabs,
+.tab-content,
+.table,
+.list-group-item {
+  background-color: #1e1e1e !important;
+  background: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+/* Asegurar que los elementos del calendario tengan fondo oscuro */
+.rbc-calendar,
+.rbc-calendar *,
+.routine-calendar-container,
+.routine-calendar-container * {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+/* Elementos específicos del calendario */
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view,
+.rbc-day-bg,
+.rbc-time-slot,
+.rbc-time-header-content,
+.rbc-row-bg,
+.rbc-date-cell {
+  background-color: #1e1e1e !important;
+  background: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+/* Botones del calendario */
+.rbc-toolbar button,
+.today-btn,
+.view-btn {
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+
+.rbc-toolbar button.rbc-active,
+.view-btn.active {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+/* Asegurar que las tarjetas de clientes mantengan su diseño */
+.client-card,
+.stat-card {
+  background-color: #1e1e1e !important;
+  border: 1px solid #2a2a2a !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}

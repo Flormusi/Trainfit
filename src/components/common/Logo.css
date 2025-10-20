@@ -1,0 +1,38 @@
+/* Styles for Logo.jsx */
+.logo-container {
+  font-weight: bold;
+  color: #333; /* Example color */
+  display: inline-block;
+}
+
+.logo-container span {
+    font-size: 1.5em; /* Default size */
+}
+
+.logo-small span {
+  font-size: 1em;
+}
+
+.logo-medium span {
+  font-size: 1.5em;
+}
+
+.logo-large span {
+  font-size: 2em;
+}
+
+/* If using an image */
+/*
+.logo-container img {
+  height: 40px; // Default height
+}
+.logo-small img {
+  height: 30px;
+}
+.logo-medium img {
+  height: 40px;
+}
+.logo-large img {
+  height: 60px;
+}
+*/

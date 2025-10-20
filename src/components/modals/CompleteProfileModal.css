@@ -1,0 +1,271 @@
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* Modal Container */
+.modal-container {
+  background: #1a1a1a;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 24px;
+}
+
+.modal-header h2 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Modal Form */
+.modal-form {
+  padding: 0 24px 24px 24px;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 32px;
+}
+
+.form-section h3 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #ff4444;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group label {
+  display: block;
+  color: #e5e5e5;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.required {
+  color: #ff4444;
+  margin-left: 4px;
+}
+
+/* Form Inputs */
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #ff4444;
+  background-color: #333;
+  box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #888;
+}
+
+/* Required Fields */
+.required-field {
+  border-color: #ff6b6b !important;
+  background-color: rgba(255, 107, 107, 0.05) !important;
+}
+
+.required-field:focus {
+  border-color: #ff4444 !important;
+  box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.2) !important;
+}
+
+/* Textarea Specific */
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+/* Form Help Text */
+.form-help {
+  display: block;
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #333;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-cancel {
+  background-color: #444;
+  color: #ffffff;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: #555;
+  transform: translateY(-1px);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #ff4444, #ff6b6b);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+}
+
+.btn-save:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ff3333, #ff5555);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+}
+
+.btn-cancel:disabled,
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+  
+  .modal-container {
+    max-height: 95vh;
+  }
+  
+  .modal-header {
+    padding: 20px 20px 0 20px;
+  }
+  
+  .modal-form {
+    padding: 0 20px 20px 20px;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+  }
+}
+
+/* Animation */
+.modal-overlay {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

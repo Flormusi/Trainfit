@@ -1,0 +1,157 @@
+.dashboard-container { 
+  background-color: #111; 
+  color: #fff; 
+  padding: 1.5rem; 
+  font-family: Arial, sans-serif; 
+} 
+
+/* Header */ 
+.dashboard-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 2rem; 
+} 
+
+.logo { 
+  color: #e63946; 
+  font-size: 1.8rem; 
+  font-weight: bold; 
+} 
+
+.greeting { 
+  color: #e63946; 
+  margin: 0; 
+} 
+
+.subtitle { 
+  color: #aaa; 
+  font-size: 0.9rem; 
+} 
+
+.header-actions { 
+  display: flex; 
+  align-items: center; 
+  gap: 1rem; 
+} 
+
+.btn-logout { 
+  background: #e63946; 
+  color: #fff; 
+  border: none; 
+  padding: 0.5rem 1rem; 
+  border-radius: 8px; 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); 
+  cursor: pointer; 
+} 
+
+/* Summary Cards */ 
+.summary-section { 
+  display: flex; 
+  gap: 1rem; 
+  margin-bottom: 2rem; 
+  flex-wrap: wrap; 
+} 
+
+.summary-card { 
+  background: #1a1a1a; 
+  padding: 1rem; 
+  border-radius: 12px; 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
+  flex: 1; 
+  min-width: 180px; 
+  text-align: center; 
+} 
+
+.summary-card h3 { 
+  font-size: 1rem; 
+  margin-bottom: 0.5rem; 
+} 
+
+.card-number { 
+  font-size: 1.5rem; 
+  font-weight: bold; 
+} 
+
+.card-icon { 
+  font-size: 1.5rem; 
+  margin-bottom: 0.3rem; 
+  color: #e63946; 
+} 
+
+.variation { 
+  font-size: 0.8rem; 
+} 
+
+.variation.positive { 
+  color: #4caf50; 
+} 
+
+.info-text { 
+  font-size: 0.8rem; 
+  color: #aaa; 
+} 
+
+.gauge-container { 
+  width: 60px; 
+  margin: 0 auto; 
+} 
+
+/* Quick Actions */ 
+.section-title { 
+  font-size: 1.2rem; 
+  font-weight: bold; 
+  margin-bottom: 1rem; 
+} 
+
+.actions { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 1rem; 
+  margin-bottom: 2rem; 
+} 
+
+.btn { 
+  border: none; 
+  border-radius: 8px; 
+  padding: 0.6rem 1rem; 
+  font-weight: bold; 
+  cursor: pointer; 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); 
+} 
+
+.btn-primary { 
+  background: #e63946; 
+  color: #fff; 
+} 
+
+.btn-secondary { 
+  background: #333; 
+  color: #fff; 
+} 
+
+/* Charts */ 
+.charts-placeholder { 
+  display: flex; 
+  gap: 1rem; 
+  margin-bottom: 2rem; 
+} 
+
+.chart { 
+  flex: 1; 
+  background: #1a1a1a; 
+  padding: 1rem; 
+  border-radius: 12px; 
+  text-align: center; 
+  color: #aaa; 
+} 
+
+/* Analytics */ 
+.analytics { 
+  display: flex; 
+  gap: 1rem; 
+} 
+
+.summary-card.small { 
+  flex: 1; 
+}

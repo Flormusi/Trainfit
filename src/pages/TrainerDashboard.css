@@ -1,0 +1,312 @@
+.trainer-dashboard {
+  background-color: #121212;
+  min-height: 100vh;
+  padding: 20px;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 15px 25px;
+  background: #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+.trainfit-logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #E63946; /* rojo intenso */
+  text-shadow: 0 0 8px rgba(230, 57, 70, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trainfit-logo .logo-icon {
+  font-size: 2rem; /* Increased from 1.6rem to match text size better */
+  color: #E63946;
+  font-weight: bold;
+  stroke-width: 2.5; /* Make the icon bolder */
+}
+
+.greeting h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e63946;
+}
+
+.greeting p {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.notification-btn {
+  background: #e63946;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.notification-btn:focus {
+  outline: none;
+}
+
+.notification-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.logout-btn {
+  background: #2e2e2e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background: #444;
+}
+
+/* Secciones */
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #fff;
+  border-bottom: 1px solid #E63946; /* Thin red underline */
+  padding-bottom: 8px;
+  background: none; /* Ensure no background */
+  box-shadow: none; /* Remove any glow effects */
+  border-radius: 0; /* Remove any border radius */
+  padding-left: 0; /* Remove any left padding */
+  padding-right: 0; /* Remove any right padding */
+  padding-top: 0; /* Remove any top padding */
+}
+
+.section-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  color: #e63946;
+}
+
+/* Summary Section */
+.summary-section {
+  margin-bottom: 64px;
+  padding-bottom: 24px;
+}
+
+
+
+.summary-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: none;
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.card-icon {
+  width: 24px;
+  height: 24px;
+  color: #E63946;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.summary-card h3 {
+  font-size: 14px;
+  color: #ccc;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.card-number {
+  font-size: 32px;
+  font-weight: bold;
+  color: #fff;
+  margin: 8px 0;
+  line-height: 1;
+}
+
+.variation {
+  font-size: 12px;
+  margin-top: auto;
+}
+
+.variation.positive {
+  color: #4ade80;
+}
+
+.variation.neutral {
+  color: #94a3b8;
+}
+
+.info-text {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: auto;
+}
+
+/* Progress Circle Styles */
+.progress-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.progress-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: conic-gradient(#E63946 0deg 280deg, #333 280deg 360deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.progress-circle::before {
+  content: '';
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  position: absolute;
+}
+
+.progress-percentage {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  z-index: 1;
+  position: relative;
+}
+
+/* Actions Section */
+.actions-section {
+  margin-bottom: 64px;
+  margin-top: 64px;
+  padding: 24px 0;
+}
+
+
+
+.action-btn {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 16px 20px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 180px;
+  max-width: 220px;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background: #2a2a2a;
+  border-color: #E63946;
+  transform: translateY(-2px);
+}
+
+.action-btn.primary {
+  background: #E63946;
+  border-color: #E63946;
+}
+
+/* Mantener el rojo base en hover para botones primarios del dashboard
+   (evitar cambio a rosa). Se añade solo una sombra sutil. */
+.trainer-dashboard .action-btn.primary:hover {
+  background: #E63946;
+  border-color: #E63946;
+  box-shadow: 0 8px 20px rgba(230, 57, 70, 0.25);
+}
+
+.action-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Charts Section */
+.charts-section {
+  margin-bottom: 64px;
+  margin-top: 64px;
+  padding: 24px 0;
+}
+
+/* Analytics Section */
+.analytics-section {
+  margin-bottom: 64px;
+  margin-top: 64px;
+  padding: 24px 0;
+}
+
+
+
+/* Section Titles */
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #E63946;
+  background: none;
+  box-shadow: none;
+}
+
+.section-icon {
+  width: 22px;
+  height: 22px;
+  color: #E63946;
+  margin-right: 12px;
+}

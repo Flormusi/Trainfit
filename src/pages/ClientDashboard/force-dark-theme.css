@@ -1,0 +1,25 @@
+/* CLIENT DASHBOARD SPECIFIC DARK THEME ENFORCEMENT */
+/* Only applies to client dashboard page to avoid affecting trainer components */
+
+.client-dashboard-page *[style*="background-color: white"],
+.client-dashboard-page *[style*="background-color: #fff"],
+.client-dashboard-page *[style*="background-color: #ffffff"],
+.client-dashboard-page *[style*="background: white"],
+.client-dashboard-page *[style*="background: #fff"],
+.client-dashboard-page *[style*="background: #ffffff"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Target specific white background classes ONLY within client dashboard */
+.client-dashboard-page .bg-white,
+.client-dashboard-page .background-white,
+.client-dashboard-page .white-bg {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Ensure metric-trend keeps its specific background ONLY in client dashboard */
+.client-dashboard-page .metric-trend {
+  background: rgba(34, 197, 94, 0.1) !important;
+}

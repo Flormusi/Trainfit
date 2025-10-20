@@ -1,0 +1,245 @@
+/* CreateRoutinePage.css */
+.create-routine-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  color: white;
+  background-color: #1a1a1a;
+  min-height: 100vh;
+}
+
+.create-routine-header {
+  margin-bottom: 30px;
+}
+
+.create-routine-header h1 {
+  color: #ff4444;
+  font-size: 24px;
+  margin: 0;
+}
+
+.error-message {
+  background-color: #ff4444;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.routine-form {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.form-section {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: white;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #ff4444;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.exercises-section {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.exercises-section h3 {
+  color: white;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.exercise-card {
+  background-color: #333;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ff4444;
+}
+
+.exercise-card h4 {
+  color: white;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.exercise-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.exercise-detail {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.exercise-detail strong {
+  color: white;
+}
+
+.remove-exercise-btn {
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.remove-exercise-btn:hover {
+  background-color: #e03333;
+}
+
+.exercise-selection {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.exercise-selection h3 {
+  color: white;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.exercise-search {
+  margin-bottom: 15px;
+}
+
+.exercise-search input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+}
+
+.exercise-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.exercise-item {
+  background-color: #333;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.exercise-item:hover {
+  background-color: #444;
+}
+
+.exercise-item h4 {
+  color: white;
+  margin: 0 0 5px 0;
+  font-size: 14px;
+}
+
+.exercise-item p {
+  color: #ccc;
+  margin: 0;
+  font-size: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: #ff4444;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #e03333;
+}
+
+.btn-secondary {
+  background-color: #666;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #777;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .create-routine-container {
+    padding: 15px;
+  }
+  
+  .exercise-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}

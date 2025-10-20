@@ -1,0 +1,58 @@
+/* Estilos para el encabezado del cliente */
+
+.client-header {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #1a1a2e;
+  color: white;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 32px;
+  margin-right: 10px;
+}
+
+.app-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.back-icon {
+  margin-right: 5px;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .client-header {
+    padding: 10px 15px;
+  }
+  
+  .logo {
+    height: 28px;
+  }
+  
+  .app-name {
+    font-size: 1rem;
+  }
+}

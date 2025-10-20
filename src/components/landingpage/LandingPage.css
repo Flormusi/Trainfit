@@ -1,0 +1,64 @@
+/* Styles for LandingPage.jsx (in components/landingpage) */
+.landing-page-container {
+  font-family: Arial, sans-serif;
+  color: #333;
+  text-align: center;
+}
+
+.landing-header {
+  background-color: #4CAF50; /* Example color */
+  color: white;
+  padding: 40px 20px;
+}
+
+.landing-header h1 {
+  margin: 0;
+  font-size: 2.5em;
+}
+
+.landing-main {
+  padding: 20px;
+}
+
+.features-section, .cta-section {
+  margin-bottom: 30px;
+}
+
+.features-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.features-section li {
+  margin-bottom: 10px;
+}
+
+.cta-section button {
+  background-color: #f0ad4e; /* Example color */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.landing-footer {
+  background-color: #333;
+  color: white;
+  padding: 15px 20px;
+  margin-top: 30px;
+}
+
+
+/* Styles for LandingPage component */
+.landing-page-hero {
+  background-color: #333;
+  color: white;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.landing-page-features {
+  padding: 30px 20px;
+}

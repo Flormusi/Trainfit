@@ -1,0 +1,34 @@
+/* Overrides puntuales para mejorar visibilidad y layout del calendario */
+
+/* Toolbar fija en la parte superior */
+.calendar-toolbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 30 !important;
+}
+
+/* Evitar desbordes en vistas de Semana/Día/Agenda */
+.unified-calendar .rbc-time-content {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* Hacer visibles los puntos de día */
+.day-markers {
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Resaltado más evidente para el día de Hoy */
+.unified-calendar .rbc-today {
+  box-shadow: inset 0 0 0 2px var(--trainfit-brand-red) !important;
+  border: 1px solid var(--trainfit-brand-red) !important;
+}
+
+/* Área clickeable en celdas del MES: sin overlays ni bloqueos */
+.date-cell-wrapper {
+  display: block !important;
+  height: 100% !important;
+  width: 100% !important;
+  cursor: pointer !important;
+}

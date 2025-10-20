@@ -1,0 +1,60 @@
+/* ELIMINACIÓN ESPECÍFICA DE BORDES BLANCOS - VERSIÓN MEJORADA */
+/* Solo eliminar bordes blancos problemáticos, no todos los bordes */
+
+/* Eliminar solo bordes blancos específicos */
+*[style*="border: 1px solid white"],
+*[style*="border: 2px solid white"],
+*[style*="border-color: white"],
+*[style*="border-color: #fff"],
+*[style*="border-color: #ffffff"],
+*[style*="border-color: rgb(255, 255, 255)"],
+*[style*="border: white"],
+.border-white,
+.border-light {
+  border-color: transparent !important;
+}
+
+/* Eliminar outlines blancos problemáticos */
+*[style*="outline: white"],
+*[style*="outline-color: white"],
+*[style*="outline-color: #fff"],
+*[style*="outline-color: #ffffff"] {
+  outline-color: transparent !important;
+}
+
+/* Eliminar sombras blancas específicas */
+*[style*="box-shadow"][style*="white"],
+*[style*="box-shadow"][style*="#fff"],
+*[style*="box-shadow"][style*="#ffffff"],
+*[style*="box-shadow"][style*="rgb(255, 255, 255)"] {
+  box-shadow: none !important;
+}
+
+/* Asegurar que las tarjetas mantengan sus sombras oscuras */
+.client-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid #2a2a2a !important;
+}
+
+.stat-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid #2a2a2a !important;
+}
+
+/* Eliminar bordes blancos de elementos Bootstrap específicos */
+.container,
+.container-fluid,
+.row,
+.col,
+.col-*,
+div[class*="col-"] {
+  border-color: transparent !important;
+}
+
+/* Mantener bordes redondeados en botones */
+.btn,
+.button,
+.action-btn,
+.add-client-btn {
+  border-radius: 8px !important;
+}

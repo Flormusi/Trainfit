@@ -1,0 +1,45 @@
+/* Archivo principal de estilos para ClientDetails */
+
+/* Importar todos los estilos de componentes */
+@import './clientDetails.css';
+@import './header.css';
+@import './profile.css';
+@import './tabs.css';
+@import './overview.css';
+@import './routines.css';
+@import './progress.css';
+@import './nutrition.css';
+@import './payments.css';
+@import './notes.css';
+@import './sections.css';
+
+/* Sobrescribir reglas globales que eliminan bordes y sombras */
+/* Permitir sombras y bordes específicos para elementos de ClientDetails */
+
+.client-details * {
+  /* Permitir sombras para elementos dentro de client-details */
+  box-shadow: inherit !important;
+}
+
+.client-details .summary-card,
+.client-details .info-card,
+.client-details .stat-card,
+.client-details .client-card,
+.client-details .routine-card,
+.client-details .payment-card,
+.client-details .progress-card,
+.client-details .nutrition-card,
+.client-details .notes-card {
+  /* Asegurar que las tarjetas tengan sombras sutiles */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  background-color: white !important;
+  border: 1px solid #f0f0f0 !important;
+  border-radius: 8px !important;
+}
+
+/* Sobrescribir específicamente para botones dentro de ClientDetails */
+.client-details .btn,
+.client-details .action-btn,
+.client-details button {
+  border-radius: 8px !important;
+}

@@ -1,0 +1,569 @@
+/* ELIMINAR TODOS LOS BORDES - MÁXIMA PRIORIDAD */
+/* Este archivo debe sobrescribir Bootstrap y cualquier otro CSS */
+/* EXCEPTO elementos del calendario unificado */
+
+/* Reglas universales con máxima especificidad - EXCEPTO calendario */
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):before,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):after {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):before,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):after {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Estados específicos - EXCEPTO calendario */
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):hover,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):focus,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):active,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):visited,
+*:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):focus-visible {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):focus,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):active,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):hover,
+html *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):visited {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Específico para la página de clientes del trainer - EXCEPTO calendario */
+.trainer-dashboard *:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.trainer-dashboard .client-card,
+.trainer-dashboard .client-card *,
+.trainer-dashboard .stat-card,
+.trainer-dashboard .stat-card *,
+.trainer-dashboard .analytics-card,
+.trainer-dashboard .analytics-card *,
+.trainer-dashboard .action-btn,
+.trainer-dashboard .action-btn * {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Sobrescribir específicamente clases de Tailwind - EXCEPTO calendario */
+.border:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-0:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-2:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-4:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-8:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-t:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-r:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-b:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-l:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-x:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-y:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-solid:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-dashed:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-dotted:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-double:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.border-none:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.outline:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.outline-0:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.outline-1:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.outline-2:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.outline-4:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.outline-8:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow-sm:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow-md:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow-lg:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow-xl:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow-2xl:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow-inner:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.shadow-none:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.ring:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.ring-0:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.ring-1:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.ring-2:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.ring-4:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.ring-8:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.ring-inset:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Sobrescribir Bootstrap específicamente - EXCEPTO calendario */
+.btn:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):hover,
+.btn:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):focus,
+.btn:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *):active,
+.btn-primary:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn-secondary:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn-success:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn-danger:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn-warning:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn-info:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn-light:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.btn-dark:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.form-control:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.form-select:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.input-group:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.card:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.modal-content:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.modal-header:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.modal-footer:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.table:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.table:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) td,
+.table:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) th,
+.nav:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.nav-link:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.navbar:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.dropdown-menu:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *),
+.alert:not(.unified-calendar):not(.unified-calendar *):not(.rbc-calendar):not(.rbc-calendar *):not(.event-modal-overlay):not(.event-modal-overlay *) {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Bootstrap específico con máxima especificidad */
+.btn,
+.btn:focus,
+.btn:active,
+.btn:hover,
+.btn:visited,
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info,
+.btn-light,
+.btn-dark,
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-success,
+.btn-outline-danger,
+.btn-outline-warning,
+.btn-outline-info,
+.btn-outline-light,
+.btn-outline-dark,
+.btn-sm,
+.btn-lg,
+.btn-block {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Modales de Bootstrap con máxima especificidad */
+.modal,
+.modal-dialog,
+.modal-content,
+.modal-header,
+.modal-body,
+.modal-footer,
+.modal-backdrop,
+.modal-sm,
+.modal-lg,
+.modal-xl {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Formularios de Bootstrap y Tailwind */
+.form-control,
+.form-select,
+.form-check-input,
+.form-range,
+.input-group,
+.input-group-text,
+.form-floating,
+.form-label,
+.form-text {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Cards de Bootstrap */
+.card,
+.card-header,
+.card-body,
+.card-footer,
+.card-img,
+.card-img-top,
+.card-img-bottom,
+.card-title,
+.card-text {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Elementos HTML específicos */
+div,
+span,
+button,
+input,
+select,
+textarea,
+h1, h2, h3, h4, h5, h6,
+p,
+ul, ol, li,
+table, tr, td, th,
+form,
+section,
+article,
+header,
+footer,
+nav,
+main,
+img {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Elementos HTML básicos con máxima especificidad */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1, h2, h3, h4, h5, h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video,
+input,
+textarea,
+select,
+button {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Elementos específicos de la aplicación con máxima especificidad */
+.client-card,
+.stat-card,
+.action-btn,
+.analytics-card,
+.summary-grid,
+.clients-list,
+.clients-grid,
+.membership-badge,
+.plus-icon,
+.trainer-dashboard,
+.dashboard-header,
+.clients-section,
+.stats-section,
+.actions-section,
+.filters-section,
+.search-section {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Clases específicas del TrainerDashboard con máxima especificidad */
+.trainer-dashboard .client-card,
+.trainer-dashboard .view-progress-btn,
+.trainer-dashboard .stat-card,
+.trainer-dashboard .analytics-card,
+.trainer-dashboard .client-info,
+.trainer-dashboard .client-name,
+.trainer-dashboard .client-status,
+.trainer-dashboard .client-goal {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Eliminar bordes de todos los estados posibles */
+:focus,
+:active,
+:focus-visible,
+:focus-within,
+:hover,
+:visited,
+:link,
+:target,
+:checked,
+:disabled,
+:enabled,
+:first-child,
+:last-child,
+:nth-child(n),
+:before,
+:after {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* Regla final que sobrescribe absolutamente todo */
+body *:not(.card-icon):not(svg) {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Regla específica para el contenedor principal */
+#root,
+#root *:not(.card-icon):not(svg),
+.app,
+.app *:not(.card-icon):not(svg) {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Attribute-based selectors for inline styles */
+[style*="border: 1px"],
+[style*="border:1px"],
+[style*="border: 2px"],
+[style*="border:2px"],
+[style*="border-top:"],
+[style*="border-right:"],
+[style*="border-bottom:"],
+[style*="border-left:"],
+[style*="border-width:"],
+[style*="border-style:"],
+[style*="border-color:"],
+[style*="outline:"],
+[style*="box-shadow:"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Specific membership tier span override */
+span[style*="border: 1px solid"] {
+  border: none !important;
+}
+
+/* Target all spans with any border style */
+span[style*="border:"],
+span[style*="border "] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Nuclear option - override any element with border in style attribute */
+*[style*="border"] {
+  border: none !important;
+}
+
+*[style*="outline"] {
+  outline: none !important;
+}
+
+*[style*="box-shadow"] {
+  box-shadow: none !important;
+}

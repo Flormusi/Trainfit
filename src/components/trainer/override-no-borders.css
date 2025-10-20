@@ -1,0 +1,53 @@
+/* Sobrescribir reglas globales para ClientList */
+/* Este archivo debe importarse DESPUÉS de los archivos no-borders */
+
+/* Eliminar SOLO los bordes blancos problemáticos, no todo el fondo */
+.container,
+.container-fluid,
+.row,
+.col,
+.col-*,
+div[class*="col-"] {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Permitir sombras y bordes específicos para elementos de ClientList */
+.trainer-dashboard .client-card,
+.trainer-dashboard .stat-card,
+.trainer-dashboard .analytics-card {
+  /* Asegurar que las tarjetas tengan sombras sutiles oscuras */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+  background-color: #1e1e1e !important;
+  border: 1px solid #2a2a2a !important;
+  border-radius: 12px !important;
+}
+
+/* Sobrescribir específicamente para botones dentro de trainer-dashboard */
+.trainer-dashboard .btn,
+.trainer-dashboard .action-btn,
+.trainer-dashboard button {
+  border-radius: 8px !important;
+}
+
+/* Asegurar que los modales también tengan bordes correctos */
+.modal-content {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid #2a2a2a !important;
+  border-radius: 12px !important;
+}
+
+/* Inputs y formularios */
+.form-control,
+.form-select {
+  border: 1px solid #2a2a2a !important;
+  border-radius: 8px !important;
+}
+
+/* Eliminar bordes blancos específicos que causan el problema */
+*[style*="border: 1px solid white"],
+*[style*="border-color: white"],
+*[style*="border-color: #fff"],
+*[style*="border-color: #ffffff"] {
+  border-color: transparent !important;
+}

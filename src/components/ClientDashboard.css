@@ -1,0 +1,241 @@
+/*
+  INICIO DEL CÓDIGO CSS PARA CLIENTDASHBOARD
+  Este es el conjunto de estilos limpio y final.
+*/
+
+.client-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Espacio entre las tarjetas principales y la fila de dos columnas */
+  max-width: 700px; /* Ancho máximo del contenedor principal */
+  margin: 20px auto; /* Centra el contenido y añade margen superior/inferior */
+  padding: 20px;
+  background-color: #000000; /* Fondo negro general */
+  min-height: calc(100vh - 40px); /* Considera el padding para el alto completo */
+  box-sizing: border-box;
+}
+
+/* NUEVO: Estilo para el contenedor del saludo y el botón de logout */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between; /* Empuja el saludo a la izquierda y el botón a la derecha */
+  align-items: center; /* Alinea verticalmente los ítems al centro */
+  margin-bottom: 20px; /* Espacio debajo de este encabezado */
+  padding-bottom: 10px; /* Un poco de espacio inferior dentro del header */
+  border-bottom: 1px solid #333; /* Línea divisoria como en la segunda imagen */
+}
+
+.dashboard-greeting {
+  font-size: 28px; /* Asegúrate de que el tamaño de fuente esté aplicado */
+  font-weight: bold; /* Asegúrate de que el peso de la fuente esté aplicado */
+  color: #ffffff; /* Asegúrate de que el color del texto esté aplicado */
+  text-align: left; /* Mantenemos la alineación a la izquierda */
+  margin-bottom: 0; /* Correcto para el layout del header */
+  flex-grow: 1; /* Permite que el saludo ocupe el espacio disponible */
+  margin-right: 20px; /* Espacio entre el saludo y el botón de logout */
+}
+
+/* Estilo para el botón de Logout */
+.logout-button {
+  background-color: #f0f0f0;
+  color: #333333;
+  border: 1px solid #cccccc;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0; /* Evita que el botón se encoja */
+}
+
+.logout-button:hover {
+  background-color: #e0e0e0;
+}
+
+.dashboard-card {
+  background-color: #1e1e1e; /* Fondo gris oscuro para las tarjetas */
+  border-radius: 15px;
+  padding: 20px; /* This is the default padding for all cards */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box; /* <<< ADD THIS LINE */
+}
+
+.card-title-red {
+  color: #ff3b30 !important; /* Rojo TrainFit */
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* --- Tarjeta: Tu rutina del mes --- */
+/* Si esta tarjeta ya no se usa según la última imagen, estos estilos no tendrán efecto visible */
+.routine-card {
+  position: relative;
+}
+.routine-card h3 {
+  font-size: 20px;
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: bold;
+  text-align: left;
+}
+.routine-card p {
+  font-size: 14px;
+  color: #a0a0a0;
+  margin-bottom: 0;
+  text-align: left;
+}
+.card-arrow-icon {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #a0a0a0;
+}
+
+/* --- Tarjeta: Semana actual --- */
+.weekly-progress-card .days-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 5px 0;
+}
+.weekly-progress-card .day-status span { /* Iconos ✓ ✕ ? ⚪ */
+  display: block;
+  font-size: 24px;
+}
+.icon-check { color: #4CAF50; }
+.icon-missed { color: #ff3b30; }
+.icon-unknown { color: #FFC107; }
+.icon-pending { color: #505050; }
+
+
+/* --- Fila de Dos Columnas (Ejercicios y Avances) --- */
+.dashboard-row-two-columns {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.column-left-exercises {
+  flex: 1.5 1 0%; /* Cambiado: flex-grow: 1.5, flex-shrink: 1, flex-basis: 0% */
+  display: flex;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.column-right-advances {
+  flex: 1 1 0%; /* Cambiado: flex-grow: 1, flex-shrink: 1, flex-basis: 0% */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* --- Tarjeta: Ejercicios de hoy (dentro de la columna izquierda) --- */
+.todays-exercises-card {
+  width: 100%;
+}
+.todays-exercises-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+.todays-exercises-card li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #303030;
+}
+.todays-exercises-card li:last-child {
+  border-bottom: none;
+}
+.todays-exercises-card li span {
+  font-size: 16px;
+  color: #e0e0e0;
+}
+.todays-exercises-card li small {
+  font-size: 14px;
+  color: #a0a0a0;
+}
+.view-routine-button {
+  background-color: #ff3b30;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+.view-routine-button:hover {
+  background-color: #e0301a;
+}
+
+/* --- Tarjetas de Avances (dentro de la columna derecha) --- */
+.progress-stat-card {
+  width: 100%;
+  text-align: center;
+  padding: 10px; /* Reducimos el padding aquí, antes era 20px heredado de .dashboard-card */
+}
+.progress-stat-card .card-title-red {
+  text-align: left;
+  margin-bottom: 10px;
+}
+.progress-stat-card p {
+  font-size: 14px;
+  color: #a0a0a0;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+.progress-stat-card strong { /* Para "68 kg" */
+  font-size: 28px;
+  color: #ffffff;
+  /* display: block;  <--- ELIMINA ESTA LÍNEA */
+  margin-bottom: 0; /* Puedes ajustar esto si es necesario, o dejar que .weight-progress strong lo maneje */
+  font-weight: bold;
+}
+
+.weight-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+.weight-progress strong {
+  /* Esta regla ahora hereda display:inline (comportamiento por defecto de strong) */
+  /* o puedes ser explícito con display: inline; si es necesario */
+  margin-bottom: 0; /* Mantenemos esto si es específico para el strong dentro de weight-progress */
+}
+.chart-icon {
+  font-size: 28px;
+  color: #FF5252;
+}
+
+.plan-completion-card .percentage-display { /* Para "79%" */
+  color: #ffffff;
+  font-size: 28px; /* Cambiado de 38px a 28px */
+  font-weight: bold;
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+.plan-completion-card p {
+  text-align: center;
+  margin-top: 0;
+}

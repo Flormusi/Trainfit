@@ -1,0 +1,97 @@
+/* ELIMINACIÓN ESPECÍFICA DE FONDOS BLANCOS PARA CLIENTLIST */
+/* Solo eliminar fondos blancos, mantener colores de tarjetas */
+
+/* Fondo principal de la página */
+.client-list-container {
+  background-color: #121212 !important;
+  background: #121212 !important;
+}
+
+/* Solo elementos que específicamente tienen fondo blanco */
+.client-list-container *[style*="background-color: white"],
+.client-list-container *[style*="background-color: #fff"],
+.client-list-container *[style*="background-color: #ffffff"],
+.client-list-container *[style*="background-color: rgb(255, 255, 255)"],
+.client-list-container *[style*="background: white"],
+.client-list-container *[style*="background: #fff"],
+.client-list-container *[style*="background: #ffffff"],
+.client-list-container *[style*="background: rgb(255, 255, 255)"] {
+  background-color: #1e1e1e !important;
+  background: #1e1e1e !important;
+}
+
+/* Clases CSS que aplican fondo blanco */
+.client-list-container .bg-white,
+.client-list-container .bg-light,
+.client-list-container .background-white,
+.client-list-container .white-bg,
+.client-list-container *[class*="bg-white"] {
+  background-color: #1e1e1e !important;
+  background: #1e1e1e !important;
+}
+
+/* Elementos comunes que suelen tener fondo blanco */
+.client-list-container .modal-content,
+.client-list-container .dropdown-menu,
+.client-list-container .card.bg-white,
+.client-list-container .container.bg-white,
+.client-list-container div.bg-white {
+  background-color: #1e1e1e !important;
+  background: #1e1e1e !important;
+}
+
+/* Mantener los botones rojos como están */
+.client-list-container button[style*="background: linear-gradient(135deg, #dc2626"],
+.client-list-container button[style*="background-color: #dc2626"] {
+  /* No cambiar estos botones */
+}
+
+/* Mantener inputs con su fondo oscuro actual */
+.client-list-container input,
+.client-list-container select,
+.client-list-container textarea {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border: 1px solid #444444 !important;
+}
+
+/* REGLAS RESPONSIVAS - Eliminar fondos blancos en todas las resoluciones */
+@media (max-width: 768px) {
+  .client-list-container,
+  .client-list-container * {
+    background-color: inherit !important;
+  }
+  
+  .client-list-container *[style*="background-color: white"],
+  .client-list-container *[style*="background-color: #fff"],
+  .client-list-container *[style*="background-color: #ffffff"] {
+    background-color: #1e1e1e !important;
+    background: #1e1e1e !important;
+  }
+  
+  .client-list-container .bg-white,
+  .client-list-container .bg-light {
+    background-color: #1e1e1e !important;
+    background: #1e1e1e !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .client-list-container,
+  .client-list-container * {
+    background-color: inherit !important;
+  }
+  
+  .client-list-container *[style*="background-color: white"],
+  .client-list-container *[style*="background-color: #fff"],
+  .client-list-container *[style*="background-color: #ffffff"] {
+    background-color: #1e1e1e !important;
+    background: #1e1e1e !important;
+  }
+  
+  .client-list-container .bg-white,
+  .client-list-container .bg-light {
+    background-color: #1e1e1e !important;
+    background: #1e1e1e !important;
+  }
+}

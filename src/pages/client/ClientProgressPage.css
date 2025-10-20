@@ -1,0 +1,453 @@
+/* ClientProgressPage.css */
+.client-progress-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+  color: #fff;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 24px 32px;
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  border: 1px solid #333;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+  border: 1px solid #444;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 24px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+  background: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+}
+
+.progress-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.error-message {
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(255, 71, 87, 0.05) 100%);
+  border: 1px solid #ff4757;
+  color: #ff4757;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(255, 71, 87, 0.1);
+}
+
+/* Payment Status Section */
+.payment-status-section {
+  margin-bottom: 40px;
+}
+
+.payment-status-section h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.payment-card {
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.payment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: #667eea;
+}
+
+.payment-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.payment-indicator.up-to-date {
+  background: linear-gradient(135deg, #10ac84 0%, #0fb881 100%);
+  color: white;
+  border: 1px solid rgba(16, 172, 132, 0.3);
+}
+
+.payment-indicator.overdue {
+  background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+  color: white;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+}
+
+.payment-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.payment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+  border: 1px solid #444;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.payment-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: #667eea;
+}
+
+.payment-item-label {
+  font-weight: 500;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.payment-item-value {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 1rem;
+}
+
+/* Routines Section */
+.routines-section {
+  margin-bottom: 40px;
+}
+
+.routines-section h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.routines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.routine-card {
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.routine-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: #667eea;
+}
+
+.routine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.routine-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.routine-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.routine-status.active {
+  background: linear-gradient(135deg, #10ac84 0%, #0fb881 100%);
+  color: white;
+}
+
+.routine-status.completed {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.routine-status.pending {
+  background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%);
+  color: white;
+}
+
+.routine-description {
+  color: #888;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.routine-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.routine-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.routine-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+  color: white;
+  border: 1px solid #444;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10ac84 0%, #0fb881 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(16, 172, 132, 0.2);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #0fb881 0%, #0ea374 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 172, 132, 0.3);
+}
+
+/* Loading States */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #333;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.empty-state-description {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* Progress Metrics */
+.progress-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: #667eea;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.metric-label {
+  color: #888;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .client-progress-page {
+    padding: 20px;
+  }
+  
+  .progress-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .progress-header h1 {
+    font-size: 2rem;
+  }
+  
+  .back-button {
+    margin-right: 0;
+    align-self: flex-start;
+  }
+  
+  .payment-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .routines-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .progress-metrics {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .routine-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .client-progress-page {
+    padding: 16px;
+  }
+  
+  .payment-card,
+  .routine-card,
+  .metric-card {
+    padding: 20px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .progress-header h1 {
+    font-size: 1.8rem;
+  }
+}

@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios from './axiosConfig';
 import { authService } from './authService';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+// Usamos axiosConfig que ya define baseURL (proxy '/api' en dev y VITE_API_URL en prod)
+// Evitamos construir URLs absolutas para prevenir desajustes y CORS
 
 interface ClientData {
     name: string;
@@ -27,12 +28,7 @@ const clientService = {
             throw new Error('No hay token de autenticación');
         }
 
-        const response = await axios.post(`${API_URL}/trainer/clients`, clientData, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        const response = await axios.post(`/trainer/clients`, clientData);
 
         return response.data;
     },
@@ -43,13 +39,20 @@ const clientService = {
             throw new Error('No hay token de autenticación');
         }
 
-        const response = await axios.get(`${API_URL}/trainer/clients`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await axios.get(`/trainer/clients`);
 
-        return response.data;
+        // Normalizar la forma de salida: devolver SIEMPRE un array de clientes
+        const data = response.data;
+        if (data && data.data && Array.isArray(data.data.clients)) {
+            return data.data.clients;
+        }
+        if (Array.isArray(data)) {
+            return data;
+        }
+        if (data && Array.isArray(data.clients)) {
+            return data.clients;
+        }
+        return [];
     },
 
     async deleteClient(clientId: string | number) {
@@ -58,11 +61,7 @@ const clientService = {
             throw new Error('No hay token de autenticación');
         }
 
-        const response = await axios.delete(`${API_URL}/trainer/clients/${clientId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await axios.delete(`/trainer/clients/${clientId}`);
 
         return response.data;
     },
@@ -73,12 +72,7 @@ const clientService = {
             throw new Error('No hay token de autenticación');
         }
 
-        const response = await axios.put(`${API_URL}/trainer/clients/${clientId}`, clientData, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        const response = await axios.put(`/trainer/clients/${clientId}`, clientData);
 
         return response.data;
     },
@@ -89,11 +83,7 @@ const clientService = {
             throw new Error('No hay token de autenticación');
         }
 
-        const response = await axios.get(`${API_URL}/trainer/clients/${clientId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await axios.get(`/trainer/clients/${clientId}`);
 
         return response.data;
     }

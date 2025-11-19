@@ -2,8 +2,11 @@ import axios from 'axios';
 import { authService } from './authService';
 
 // Configuración base de axios
-// Usar la URL del backend configurada en el .env
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+// En desarrollo, usar el proxy de Vite a '/api' para evitar desajustes de puertos
+// En producción, usar la URL del backend configurada en el .env
+const API_URL = import.meta.env.DEV
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || '/api');
 axios.defaults.baseURL = API_URL;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.withCredentials = true;

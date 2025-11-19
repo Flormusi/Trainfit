@@ -38,6 +38,12 @@
   color: white;
 }
 
+.notification-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .notification-header h2 {
   margin: 0;
   font-size: 1.5rem;
@@ -57,6 +63,25 @@
 
 .close-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.clear-all-button {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.clear-all-button:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.clear-all-button:active {
+  transform: scale(0.98);
 }
 
 /* Contenido del modal */
@@ -165,6 +190,29 @@
 .notification-details {
   flex: 1;
   min-width: 0;
+}
+
+.delete-notification-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.notification-item:hover .delete-notification-button {
+  color: #ffffff;
+}
+
+.delete-notification-button:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ff6b81;
 }
 
 .notification-title {

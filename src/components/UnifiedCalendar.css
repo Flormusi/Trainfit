@@ -1,14 +1,14 @@
 /* Importar estilos de react-big-calendar */
 @import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-/* Variables CSS para el calendario unificado - Tema TrainFit */
+/* Variables CSS para el calendario unificado - Tema TrainFit (modo oscuro) */
 :root {
   /* Colores principales - TrainFit */
-  --trainfit-primary: #dc2626;
-  --trainfit-primary-light: #ef4444;
-  --trainfit-primary-dark: #b91c1c;
-  --trainfit-brand-red: #c14154; /* rojo claro solicitado */
-  --trainfit-brand-red-overlay: rgba(193, 65, 84, 0.2); /* opacidad para eventos */
+  --trainfit-primary: #E53935; /* rojo marca */
+  --trainfit-primary-light: #F0625A; /* rojo claro para hover */
+  --trainfit-primary-dark: #C62828; /* rojo más oscuro */
+  --trainfit-brand-red: #E53935; /* uso consistente */
+  --trainfit-brand-red-overlay: rgba(229, 57, 53, 0.14); /* overlay para hoy/eventos en oscuro */
   
   /* Colores de estado */
   --trainfit-success: #10b981;
@@ -17,18 +17,18 @@
   --trainfit-info: #3b82f6;
   
   /* Fondo y texto - Modo oscuro TrainFit */
-  --trainfit-bg-primary: #000000;
-  --trainfit-bg-secondary: #1a1a1a;
-  --trainfit-bg-tertiary: #2a2a2a;
-  --trainfit-bg-quaternary: #3a3a3a;
+  --trainfit-bg-primary: #1a1a1a; /* área general */
+  --trainfit-bg-secondary: #242424; /* card calendario */
+  --trainfit-bg-tertiary: #2a2a2a; /* toolbar oscura */
+  --trainfit-bg-quaternary: #333333; /* botones neutrales */
   
-  --trainfit-text-primary: #ffffff;
-  --trainfit-text-secondary: #b3b3b3;
-  --trainfit-text-muted: #808080;
+  --trainfit-text-primary: #ffffff; /* texto principal */
+  --trainfit-text-secondary: #b0b0b0; /* subtítulos y textos secundarios */
+  --trainfit-text-muted: #8a8a8a; /* gris suave */
   
   /* Bordes y sombras */
-  --trainfit-border: #333333;
-  --trainfit-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --trainfit-border: #3a3a3a; /* borde oscuro sutil */
+  --trainfit-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
@@ -42,20 +42,80 @@
 }
 
 /* ===== HEADER DEL CALENDARIO ===== */
+.unified-calendar-page, .unified-calendar {
+  background-color: var(--trainfit-bg-primary) !important;
+}
+
+.unified-calendar .rbc-calendar {
+  background-color: var(--trainfit-bg-secondary) !important;
+  border: 1px solid var(--trainfit-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--trainfit-shadow) !important;
+  color: var(--trainfit-text-primary) !important;
+}
+
+/* Fuerza el fondo del calendario y sus sub-vistas a gris oscuro */
+.unified-calendar .rbc-month-view,
+.unified-calendar .rbc-time-view,
+.unified-calendar .rbc-agenda-view,
+.unified-calendar .rbc-time-header,
+.unified-calendar .rbc-time-content {
+  background-color: var(--trainfit-bg-secondary) !important;
+  color: var(--trainfit-text-primary) !important;
+}
+
+/* Encabezados de días/horas en modo oscuro */
+.unified-calendar .rbc-header {
+  background-color: var(--trainfit-bg-tertiary) !important;
+  color: var(--trainfit-text-primary) !important;
+  border-bottom: 1px solid var(--trainfit-border) !important;
+}
+
+/* Texto de gutter y marcas de tiempo en vistas semanales/diarias */
+.unified-calendar .rbc-time-gutter,
+.unified-calendar .rbc-time-gutter .rbc-timeslot-group,
+.unified-calendar .rbc-time-header-gutter {
+  color: var(--trainfit-text-secondary) !important;
+}
+
+/* Texto y fondo de celdas de fecha en modo oscuro */
+.unified-calendar .rbc-date-cell {
+  color: var(--trainfit-text-primary) !important;
+}
+.unified-calendar .rbc-day-bg {
+  background-color: transparent !important;
+}
+
+/* Bordes divisores consistentes en gris medio */
+.unified-calendar .rbc-month-view,
+.unified-calendar .rbc-time-view,
+.unified-calendar .rbc-agenda-view,
+.unified-calendar .rbc-time-header,
+.unified-calendar .rbc-time-content,
+.unified-calendar .rbc-row,
+.unified-calendar .rbc-day-bg,
+.unified-calendar .rbc-header,
+.unified-calendar .rbc-month-row {
+  border-color: var(--trainfit-border) !important;
+}
+
 .calendar-header {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  margin-bottom: 32px !important;
-  padding: 20px 0 !important;
-  border-bottom: 1px solid var(--trainfit-border) !important;
+  margin-bottom: 24px !important;
+  padding: 8px 0 !important;
 }
 
 .calendar-title {
-  font-size: 2rem !important;
-  font-weight: 700 !important;
+  font-size: 2.25rem !important;
+  font-weight: 800 !important;
   color: var(--trainfit-text-primary) !important;
   margin: 0 !important;
+}
+
+.calendar-description {
+  color: var(--trainfit-text-secondary) !important;
 }
 
 .calendar-actions {
@@ -68,12 +128,12 @@
 
 .btn-create-event {
   background-color: var(--trainfit-primary) !important;
-  color: var(--trainfit-text-primary) !important;
+  color: #ffffff !important;
   border: none !important;
-  border-radius: 10px !important;
-  padding: 10px 16px !important; /* más pequeño */
-  font-size: 0.8rem !important; /* reduce competencia con el título */
-  font-weight: 600 !important;
+  border-radius: 12px !important;
+  padding: 12px 18px !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
   display: flex !important;
@@ -82,6 +142,7 @@
   margin: 0 !important;
   text-decoration: none !important;
   white-space: nowrap !important;
+  box-shadow: 0 6px 18px rgba(229, 57, 53, 0.28) !important;
 }
 
 .btn-create-event:hover {
@@ -123,7 +184,7 @@
   background-color: var(--trainfit-bg-tertiary) !important;
   padding: 12px 16px !important;
   border: 1px solid var(--trainfit-border) !important;
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   margin-bottom: 12px !important;
 }
 
@@ -137,8 +198,8 @@
   color: var(--trainfit-text-primary) !important;
   background-color: var(--trainfit-bg-quaternary) !important;
   border: 1px solid var(--trainfit-border) !important;
-  border-radius: 8px !important;
-  padding: 6px 12px !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
   font-weight: 600 !important;
   font-size: 0.85rem !important;
   transition: all 0.2s ease !important;
@@ -147,10 +208,44 @@
   gap: 6px !important;
 }
 
+.btn-nav:hover, .btn-today:hover, .btn-view:hover {
+  background-color: var(--trainfit-border) !important; /* #3a3a3a */
+  color: #ffffff !important;
+  border-color: var(--trainfit-border) !important;
+}
+
+.btn-create-event:hover {
+  background-color: var(--trainfit-primary-dark) !important;
+}
+
+.btn-nav:focus-visible, .btn-today:focus-visible, .btn-view:focus-visible, .btn-create-event:focus-visible {
+  outline: 2px solid var(--trainfit-primary) !important;
+  outline-offset: 2px !important;
+}
+
 .btn-view.active {
   background-color: var(--trainfit-primary) !important; /* solo el activo en rojo */
   border-color: var(--trainfit-primary) !important;
-  color: var(--trainfit-text-primary) !important;
+  color: #ffffff !important;
+}
+
+/* Selector de vistas con estilo de pestañas redondeadas */
+.view-selector {
+  display: flex !important;
+  align-items: center !important;
+  background: var(--trainfit-bg-secondary) !important;
+  border: 1px solid var(--trainfit-border) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+.btn-view {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--trainfit-text-secondary) !important;
+  padding: 8px 14px !important;
+}
+.btn-view:not(.active):hover {
+  background-color: var(--trainfit-bg-quaternary) !important;
 }
 
 .btn-nav:hover, .btn-today:hover, .btn-view:hover {
@@ -182,12 +277,15 @@
 }
 
 .unified-calendar .rbc-day-bg:hover {
-  background-color: var(--trainfit-bg-tertiary);
-  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.35);
+  background-color: var(--trainfit-brand-red-overlay) !important;
+  box-shadow: inset 0 0 0 1px rgba(229, 57, 53, 0.35) !important;
 }
 
 .unified-calendar .rbc-off-range-bg {
-  background-color: #1a1a1a !important; /* mayor contraste para días fuera de mes */
+  background-color: #1f1f1f !important;
+}
+.unified-calendar .rbc-off-range {
+  color: var(--trainfit-text-muted) !important;
 }
 
 .unified-calendar .rbc-off-range {
@@ -195,8 +293,38 @@
 }
 
 .unified-calendar .rbc-today {
-  background-color: rgba(220, 38, 38, 0.08);
-  box-shadow: inset 0 0 0 2px var(--trainfit-primary);
+  background-color: var(--trainfit-brand-red-overlay) !important;
+  box-shadow: inset 0 0 0 2px var(--trainfit-primary) !important;
+}
+
+/* Vistas de semana/día/agenda en modo oscuro */
+.unified-calendar .rbc-time-view,
+.unified-calendar .rbc-agenda-view {
+  background-color: var(--trainfit-bg-secondary) !important;
+}
+.unified-calendar .rbc-event {
+  color: #ffffff !important;
+  border: 0 !important;
+}
+
+.unified-calendar .rbc-row-segment {
+  color: var(--trainfit-text-primary) !important;
+}
+
+/* Agenda view en modo oscuro (tabla) */
+.unified-calendar .rbc-agenda-table {
+  border-color: var(--trainfit-border) !important;
+}
+.unified-calendar .rbc-agenda-table th,
+.unified-calendar .rbc-agenda-table td {
+  background-color: var(--trainfit-bg-secondary) !important;
+  color: var(--trainfit-text-primary) !important;
+  border-color: var(--trainfit-border) !important;
+}
+.unified-calendar .rbc-agenda-date-cell,
+.unified-calendar .rbc-agenda-time-cell,
+.unified-calendar .rbc-agenda-event-cell {
+  color: var(--trainfit-text-primary) !important;
 }
 
 .unified-calendar .rbc-date-cell {
@@ -235,9 +363,65 @@
   background-color: var(--trainfit-border);
   box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
 }
-.marker-rutina { background-color: var(--trainfit-primary) !important; }
-.marker-sesion { background-color: #f59e0b !important; }
-.marker-consulta { background-color: #7c3aed !important; }
+.marker-rutina { background-color: #E53935 !important; }
+.marker-sesion { background-color: #FB8C00 !important; }
+.marker-consulta { background-color: #8E24AA !important; }
+
+/* Eventos con hover/tooltip y estilo moderno adicional */
+.unified-calendar .rbc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Leyenda inferior con puntos de color */
+.calendar-legend {
+  margin-top: 16px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+.legend-items {
+  display: flex !important;
+  gap: 16px !important;
+  background: var(--trainfit-bg-secondary) !important;
+  border: 1px solid var(--trainfit-border) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  box-shadow: var(--trainfit-shadow) !important;
+}
+.legend-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: var(--trainfit-text-secondary) !important;
+  font-weight: 600 !important;
+}
+.legend-dot {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 9999px !important;
+}
+.legend-dot.legend-rutina { background: #E53935 !important; }
+.legend-dot.legend-sesion { background: #FB8C00 !important; }
+.legend-dot.legend-consulta { background: #8E24AA !important; }
+
+/* Responsive: apilar header y toolbar en pantallas pequeñas */
+@media (max-width: 640px) {
+  .calendar-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .calendar-toolbar {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .view-selector {
+    width: 100% !important;
+  }
+  .btn-create-event {
+    align-self: flex-start !important;
+  }
+}
 
 /* Mobile: toolbar y selector de vistas */
 @media (max-width: 768px) {
@@ -282,18 +466,30 @@
   padding: 4px 8px;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--trainfit-text-primary);
+  color: #ffffff !important; /* mantiene texto legible, sin aplicar color al texto */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   transition: all 0.2s ease;
-  background-color: var(--trainfit-brand-red-overlay) !important; /* fondo rojo con opacidad */
-  border-left: 3px solid var(--trainfit-brand-red) !important; /* acento por defecto */
+  background-color: var(--trainfit-bg-tertiary) !important; /* fondo neutro por defecto */
+  border-left: 3px solid var(--trainfit-border) !important; /* acento neutro por defecto */
 }
 
 /* Acentos por tipo (solo borde izquierdo) */
-.unified-calendar .rbc-event.event-rutina { border-left-color: var(--trainfit-primary) !important; }
-.unified-calendar .rbc-event.event-sesion { border-left-color: #f59e0b !important; }
-.unified-calendar .rbc-event.event-consulta { border-left-color: #7c3aed !important; }
+.unified-calendar .rbc-event.event-rutina {
+  background-color: #E53935 !important; /* Rutinas → rojo TrainFit */
+  border-left-color: #C62828 !important; /* acento más oscuro */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.10), 0 2px 4px rgba(0, 0, 0, 0.30) !important; /* separación sutil entre eventos del mismo tipo */
+}
+.unified-calendar .rbc-event.event-sesion {
+  background-color: #FB8C00 !important; /* Sesiones → naranja */
+  border-left-color: #EF6C00 !important; /* acento más oscuro */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.10), 0 2px 4px rgba(0, 0, 0, 0.30) !important;
+}
+.unified-calendar .rbc-event.event-consulta {
+  background-color: #8E24AA !important; /* Consultas → violeta */
+  border-left-color: #6A1B9A !important; /* acento más oscuro */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.10), 0 2px 4px rgba(0, 0, 0, 0.30) !important;
+}
 
 /* Estados de eventos */
 .unified-calendar .rbc-event.status-programado {
@@ -372,26 +568,28 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
-  padding: 16px;
+  padding: 24px;
+  padding-top: 72px; /* evita tapar header del sitio */
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .event-modal {
-  background-color: var(--trainfit-bg-secondary);
-  border-radius: 12px;
-  padding: 16px;
+  background-color: #242424;
+  border-radius: 16px;
+  padding: 24px;
   width: 100%;
-  max-width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--trainfit-shadow);
-  border: 1px solid var(--trainfit-border);
+  max-width: 640px;
+  max-height: none;
+  overflow: visible;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+  border: 1px solid #3a3a3a;
   animation: fadeIn 0.2s ease-out;
   box-sizing: border-box;
   position: relative;
@@ -402,17 +600,22 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-  padding: 12px 16px;
-  background-color: var(--trainfit-bg-tertiary);
-  border-radius: 8px;
-  border: 1px solid var(--trainfit-border);
+  padding: 14px 18px;
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  border: 1px solid #3a3a3a;
 }
 
 .modal-title {
-  font-size: 1.1rem;
+  font-size: 1.375rem; /* ~22px */
   font-weight: 700;
-  color: var(--trainfit-text-primary);
+  color: #ffffff;
   margin: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
 }
 
 .modal-close {
@@ -439,7 +642,7 @@
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px; /* entre 12–16px como pedido */
 }
 
 .form-group {
@@ -450,7 +653,7 @@
 
 .form-label {
   font-weight: 600;
-  color: var(--trainfit-text-primary);
+  color: #b0b0b0;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -468,6 +671,14 @@
   font-size: 0.9rem;
   transition: all 0.2s ease;
   box-sizing: border-box;
+}
+
+/* Valores de solo lectura dentro del modal de detalles */
+div.form-input {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  color: #ffffff;
 }
 
 .form-input:focus,
@@ -503,18 +714,19 @@
 
 .modal-actions {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px; /* 8–10px */
   justify-content: flex-end;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid var(--trainfit-border);
+  border-top: 1px solid #3a3a3a;
 }
 
 .btn-cancel {
   background-color: transparent;
   color: var(--trainfit-text-secondary);
-  border: 1px solid var(--trainfit-border);
-  border-radius: 6px;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
   padding: 10px 20px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -524,15 +736,15 @@
 }
 
 .btn-cancel:hover {
-  background-color: var(--trainfit-bg-tertiary);
-  color: var(--trainfit-text-primary);
+  background-color: #2a2a2a;
+  color: #ffffff;
 }
 
 .btn-save {
-  background-color: var(--trainfit-primary);
-  color: var(--trainfit-text-primary);
+  background-color: #D62828;
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 10px 20px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -542,8 +754,8 @@
 }
 
 .btn-save:hover {
-  background-color: var(--trainfit-primary-dark);
-  transform: translateY(-1px);
+  background-color: #D62828;
+  transform: none;
 }
 
 .btn-save:disabled {
@@ -551,6 +763,149 @@
   cursor: not-allowed;
   transform: none;
 }
+
+/* Botones específicos del modal de detalles */
+.btn-secondary {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover {
+  background-color: #333333;
+}
+
+.btn-confirm,
+.btn-completed {
+  background-color: #E53935; /* rojo TrainFit */
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px; /* padding-y: 10px */
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-confirm:hover,
+.btn-completed:hover {
+  background-color: #cf2f2c;
+}
+
+.btn-no-show {
+  background-color: #F59E0B; /* naranja para no presentado */
+  color: #111111;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-no-show:hover {
+  background-color: #d38709;
+}
+
+.btn-danger {
+  background-color: transparent;
+  color: #E53935;
+  border: 1px solid #E53935;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-danger:hover {
+  background-color: rgba(229, 57, 53, 0.12);
+}
+
+.btn-close {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border: 1px solid #3a3a3a; /* sin borde rojo */
+  border-radius: 12px; /* igual que otros botones */
+  padding: 10px 18px; /* igual que otros botones */
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-close:hover {
+  background-color: #3a3a3a;
+}
+
+/* Variante específica para el UnifiedCalendar (evita conflictos con otros .btn-close globales) */
+.btn-close-primary {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-close-primary:hover {
+  background-color: #3a3a3a;
+}
+
+/* Aumentar especificidad para evitar conflictos con otros modales */
+.event-modal .btn-close {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.event-modal .btn-close:hover {
+  background-color: #3a3a3a;
+}
+
+/* Específico para el botón renombrado en el modal de eventos */
+.event-modal .btn-close-primary {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.event-modal .btn-close-primary:hover {
+  background-color: #3a3a3a;
+}
+
+/* Punto de color según tipo de evento */
+.type-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-rutina { background-color: #E53935; }
+.dot-sesion { background-color: #F59E0B; }
+.dot-consulta { background-color: #8B5CF6; }
 
 /* ===== TOOLTIP PERSONALIZADO ===== */
 .event-tooltip {
@@ -707,6 +1062,27 @@
     padding: 10px 16px !important;
     font-size: 0.9rem !important;
   }
+
+  /* Vista MES en móvil: eventos más limpios (chips sin fondo) */
+  .unified-calendar .rbc-month-view .rbc-event {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    padding: 2px 6px !important;
+    border-left-width: 3px !important;
+    color: var(--trainfit-text-primary) !important;
+  }
+  .unified-calendar .rbc-month-view .rbc-event-label {
+    display: none !important; /* oculta rango de horas para mes */
+  }
+  .unified-calendar .rbc-month-view .rbc-event-content {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -748,12 +1124,12 @@
   }
   
   .event-modal {
-    padding: 12px !important;
-    max-width: 95vw !important;
+    padding: 16px !important; /* solicitado para mobile */
+    max-width: 100% !important;
     max-height: 85vh !important;
     width: calc(100% - 16px) !important;
     margin: 0 !important;
-    border-radius: 8px !important;
+    border-radius: 12px !important;
   }
   
   .modal-header {

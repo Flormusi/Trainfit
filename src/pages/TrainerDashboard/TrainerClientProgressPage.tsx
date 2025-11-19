@@ -15,10 +15,12 @@ interface Routine {
   description: string;
   exercises: Exercise[];
   assignedDate: string;
-  status: 'active' | 'completed' | 'paused';
+  status: 'active' | 'completed' | 'paused' | 'vencida';
   progress: number;
   estimatedDuration?: string;
   difficulty?: string;
+  totalWeeks?: number;
+  endDate?: string;
 }
 
 interface Exercise {
@@ -300,6 +302,60 @@ const TrainerClientProgressPage: React.FC = () => {
     return routines.find(r => r.status === 'active') || routines[0];
   };
 
+  const getRoutineWeekDisplay = () => {
+    const routine = getActiveRoutine();
+    if (!routine) {
+      const defaultTotal = 4;
+      return `Semana 1/${defaultTotal}`;
+    }
+
+    const start = routine.assignedDate ? new Date(routine.assignedDate) : null;
+    let currentWeek = 1;
+    if (start && !isNaN(start.getTime())) {
+      const days = Math.floor((Date.now() - start.getTime()) / 86400000);
+      currentWeek = Math.max(1, Math.floor(days / 7) + 1);
+    }
+
+    let totalWeeks: number | null = null;
+    // 1) Preferir totalWeeks explícito
+    if (typeof routine.totalWeeks === 'number' && !isNaN(routine.totalWeeks) && routine.totalWeeks > 0) {
+      totalWeeks = routine.totalWeeks;
+    }
+    // 2) Intentar parsear estimatedDuration (e.g., "8 semanas")
+    else if (routine.estimatedDuration) {
+      const match = routine.estimatedDuration.match(/\d+/);
+      if (match) totalWeeks = parseInt(match[0], 10);
+    }
+    // 3) Calcular desde endDate si existe
+    else if (routine.endDate && start) {
+      const end = new Date(routine.endDate);
+      if (!isNaN(end.getTime())) {
+        const totalDays = Math.max(0, Math.floor((end.getTime() - start.getTime()) / 86400000));
+        const weeks = Math.max(1, Math.ceil(totalDays / 7));
+        totalWeeks = weeks;
+      }
+    }
+    // 4) Fallback uniforme (mensual)
+    if (!totalWeeks || isNaN(totalWeeks)) totalWeeks = 4;
+
+    return `Semana ${Math.min(currentWeek, totalWeeks)}/${totalWeeks}`;
+  };
+
+  // Progreso general: usa rutina activa o la más reciente
+  const getOverallProgress = () => {
+    if (!routines || routines.length === 0) return 0;
+    const active = routines.find(r => r.status === 'active');
+    const target = active || [...routines].sort((a, b) => new Date(b.assignedDate).getTime() - new Date(a.assignedDate).getTime())[0];
+    const p = Number(target?.progress) || 0;
+    return Math.max(0, Math.min(100, Math.round(p)));
+  };
+
+  const getProgressColor = (p: number) => {
+    if (p >= 80) return '#10b981'; // verde
+    if (p >= 40) return '#f59e0b'; // ámbar
+    return '#dc2626'; // rojo
+  };
+
   const checkProfileCompleteness = () => {
     if (!client) return { isComplete: false, missingFields: [] };
     
@@ -360,11 +416,12 @@ const TrainerClientProgressPage: React.FC = () => {
         };
         reader.readAsDataURL(blob);
       });
-    } catch (error) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      const err = error as any;
+      if (err?.name === 'AbortError') {
         console.warn('Timeout al cargar imagen:', imageUrl);
       } else {
-        console.error('Error converting image to base64:', error);
+        console.error('Error converting image to base64:', err);
       }
       return null;
     }
@@ -396,24 +453,57 @@ const TrainerClientProgressPage: React.FC = () => {
       const trainfitLightGray = [156, 163, 175] as [number, number, number]; // #9ca3af - Gris claro
       const trainfitWhite = [255, 255, 255] as [number, number, number]; // #ffffff - Blanco
 
-      // Header con diseño Trainfit mejorado (más alto)
-      pdf.setFillColor(...trainfitRed);
+      // Header con diseño Trainfit mejorado (más alto) - ahora negro
+      pdf.setFillColor(...trainfitBlack);
       pdf.rect(0, 0, pageWidth, 35, 'F');
       
-      // Logo TRAINFIT prominente en la esquina superior izquierda
-      pdf.setTextColor(...trainfitWhite);
-      pdf.setFontSize(18);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('TRAINFIT', 15, 15);
+      // Branding en el header: logo + títulos
+      try {
+        const logoResp = await fetch('/images/logo-trainfit.png');
+        const logoBlob = await logoResp.blob();
+        const logoBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(logoBlob);
+        });
+        // Mantener proporción del logo para evitar compresión
+        const imgEl = new Image();
+        imgEl.src = logoBase64;
+        await new Promise((resolve) => { imgEl.onload = resolve; });
+        const naturalW = (imgEl.naturalWidth || 0);
+        const naturalH = (imgEl.naturalHeight || 0);
+        const targetH = 16; // altura fija coherente con el header
+        const targetW = naturalW && naturalH ? (targetH * (naturalW / naturalH)) : 24;
+        pdf.addImage(imgEl, 'PNG', 12, 9, targetW, targetH);
+      } catch (error) {
+        // Fallback al texto si el logo no carga
+        pdf.setTextColor(...trainfitWhite);
+        pdf.setFontSize(18);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('TRAINFIT', 15, 15);
+      }
       
       // Subtítulo junto al logo
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...trainfitWhite);
       pdf.text('FITNESS & TRAINING', 15, 25);
       
-      // Título de la rutina centrado y más grande
-      pdf.setFontSize(24);
-      pdf.text(routine.name.toUpperCase(), pageWidth / 2, 22, { align: 'center' });
+      // Título grande: Plan de Entrenamiento - Día X
+      const dayTitle = routine.name || 'Rutina';
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(26);
+      pdf.text(`Plan de Entrenamiento - ${dayTitle}`, pageWidth / 2, 22, { align: 'center' });
+      
+      // Subtítulo con cliente, fecha y progreso
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      pdf.text(`Cliente: ${client?.name || 'N/A'} • Fecha: ${new Date().toLocaleDateString('es-ES')} • Progreso: ${routine.progress || 0}%`, pageWidth / 2, 30, { align: 'center' });
+      
+      // Separador decorativo
+      pdf.setDrawColor(230, 230, 230);
+      pdf.setLineWidth(0.5);
+      pdf.line(15, 35, pageWidth - 15, 35);
       
       yPosition = 45;
       pdf.setTextColor(...trainfitBlack);
@@ -422,7 +512,7 @@ const TrainerClientProgressPage: React.FC = () => {
       pdf.setFillColor(...trainfitDarkGray);
       pdf.rect(15, yPosition, pageWidth - 30, 25, 'F');
       pdf.setDrawColor(...trainfitLightGray);
-      pdf.setLineWidth(0.3);
+      pdf.setLineWidth(0.25);
       pdf.rect(15, yPosition, pageWidth - 30, 25);
       
       pdf.setFontSize(12);
@@ -484,14 +574,22 @@ const TrainerClientProgressPage: React.FC = () => {
         )
       );
 
+      // Helper para espaciar listas delimitadas por '-'
+      const formatDelimited = (value: any) => {
+        const s = String(value ?? '').trim();
+        if (!s) return '-';
+        return s.includes('-') ? s.split('-').map(v => v.trim()).join(' · ') : s;
+      };
+
       // Tabla de ejercicios con diseño mejorado
       const tableHeaders = ['#', 'Imagen', 'Ejercicio', 'Series', 'Reps', 'Peso', 'Descanso'];
-      const colWidths = [18, 40, 85, 28, 28, 28, 35]; // Ajustados para mejor proporción
-      const tableWidth = colWidths.reduce((sum, width) => sum + width, 0);
-      const tableStartX = (pageWidth - tableWidth) / 2; // Centrar tabla
+      const tableStartX = 15;
+      const tableWidth = pageWidth - 30; // respetar márgenes para evitar recortes
+      const colWidths = [12, 46, 80, 22, 34, 34, 39]; // suma = 267mm = tableWidth
       let xPosition = tableStartX;
 
       // Encabezados de tabla con diseño Trainfit
+      // Rojo institucional TrainFit para encabezado de tabla
       pdf.setFillColor(...trainfitRed);
       pdf.rect(tableStartX, yPosition, tableWidth, 14, 'F');
       pdf.setTextColor(...trainfitWhite);
@@ -510,13 +608,15 @@ const TrainerClientProgressPage: React.FC = () => {
       // Filas de ejercicios con imágenes mejoradas
       for (let index = 0; index < exercisesWithImages.length; index++) {
         const exercise = exercisesWithImages[index];
-        const rowHeight = 35; // Altura optimizada para imágenes
+        const hasNotes = !!(exercise as any).notes && String((exercise as any).notes).trim() !== '';
+        const rowHeight = hasNotes ? 54 : 50; // un poco más alto si hay notas
 
         if (yPosition + rowHeight > pageHeight - 25) {
           pdf.addPage();
           yPosition = 20;
           
           // Repetir encabezados en nueva página
+          // Rojo institucional TrainFit
           pdf.setFillColor(...trainfitRed);
           pdf.rect(tableStartX, yPosition, tableWidth, 14, 'F');
           pdf.setTextColor(...trainfitWhite);
@@ -540,9 +640,9 @@ const TrainerClientProgressPage: React.FC = () => {
           pdf.rect(tableStartX, yPosition, tableWidth, rowHeight, 'F');
         }
 
-        // Bordes de celda más sutiles con colores Trainfit
+        // Bordes de celda finos con colores Trainfit
         pdf.setDrawColor(...trainfitLightGray);
-        pdf.setLineWidth(0.3);
+        pdf.setLineWidth(0.25);
         xPosition = tableStartX;
         
         // Dibujar bordes de todas las celdas
@@ -558,133 +658,172 @@ const TrainerClientProgressPage: React.FC = () => {
         pdf.setFillColor(...trainfitRed);
         const circleX = xPosition + colWidths[0]/2;
         const circleY = yPosition + rowHeight/2;
-        pdf.circle(circleX, circleY, 6, 'F');
+        pdf.circle(circleX, circleY, 5, 'F');
         pdf.setTextColor(...trainfitWhite);
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.text((index + 1).toString(), circleX, circleY + 2, { align: 'center' });
         xPosition += colWidths[0];
 
-        // Imagen del ejercicio con mejor proporción
+        // Imagen del ejercicio con mejor proporción y padding simétrico
         pdf.setTextColor(...trainfitBlack);
         pdf.setFont('helvetica', 'normal');
         if (exercise.imageBase64) {
           try {
-            // Calcular dimensiones manteniendo proporción
-            const maxImgWidth = 30;
-            const maxImgHeight = 25;
-            const imgPadding = 3;
-            
-            const imgX = xPosition + imgPadding;
-            const imgY = yPosition + (rowHeight - maxImgHeight) / 2;
-            
-            // Agregar imagen con proporción correcta
-            pdf.addImage(exercise.imageBase64, 'JPEG', imgX, imgY, maxImgWidth, maxImgHeight, undefined, 'MEDIUM');
+            const boxPadding = 4;
+            const boxW = colWidths[1] - boxPadding * 2;
+            const boxH = rowHeight - 12; // aire vertical
+
+            const imgEl = new Image();
+            imgEl.src = exercise.imageBase64 as string;
+            await new Promise((resolve) => { imgEl.onload = resolve; });
+
+            const iW = imgEl.naturalWidth || 1;
+            const iH = imgEl.naturalHeight || 1;
+            const scale = Math.min(boxW / iW, boxH / iH);
+            const targetW = Math.max(1, Math.min(iW * scale, boxW));
+            const targetH = Math.max(1, Math.min(iH * scale, boxH));
+            const imgX = xPosition + boxPadding + (boxW - targetW) / 2;
+            const imgY = yPosition + (rowHeight - targetH) / 2;
+
+            pdf.addImage(imgEl, 'JPEG', imgX, imgY, targetW, targetH, undefined, 'MEDIUM');
           } catch (error) {
             console.error('Error adding image to PDF:', error);
             // Si falla la imagen, mostrar texto alternativo
             pdf.setFontSize(8);
             pdf.setTextColor(180, 180, 180);
-            pdf.text('SIN IMAGEN', xPosition + colWidths[1]/2, yPosition + rowHeight/2 + 1, { align: 'center' });
+            pdf.text('SIN IMAGEN', xPosition + colWidths[1]/2, yPosition + rowHeight/2, { align: 'center' });
           }
         } else {
           pdf.setFontSize(8);
           pdf.setTextColor(180, 180, 180);
-          pdf.text('SIN IMAGEN', xPosition + colWidths[1]/2, yPosition + rowHeight/2 + 1, { align: 'center' });
+          pdf.text('SIN IMAGEN', xPosition + colWidths[1]/2, yPosition + rowHeight/2, { align: 'center' });
         }
         xPosition += colWidths[1];
 
         // Nombre del ejercicio con mejor formato
-        const exerciseName = exercise.name || 'N/A';
+        const rawName = exercise.name || 'N/A';
+        const exerciseName = rawName.toLowerCase().includes('unilateral') ? `${rawName} (por lado)` : rawName;
         pdf.setFontSize(10);
         pdf.setTextColor(0, 0, 0);
         pdf.setFont('helvetica', 'normal');
-        
-        if (exerciseName.length > 30) {
-          const words = exerciseName.split(' ');
-          const midPoint = Math.ceil(words.length / 2);
-          const line1 = words.slice(0, midPoint).join(' ');
-          const line2 = words.slice(midPoint).join(' ');
-          pdf.text(line1, xPosition + 3, yPosition + rowHeight/2 - 2);
-          pdf.text(line2, xPosition + 3, yPosition + rowHeight/2 + 4);
-        } else {
-          pdf.text(exerciseName, xPosition + 3, yPosition + rowHeight/2 + 1);
+
+        const nameY = yPosition + (hasNotes ? rowHeight/2 - 4 : rowHeight/2);
+        const nameLines = pdf.splitTextToSize(exerciseName, colWidths[2] - 6);
+        const nameToRender = Array.isArray(nameLines) ? nameLines.slice(0, 2) : [nameLines];
+        nameToRender.forEach((line: string, i: number) => {
+          pdf.text(line, xPosition + 3, nameY + i * 4);
+        });
+
+        if (hasNotes) {
+          const rawNotes = String((exercise as any).notes);
+          const notesLines = pdf.splitTextToSize(rawNotes, colWidths[2] - 6);
+          const limited = Array.isArray(notesLines) ? notesLines.slice(0, 2) : [notesLines];
+          pdf.setFont('helvetica', 'italic');
+          pdf.setTextColor(110, 110, 110);
+          const notesY = nameY + (Array.isArray(nameToRender) ? nameToRender.length * 4 : 4) + 2;
+          limited.forEach((line: string, i: number) => {
+            pdf.text(line, xPosition + 3, notesY + i * 4);
+          });
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(...trainfitBlack);
         }
         xPosition += colWidths[2];
 
         // Datos numéricos con mejor formato
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        pdf.setTextColor(...trainfitDarkGray);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(...trainfitDarkGray);
 
         // Series
-        pdf.text((exercise.sets?.toString() || exercise.series?.toString() || '-'), xPosition + colWidths[3]/2, yPosition + rowHeight/2 + 1, { align: 'center' });
+        pdf.text((exercise.sets?.toString() || exercise.series?.toString() || '-'), xPosition + colWidths[3]/2, yPosition + rowHeight/2, { align: 'center' });
         xPosition += colWidths[3];
 
-        // Repeticiones
-        pdf.text((exercise.reps?.toString() || '-'), xPosition + colWidths[4]/2, yPosition + rowHeight/2 + 1, { align: 'center' });
+        // Repeticiones (envolver para evitar desbordes)
+        {
+          const repsText = formatDelimited(exercise.reps?.toString() || '-');
+          const maxWidth = colWidths[4] - 6; // padding lateral
+          const lines = pdf.splitTextToSize(repsText, maxWidth);
+          const visible = Array.isArray(lines) ? lines.slice(0, 2) : [lines];
+          const lineHeight = 4;
+          const centerY = yPosition + rowHeight/2;
+          const startY = centerY - ((visible.length - 1) * lineHeight) / 2;
+          visible.forEach((line: string, i: number) => {
+            pdf.text(line, xPosition + colWidths[4]/2, startY + i * lineHeight, { align: 'center' });
+          });
+        }
         xPosition += colWidths[4];
 
         // Peso
-        pdf.text((exercise.weight ? `${exercise.weight}kg` : '-'), xPosition + colWidths[5]/2, yPosition + rowHeight/2 + 1, { align: 'center' });
+        // Normalización: usar weightsPerSeries si existe, si no weight básico
+        // Peso (envolver si es largo)
+        {
+          const rawWeights = (exercise as any).weightsPerSeries;
+          const joinedWeights = Array.isArray(rawWeights) && rawWeights.length > 0
+            ? rawWeights.map((w: any) => String(w).replace(/kg/gi, '').trim()).join('-')
+            : (exercise as any).weight;
+          const weightText = (joinedWeights !== undefined && joinedWeights !== null && String(joinedWeights).trim() !== '')
+            ? formatDelimited(String(joinedWeights).replace(/kg/gi, '').trim()) + ' kg'
+            : '-';
+          const maxWidthW = colWidths[5] - 6;
+          const wLines = pdf.splitTextToSize(weightText, maxWidthW);
+          const wVisible = Array.isArray(wLines) ? wLines.slice(0, 2) : [wLines];
+          const lineHeight = 4;
+          const centerY = yPosition + rowHeight/2;
+          const startY = centerY - ((wVisible.length - 1) * lineHeight) / 2;
+          wVisible.forEach((line: string, i: number) => {
+            pdf.text(line, xPosition + colWidths[5]/2, startY + i * lineHeight, { align: 'center' });
+          });
+        }
         xPosition += colWidths[5];
 
         // Descanso
-        pdf.text((exercise.restTime || exercise.rest_time || '-'), xPosition + colWidths[6]/2, yPosition + rowHeight/2 + 1, { align: 'center' });
+        {
+          const restValue = (exercise as any).restTime ?? (exercise as any).rest_time;
+          const restText = (restValue !== undefined && restValue !== null && String(restValue).trim() !== '')
+            ? `${restValue}s`
+            : '-';
+          pdf.text(restText, xPosition + colWidths[6]/2, yPosition + rowHeight/2, { align: 'center' });
+        }
 
         yPosition += rowHeight;
       }
 
+      // (Eliminado) Sección final de "Notas del entrenador"
+      // Las notas ya se renderizan bajo el nombre del ejercicio dentro de la fila.
+
       // Footer con fondo negro y logo TRAINFIT
-      const footerY = pageHeight - 20;
-      pdf.setFillColor(...trainfitBlack);
-      pdf.rect(0, footerY, pageWidth, 20, 'F');
-      
-      // Cargar y agregar el logo real de Trainfit
-      try {
-        const logoResponse = await fetch('/images/logo-trainfit.png');
-        const logoBlob = await logoResponse.blob();
-        const logoBase64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(logoBlob);
-        });
-        
-        // Agregar logo centrado en el footer
-        const logoWidth = 40;
-        const logoHeight = 12;
-        const logoX = (pageWidth - logoWidth) / 2;
-        const logoY = footerY + 4;
-        
-        pdf.addImage(logoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight);
-      } catch (error) {
-        console.warn('Error cargando logo, usando texto alternativo:', error);
-        // Fallback: texto TRAINFIT si no se puede cargar el logo
+      // Footer con branding y número de página
+      const footerHeight = 22;
+      const footerY = pageHeight - footerHeight;
+      const totalPages = pdf.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        pdf.setPage(p);
+        pdf.setFillColor(...trainfitBlack);
+        pdf.rect(0, footerY, pageWidth, footerHeight, 'F');
         pdf.setTextColor(...trainfitWhite);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(16);
-        pdf.text('TRAINFIT', pageWidth / 2, footerY + 12, { align: 'center' });
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.text('Trainfit - Tu entrenamiento a medida', pageWidth / 2, footerY + 14, { align: 'center' });
+        pdf.setFontSize(8);
+        pdf.text(`Página ${p} de ${totalPages}`, pageWidth - 20, footerY + 14, { align: 'right' });
       }
-      
-      pdf.setTextColor(...trainfitWhite);
-      pdf.setFontSize(8);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text('Tu entrenamiento personalizado', pageWidth / 2, footerY + 16, { align: 'center' });
 
       // Guardar PDF con nombre seguro
       const fileName = `rutina-${routine.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${client?.name?.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() || 'cliente'}.pdf`;
       pdf.save(fileName);
       toast.success('PDF con diseño Trainfit generado correctamente');
-    } catch (error) {
-      console.error('Error generando PDF:', error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('Error generando PDF:', message);
       
       // Mensajes de error más específicos
-      if (error.message?.includes('fetch')) {
+      if (message.includes('fetch')) {
         toast.error('Error al cargar las imágenes. PDF generado sin imágenes.');
-      } else if (error.message?.includes('jsPDF')) {
+      } else if (message.includes('jsPDF')) {
         toast.error('Error en la generación del PDF. Verifica los datos de la rutina.');
       } else {
-        toast.error(`Error al generar el PDF: ${error.message || 'Error desconocido'}`);
+        toast.error(`Error al generar el PDF: ${message || 'Error desconocido'}`);
       }
     }
   };
@@ -781,6 +920,46 @@ const TrainerClientProgressPage: React.FC = () => {
             boxShadow: 'none'
           }}></span>
           Activo
+          <button
+            onClick={() => navigate(`/trainer/messages?to=${clientId}`)}
+            style={{
+              marginLeft: '12px',
+              padding: '8px 14px',
+              background: 'linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)',
+              color: 'white',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: `
+                0 4px 12px rgba(220, 38, 38, 0.3),
+                0 2px 6px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2)
+              `
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = `
+                0 6px 16px rgba(220, 38, 38, 0.4),
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2)
+              `;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = `
+                0 4px 12px rgba(220, 38, 38, 0.3),
+                0 2px 6px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2)
+              `;
+            }}
+            title="Enviar mensaje a este cliente"
+          >
+            Enviar Mensaje
+          </button>
         </div>
       </div>
 
@@ -864,12 +1043,14 @@ const TrainerClientProgressPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Título principal con botón de editar */}
+      {/* Contenedor de contenido principal para alinear título y secciones */}
+      <div className="trainer-client-progress-container">
+      {/* Título principal con acciones a la derecha (rojo TrainFit) */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '32px',
+        marginBottom: '16px',
         border: 'none',
         outline: 'none',
         boxShadow: 'none'
@@ -879,64 +1060,76 @@ const TrainerClientProgressPage: React.FC = () => {
           fontWeight: '700',
           color: 'white',
           margin: 0,
+          lineHeight: 1.2,
+          letterSpacing: '0.2px',
           border: 'none',
           outline: 'none',
           boxShadow: 'none'
         }}>{client.name}</h1>
-        
-        <div style={{ display: 'flex', gap: '12px' }}>
+
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
           <button 
             onClick={refreshClientData}
+            title="Actualizar datos del cliente"
+            aria-label="Actualizar datos del cliente"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              background: '#059669',
+              background: 'rgba(255,255,255,0.06)',
               color: 'white',
-              border: 'none',
-              padding: '12px 20px',
-              borderRadius: '8px',
+              border: '1px solid #3a3a3a',
+              padding: '10px 16px',
+              borderRadius: '10px',
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'transform 0.15s ease, background 0.15s ease, border-color 0.15s ease',
               outline: 'none',
               boxShadow: 'none'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#047857';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+              e.currentTarget.style.borderColor = '#4a4a4a';
+              e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#059669';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+              e.currentTarget.style.borderColor = '#3a3a3a';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             <span style={{ fontSize: '16px' }}>🔄</span>
             Refrescar
           </button>
-          
+
           <button 
             onClick={handleEditClient}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              background: '#dc2626',
+              background: 'linear-gradient(135deg, #ec1b21 0%, #9b1212 100%)',
               color: 'white',
               border: 'none',
-              padding: '12px 20px',
-              borderRadius: '8px',
+              padding: '10px 18px',
+              borderRadius: '10px',
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease',
               outline: 'none',
-              boxShadow: 'none'
+              boxShadow: '0 8px 18px rgba(239,68,68,0.25)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#b91c1c';
+              e.currentTarget.style.background = 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)';
+              e.currentTarget.style.boxShadow = '0 10px 20px rgba(239,68,68,0.35)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#dc2626';
+              e.currentTarget.style.background = 'linear-gradient(135deg, #ec1b21 0%, #9b1212 100%)';
+              e.currentTarget.style.boxShadow = '0 8px 18px rgba(239,68,68,0.25)';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             <span style={{ fontSize: '16px' }}>✏️</span>
@@ -947,35 +1140,26 @@ const TrainerClientProgressPage: React.FC = () => {
 
       {/* Contenido según tab activo */}
       {activeTab === 'resumen' && (
-        <div style={{
-          border: 'none',
-          outline: 'none',
-          boxShadow: 'none',
-          backgroundColor: 'transparent'
-        }}>
-          {/* Resumen del cliente */}
-          <div style={{
-            backgroundColor: '#1a1a1a',
-            borderRadius: '12px',
-            padding: '24px',
-            marginBottom: '24px',
-            border: 'none',
-            outline: 'none',
-            boxShadow: 'none',
-            WebkitBoxShadow: 'none',
-            MozBoxShadow: 'none'
-          }}>
-            <h2>Resumen del cliente</h2>
-            
+        <div style={{ border: 'none', outline: 'none', boxShadow: 'none', backgroundColor: 'transparent' }}>
+          {/* Resumen del cliente (rediseñado) */}
+          <div className="client-summary-card">
+            <h2 className="summary-title">Perfil del Cliente</h2>
+
+            {/* Datos en grid 2 columnas */}
             <div className="summary-grid">
               <div className="summary-item">
-                <span className="label">Edad</span>
-                <span className="value">{client.clientProfile?.age || client.age || 'No especificada'}</span>
+                <span className="summary-label" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span aria-hidden>🎂</span>
+                  Edad
+                </span>
+                <span className="summary-value">{client.clientProfile?.age || client.age || 'No especificada'}</span>
               </div>
-              
               <div className="summary-item">
-                <span className="label">Género</span>
-                <span className="value">
+                <span className="summary-label" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span aria-hidden>👤</span>
+                  Género
+                </span>
+                <span className="summary-value">
                   {client.clientProfile?.gender === 'MALE' ? 'Masculino' : 
                    client.clientProfile?.gender === 'FEMALE' ? 'Femenino' : 
                    client.clientProfile?.gender === 'OTHER' ? 'Otro' : 
@@ -984,20 +1168,19 @@ const TrainerClientProgressPage: React.FC = () => {
                    client.gender === 'OTHER' ? 'Otro' : 'No especificado'}
                 </span>
               </div>
-              
               <div className="summary-item">
-                <span className="label">Último entrenamiento</span>
-                <span className="value">{getLastTrainingDate()}</span>
+                <span className="summary-label" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span aria-hidden>🎯</span>
+                  Objetivo
+                </span>
+                <span className="summary-value">{client.clientProfile?.goals?.[0] || client.goals?.[0] || 'No especificado'}</span>
               </div>
-              
               <div className="summary-item">
-                <span className="label">Objetivo</span>
-                <span className="value">{client.clientProfile?.goals?.[0] || client.goals?.[0] || 'No especificado'}</span>
-              </div>
-              
-              <div className="summary-item">
-                <span className="label">Nivel</span>
-                <span className="value">
+                <span className="summary-label" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span aria-hidden>📈</span>
+                  Nivel
+                </span>
+                <span className="summary-value">
                   {client.clientProfile?.fitnessLevel === 'BEGINNER' ? 'Principiante' : 
                    client.clientProfile?.fitnessLevel === 'INTERMEDIATE' ? 'Intermedio' : 
                    client.clientProfile?.fitnessLevel === 'ADVANCED' ? 'Avanzado' : 
@@ -1006,68 +1189,62 @@ const TrainerClientProgressPage: React.FC = () => {
                    client.fitnessLevel === 'ADVANCED' ? 'Avanzado' : 'No especificado'}
                 </span>
               </div>
-              
-              <div className="summary-item">
-                <span className="label">Semana actual</span>
-                <span className="value">Semana 4/8</span>
+            </div>
+
+            {/* Progreso general */}
+            <div style={{ marginTop: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span className="summary-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>📊 Progreso general</span>
+                <span style={{ color: '#fff', fontWeight: 600 }}>{getOverallProgress()}%</span>
+              </div>
+              <div style={{ width: '100%', height: 6, background: '#3a3a3a', borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{ width: `${getOverallProgress()}%`, height: '100%', background: getProgressColor(getOverallProgress()) }} />
               </div>
             </div>
-          </div>
 
-          {/* Layout de dos columnas */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-            {/* Rutina actual */}
-            <div style={{
-              backgroundColor: '#1a1a1a',
-              borderRadius: '12px',
-              padding: '24px',
-              border: 'none',
-              outline: 'none',
-              boxShadow: 'none',
-              WebkitBoxShadow: 'none',
-              MozBoxShadow: 'none'
-            }}>
-              <h2>Rutina actual</h2>
-              
-              {activeRoutine ? (
-                <>
-                  <h3>{activeRoutine.name}</h3>
-                  <p className="routine-week">Semana 4/8</p>
-                  
-                  <button 
-                    className="btn-view-progress"
-                    onClick={() => {
-                      console.log('🔥 BOTÓN VER PROGRESO CLICKEADO!');
-                      console.log('🚀 Cliente ID:', clientId);
-                      console.log('🎯 Navegando a rutinas tab');
-                      setActiveTab('rutinas');
-                    }}
-                  >
-                    Ver progreso
-                  </button>
-                </>
-              ) : (
-                <div className="no-routine">
-                  <h3>Programa de Definición</h3>
-                  <p className="routine-week">Semana 4/8</p>
-                  
-                  <button 
-                    className="btn-view-progress"
-                    onClick={() => {
-                      console.log('🔥 BOTÓN VER PROGRESO CLICKEADO!');
-                      console.log('🚀 Cliente ID:', clientId);
-                      console.log('🎯 Navegando a rutinas tab');
-                      setActiveTab('rutinas');
-                    }}
-                  >
-                    Ver progreso
-                  </button>
-                </div>
-              )}
+            {/* Acciones inferiores */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: 14 }}>
+              <button
+                onClick={() => setActiveTab('rutinas')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  background: 'linear-gradient(90deg, #dc2626, #ef4444)',
+                  color: 'white', border: 'none', padding: '10px 16px',
+                  borderRadius: '10px', fontSize: '14px', fontWeight: 700,
+                  cursor: 'pointer', transition: 'filter 0.2s ease'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.filter = 'brightness(1.1)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}
+              >
+                🧭 Ver rutina asignada
+              </button>
+
+              <button
+                onClick={handleEditClient}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  background: 'rgba(255,255,255,0.06)',
+                  color: 'white', border: '1px solid #3a3a3a', padding: '10px 16px',
+                  borderRadius: '10px', fontSize: '14px', fontWeight: 600,
+                  cursor: 'pointer', transition: 'transform 0.15s ease, background 0.15s ease, border-color 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+                  e.currentTarget.style.borderColor = '#4a4a4a';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                  e.currentTarget.style.borderColor = '#3a3a3a';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                ✏️ Editar cliente
+              </button>
             </div>
-
-
           </div>
+
+          {/* Se eliminó “Rutina actual” para simplificar la vista */}
         </div>
       )}
 
@@ -1097,69 +1274,84 @@ const TrainerClientProgressPage: React.FC = () => {
             {routines && routines.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {routines.map((routine, index) => (
-                  <div key={routine.id || index} style={{
-                    backgroundColor: '#2a2a2a',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    border: '1px solid #333',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#333';
-                    e.currentTarget.style.borderColor = '#dc2626';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#2a2a2a';
-                    e.currentTarget.style.borderColor = '#333';
-                  }}
-                  onClick={() => {
-                    // Parsear ejercicios si están en formato JSON string
-                    let processedRoutine = { ...routine };
-                    if (typeof routine.exercises === 'string') {
-                      try {
-                        processedRoutine.exercises = JSON.parse(routine.exercises);
-                      } catch (e) {
-                        console.error('Error parsing routine exercises:', e);
-                        processedRoutine.exercises = [];
+                  <div
+                    key={routine.id || index}
+                    data-status={routine.status}
+                    style={{
+                      backgroundColor: '#2a2a2a',
+                      borderRadius: '10px',
+                      padding: '16px',
+                      border: '1px solid #333',
+                      borderLeft: routine.status === 'vencida' ? '2px solid #f59e0b' : '2px solid transparent',
+                      transition: 'background 0.2s ease, border-color 0.2s ease',
+                      position: 'relative'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#333';
+                      // Mantener el borde ámbar en vencidas
+                      const status = e.currentTarget.getAttribute('data-status');
+                      if (status !== 'vencida') {
+                        e.currentTarget.style.borderColor = '#3a3a3a';
                       }
-                    }
-                    setSelectedRoutine(processedRoutine);
-                    setIsRoutineModalOpen(true);
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <h3 style={{ color: 'white', marginBottom: '0', flex: 1 }}>{routine.name}</h3>
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#2a2a2a';
+                      const status = e.currentTarget.getAttribute('data-status');
+                      if (status !== 'vencida') {
+                        e.currentTarget.style.borderColor = '#333';
+                      }
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <h3 style={{ color: 'white', margin: 0, flex: 1, fontSize: '18px', fontWeight: 700, letterSpacing: '0.2px' }}>{routine.name}</h3>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ 
-                          backgroundColor: routine.status === 'active' ? '#10b981' : routine.status === 'completed' ? '#3b82f6' : '#dc2626',
-                          color: 'white',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: '500'
-                        }}>
-                          {routine.status === 'active' ? 'Activa' : routine.status === 'completed' ? 'Completada' : 'Pausada'}
-                        </span>
-                        <span style={{
-                          color: '#dc2626',
-                          fontSize: '14px',
-                          fontWeight: '500'
-                        }}>
-                          👁️ Ver
-                        </span>
+                        {(() => {
+                          const bg = routine.status === 'completed' ? '#3b82f6' : routine.status === 'paused' ? '#dc2626' : routine.status === 'vencida' ? '#f59e0b' : '#10b981';
+                          const label = routine.status === 'completed' ? 'Completada' : routine.status === 'paused' ? 'Pausada' : routine.status === 'vencida' ? 'Vencida ⚠️' : 'Activa';
+                          const tooltip = routine.status === 'completed'
+                            ? 'Progreso ≥ 95% o todos los ejercicios completados.'
+                            : routine.status === 'paused'
+                              ? 'Sin actividad en los últimos 10 días.'
+                              : routine.status === 'vencida'
+                                ? 'Fecha de fin pasada y progreso < 90%.'
+                                : 'Rutina en curso.';
+                          return (
+                            <span
+                              title={tooltip}
+                              style={{ 
+                                backgroundColor: bg,
+                                color: 'white',
+                                padding: '6px 10px',
+                                borderRadius: '12px',
+                                fontSize: '11px',
+                                fontWeight: 700
+                              }}
+                            >
+                              {label}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
                     
-                    <p style={{ color: '#ccc', marginBottom: '12px', fontSize: '14px' }}>{routine.description}</p>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ color: '#dc2626', fontSize: '14px' }}>
+                    {routine.description && (
+                      <p style={{ color: '#c9c9c9', margin: '0 0 10px 0', fontSize: '14px', lineHeight: 1.45 }}>{routine.description}</p>
+                    )}
+                    <div style={{ color: '#9aa0a6', fontSize: '12px', marginBottom: '8px' }}>
+                      Asignada: {routine.assignedDate ? new Date(routine.assignedDate).toLocaleDateString() : 'N/A'}
+                    </div>
+                    {routine.endDate && (
+                      <div style={{ color: '#9aa0a6', fontSize: '12px', marginBottom: '8px' }}>
+                        Finaliza: {new Date(routine.endDate).toLocaleDateString()}
+                      </div>
+                    )}
+                    <div style={{ margin: '6px 0 12px 0' }}>
+                      <div style={{ color: '#dc2626', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
                         Progreso: {routine.progress || 0}%
-                      </span>
-                      <span style={{ color: '#999', fontSize: '14px' }}>
-                        Asignada: {routine.assignedDate ? new Date(routine.assignedDate).toLocaleDateString() : 'N/A'}
-                      </span>
+                      </div>
+                      <div style={{ width: '100%', height: '6px', background: '#3a3a3a', borderRadius: '999px', overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(Math.max(Number(routine.progress) || 0, 0), 100)}%`, height: '100%', background: '#dc2626' }} />
+                      </div>
                     </div>
                     
                     {routine.exercises && routine.exercises.length > 0 && (
@@ -1167,23 +1359,27 @@ const TrainerClientProgressPage: React.FC = () => {
                         <p style={{ color: '#ccc', fontSize: '14px', marginBottom: '8px' }}>
                           Ejercicios ({routine.exercises.length}):
                         </p>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                           {routine.exercises.slice(0, 4).map((exercise, idx) => (
                             <span key={idx} style={{
-                              backgroundColor: '#374151',
+                              backgroundColor: '#3a3a3a',
                               color: 'white',
-                              padding: '4px 8px',
-                              borderRadius: '4px',
-                              fontSize: '12px'
+                              padding: '3px 8px',
+                              borderRadius: '999px',
+                              fontSize: '11px',
+                              lineHeight: 1.2
                             }}>
                               {exercise.name}
                             </span>
                           ))}
                           {routine.exercises.length > 4 && (
                             <span style={{
-                              color: '#9ca3af',
-                              fontSize: '12px',
-                              padding: '4px 8px'
+                              backgroundColor: '#3a3a3a',
+                              color: '#c9c9c9',
+                              padding: '3px 8px',
+                              borderRadius: '999px',
+                              fontSize: '11px',
+                              lineHeight: 1.2
                             }}>
                               +{routine.exercises.length - 4} más
                             </span>
@@ -1202,46 +1398,80 @@ const TrainerClientProgressPage: React.FC = () => {
                       paddingTop: '12px'
                     }}>
                       <button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          const confirmResend = window.confirm(
-                            `¿Quieres reenviar el email de la rutina "${routine.name}" al cliente?\n\nSe enviará una nueva notificación por correo electrónico.`
+                          const confirmDelete = window.confirm(
+                            `¿Estás seguro de que deseas eliminar la rutina "${routine.name}"?\n\nEsta acción es permanente y no se puede deshacer.`
                           );
-                          
-                          if (confirmResend) {
-                            // Aquí iría la lógica para reenviar el email
-                            alert(`✅ Email de la rutina "${routine.name}" reenviado exitosamente`);
+                          if (!confirmDelete) return;
+                          try {
+                            await trainerApi.deleteRoutine(routine.id);
+                            setRoutines(prev => prev.filter(r => r.id !== routine.id));
+                            toast.success('Rutina eliminada exitosamente');
+                          } catch (error) {
+                            console.error('Error al eliminar la rutina:', error);
+                            toast.error('Error al eliminar la rutina');
                           }
                         }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
                           gap: '8px',
-                          backgroundColor: '#ff6600',
-                          color: 'white',
-                          border: '3px solid #ff4400',
-                          padding: '12px 20px',
-                          borderRadius: '8px',
-                          fontSize: '16px',
-                          fontWeight: 'bold',
+                          backgroundColor: 'rgba(220,38,38,0.08)',
+                          color: '#ef4444',
+                          border: '1px solid #dc2626',
+                          padding: '10px 16px',
+                          borderRadius: '10px',
+                          fontSize: '14px',
+                          fontWeight: 700,
                           cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          textTransform: 'uppercase',
-                          letterSpacing: '1px',
-                          boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+                          transition: 'background 0.2s ease, border-color 0.2s ease'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#ff4400';
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.3)';
+                          e.currentTarget.style.backgroundColor = 'rgba(220,38,38,0.15)';
+                          e.currentTarget.style.borderColor = '#ef4444';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#ff6600';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                          e.currentTarget.style.backgroundColor = 'rgba(220,38,38,0.08)';
+                          e.currentTarget.style.borderColor = '#dc2626';
                         }}
                       >
-                        📧 ENVIAR EMAIL
+                        🗑️ Eliminar
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const subject = encodeURIComponent(`Rutina asignada: ${routine.name}`);
+                          const body = encodeURIComponent(
+                            `Hola ${client?.name || ''},\n\nTe comparto la rutina "${routine.name}".\n\n¡Éxitos!\nEquipo TrainFit`
+                          );
+                          const email = client?.email || '';
+                          window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          backgroundColor: 'rgba(255,255,255,0.06)',
+                          color: 'white',
+                          border: '1px solid #3a3a3a',
+                          padding: '10px 16px',
+                          borderRadius: '10px',
+                          fontSize: '14px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'background 0.2s ease, border-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                          e.currentTarget.style.borderColor = '#4a4a4a';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
+                          e.currentTarget.style.borderColor = '#3a3a3a';
+                        }}
+                      >
+                        📧 Enviar Email
                       </button>
                       
                       <button
@@ -1264,21 +1494,21 @@ const TrainerClientProgressPage: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '8px',
-                          backgroundColor: '#dc2626',
+                          background: 'linear-gradient(90deg, #dc2626, #ef4444)',
                           color: 'white',
                           border: 'none',
-                          padding: '10px 16px',
-                          borderRadius: '6px',
+                          padding: '10px 18px',
+                          borderRadius: '10px',
                           fontSize: '14px',
-                          fontWeight: '500',
+                          fontWeight: 700,
                           cursor: 'pointer',
-                          transition: 'all 0.2s ease'
+                          transition: 'filter 0.2s ease'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#b91c1c';
+                          e.currentTarget.style.filter = 'brightness(1.1)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#dc2626';
+                          e.currentTarget.style.filter = 'brightness(1)';
                         }}
                       >
                         👁️ Ver Detalles
@@ -1330,32 +1560,44 @@ const TrainerClientProgressPage: React.FC = () => {
                 border: '1px solid #333'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <span style={{ color: 'white', fontWeight: '500' }}>Estado actual:</span>
+                  <span style={{ color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span aria-hidden>💰</span>
+                    Estado:
+                  </span>
                   <span style={{ 
-                    color: paymentStatus.status === 'paid' ? '#10b981' : paymentStatus.status === 'pending' ? '#f59e0b' : '#ef4444',
-                    fontWeight: '500'
+                    color: paymentStatus.status === 'paid' ? '#10b981' : paymentStatus.status === 'pending' ? '#f59e0b' : '#dc2626',
+                    fontWeight: 500
                   }}>
                     {paymentStatus.status === 'paid' ? 'Pagado' : paymentStatus.status === 'pending' ? 'Pendiente' : 'Vencido'}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <span style={{ color: '#ccc' }}>Monto:</span>
-                  <span style={{ color: 'white' }}>${paymentStatus.amount}</span>
+                  <span style={{ color: '#e5e7eb', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span aria-hidden>💵</span>
+                    Monto:
+                  </span>
+                  <span style={{ color: 'white', fontWeight: 400 }}>${paymentStatus.amount}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                  <span style={{ color: '#ccc' }}>Fecha de vencimiento:</span>
-                  <span style={{ color: 'white' }}>{new Date(paymentStatus.dueDate).toLocaleDateString()}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: '#e5e7eb', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span aria-hidden>📅</span>
+                    Fecha de vencimiento:
+                  </span>
+                  <span style={{ color: 'white', fontWeight: 400 }}>{new Date(paymentStatus.dueDate).toLocaleDateString()}</span>
                 </div>
-                
+
+                {/* Divisor sutil */}
+                <div style={{ height: '1px', backgroundColor: '#333', opacity: 0.8, margin: '16px 0' }} />
+
                 {/* Botones de acción */}
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', paddingTop: '4px' }}>
                   <button
                     onClick={handleSendPaymentReminder}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      backgroundColor: '#f59e0b',
+                      backgroundColor: '#374151',
                       color: 'white',
                       border: 'none',
                       padding: '10px 16px',
@@ -1366,10 +1608,10 @@ const TrainerClientProgressPage: React.FC = () => {
                       transition: 'all 0.2s ease'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#d97706';
+                      e.currentTarget.style.backgroundColor = '#4b5563';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f59e0b';
+                      e.currentTarget.style.backgroundColor = '#374151';
                     }}
                   >
                     <span>📧</span>
@@ -1473,6 +1715,9 @@ const TrainerClientProgressPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Cierre del contenedor de contenido principal */}
+      </div>
 
       {/* Modal para completar perfil */}
       {isCompleteProfileModalOpen && (
@@ -1694,9 +1939,9 @@ const TrainerClientProgressPage: React.FC = () => {
                                    src={imageUrl} 
                                    alt={parsedExercise.name || 'Ejercicio'}
                                    style={{
-                                     width: '120px',
-                                     height: '120px',
-                                     objectFit: 'cover',
+                                     width: '160px',
+                                     height: '160px',
+                                     objectFit: 'contain',
                                      borderRadius: '8px',
                                      border: '2px solid #dc2626'
                                    }}
@@ -1717,8 +1962,8 @@ const TrainerClientProgressPage: React.FC = () => {
                              
                              {/* Placeholder siempre presente pero oculto si hay imagen */}
                              <div style={{
-                               width: '120px',
-                               height: '120px',
+                               width: '160px',
+                               height: '160px',
                                backgroundColor: '#444',
                                borderRadius: '8px',
                                display: (() => {
@@ -1828,7 +2073,7 @@ const TrainerClientProgressPage: React.FC = () => {
                                    </div>
                                    <div style={{ fontSize: '11px', color: '#ccc' }}>
                                      <div>{serie.reps} repeticiones</div>
-                                     {serie.weight && <div>{serie.weight} kg</div>}
+                                     {serie.weight && <div>{String(serie.weight).replace(/kg/gi, '').trim()} kg</div>}
                                      {serie.restTime && <div>Descanso: {serie.restTime}</div>}
                                    </div>
                                  </div>
@@ -1863,10 +2108,20 @@ const TrainerClientProgressPage: React.FC = () => {
                                      <p style={{ color: '#fff', margin: '2px 0 0 0', fontSize: '16px', fontWeight: 'bold' }}>{parsedExercise.reps}</p>
                                    </div>
                                  )}
-                                 {parsedExercise.weight && (
+                                 {(parsedExercise.weight || (Array.isArray(parsedExercise.weightsPerSeries) && parsedExercise.weightsPerSeries.length > 0)) && (
                                    <div style={{ backgroundColor: '#1a1a1a', padding: '10px', borderRadius: '6px', border: '1px solid #dc2626' }}>
                                      <span style={{ color: '#dc2626', fontSize: '12px', fontWeight: 'bold' }}>PESO</span>
-                                     <p style={{ color: '#fff', margin: '2px 0 0 0', fontSize: '16px', fontWeight: 'bold' }}>{parsedExercise.weight} kg</p>
+                                     {(() => {
+                                       const rawWeights = Array.isArray(parsedExercise.weightsPerSeries) && parsedExercise.weightsPerSeries.length > 0
+                                         ? parsedExercise.weightsPerSeries.map((w: any) => String(w).replace(/kg/gi, '').trim()).join('-')
+                                         : String(parsedExercise.weight ?? '').replace(/kg/gi, '').trim();
+                                       const formatted = rawWeights.includes('-')
+                                         ? rawWeights.split('-').map((v: string) => v.trim()).join(' · ')
+                                         : rawWeights;
+                                       return (
+                                         <p style={{ color: '#fff', margin: '2px 0 0 0', fontSize: '16px', fontWeight: 'bold' }}>{formatted} kg</p>
+                                       );
+                                     })()}
                                    </div>
                                  )}
                                  {parsedExercise.duration && (

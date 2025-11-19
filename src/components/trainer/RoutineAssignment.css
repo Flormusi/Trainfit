@@ -21,17 +21,18 @@
 }
 
 .create-routine-btn {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   text-decoration: none;
   padding: 10px 20px;
   border-radius: 8px;
   font-size: 0.9rem;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .create-routine-btn:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
+  box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.1);
 }
 
 .assignment-grid {
@@ -52,7 +53,7 @@
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .assignment-form {
@@ -91,11 +92,13 @@ input[type="date"] {
 
 select:focus,
 input[type="date"]:focus {
-  outline: 1px solid #ff3b30;
+  outline: none;
+  border-color: #D62828;
+  box-shadow: 0 0 0 3px rgba(214, 40, 40, 0.1);
 }
 
 .assign-btn {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border: none;
   padding: 12px;
@@ -103,12 +106,13 @@ input[type="date"]:focus {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   margin-top: 10px;
 }
 
 .assign-btn:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
+  box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.1);
 }
 
 .month-navigation {
@@ -166,7 +170,7 @@ input[type="date"]:focus {
 .client-avatar {
   width: 50px;
   height: 50px;
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -189,7 +193,7 @@ input[type="date"]:focus {
 .routine-info h4 {
   margin: 0 0 5px 0;
   font-size: 1.1rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .routine-info p {
@@ -240,13 +244,13 @@ input[type="date"]:focus {
 
 .view-progress-btn {
   background-color: transparent;
-  border: 1px solid #ff3b30;
-  color: #ff3b30;
+  border: 1px solid #D62828;
+  color: #D62828;
   text-decoration: none;
 }
 
 .view-progress-btn:hover {
-  background-color: rgba(255, 59, 48, 0.1);
+  background-color: rgba(214, 40, 40, 0.1);
 }
 
 .remove-assignment-btn {
@@ -257,8 +261,8 @@ input[type="date"]:focus {
 
 .remove-assignment-btn:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  color: #ff3b30;
-  border-color: #ff3b30;
+  color: #D62828;
+  border-color: #D62828;
 }
 
 /* Loading and Error States */

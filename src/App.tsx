@@ -11,6 +11,7 @@ const ClientProgressPage = React.lazy(() => import('./pages/client/ClientProgres
 const TrainerDashboard = React.lazy(() => import('./pages/TrainerDashboard'));
 const CreateRoutinePage = React.lazy(() => import('./pages/TrainerDashboard/CreateRoutinePage'));
 const EditRoutinePage = React.lazy(() => import('./pages/TrainerDashboard/EditRoutinePage'));
+const RoutineLibraryPage = React.lazy(() => import('./pages/TrainerDashboard/RoutineLibraryPage'));
 const UnassignedRoutines = React.lazy(() => import('./components/trainer/UnassignedRoutines'));
 const AllRoutines = React.lazy(() => import('./pages/TrainerDashboard/AllRoutines'));
 const AddClientPage = React.lazy(() => import('./pages/TrainerDashboard/AddClientPage'));
@@ -107,6 +108,14 @@ function App() {
           element={
             <ProtectedRoute role="trainer">
               <AllRoutines />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trainer/routines/library"
+          element={
+            <ProtectedRoute role="trainer">
+              <RoutineLibraryPage />
             </ProtectedRoute>
           }
         />

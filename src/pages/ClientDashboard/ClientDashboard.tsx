@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, AlertCircle, Clock, FileText } from 'lucide-react';
+import { CheckCircle, AlertCircle, Clock, FileText, MessageSquare } from 'lucide-react';
 import './ClientDashboard.css';
 import './force-dark-theme.css';
 import SkeletonCard from '../../components/common/SkeletonCard';
@@ -19,6 +19,8 @@ import PaymentHistoryModal from '../../components/client/PaymentHistoryModal/Pay
 import { clientApi } from '../../services/api';
 import { toast } from 'react-toastify';
 import { formatCurrencyARS, calculateAnnualTotal } from '../../utils/payments';
+import { useSocket } from '../../hooks/useSocket';
+import axios from '../../services/axiosConfig';
 
 interface PaymentStatus {
   status: string;
@@ -125,6 +127,12 @@ const formatShortDate = (dateString: string): string => {
   });
 };
 
+// Format time as HH:MM in Spanish locale
+const formatShortTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+};
+
 // Format currency amounts for Argentina with proper thousand separators
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('es-AR', {
@@ -177,6 +185,12 @@ const calculatePaymentProgress = (isUpToDate: boolean): { monthsPaid: number, to
   return { monthsPaid, totalMonths, percent, label };
 };
 
+// Truncar textos largos para previews de mensajes
+const truncate = (text: string, maxLen = 120): string => {
+  if (!text) return '';
+  return text.length > maxLen ? `${text.slice(0, maxLen - 1)}…` : text;
+};
+
 const ClientDashboard: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -214,7 +228,8 @@ const ClientDashboard: React.FC = () => {
   const [selectedDayEvents, setSelectedDayEvents] = useState<{
     localTrainings: any[];
     googleEvents: any[];
-  }>({ localTrainings: [], googleEvents: [] });
+    serverEvents?: CalendarEvent[];
+  }>({ localTrainings: [], googleEvents: [], serverEvents: [] });
   const [showCreateTrainingModal, setShowCreateTrainingModal] = useState(false);
   const [createTrainingDate, setCreateTrainingDate] = useState<Date | null>(null);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -222,7 +237,27 @@ const ClientDashboard: React.FC = () => {
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
   const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
   const [editingTraining, setEditingTraining] = useState<any>(null);
-
+  // Añadir contador de mensajes no leídos
+  const [unreadMessages, setUnreadMessages] = useState<number>(0);
+  // Preview del último mensaje recibido
+const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: string; content: string; time?: string } | null>(null);
+  const { subscribeToNotificationEvents, unsubscribeFromNotificationEvents } = useSocket();
+  // Highlight del icono 💬 ante nuevos mensajes
+  const [isMessageIconHighlight, setIsMessageIconHighlight] = useState(false);
+  const prevUnreadRef = useRef<number>(0);
+  // Eventos del servidor (rutinas, sesiones, consultas)
+  interface CalendarEvent {
+    id: string;
+    type: 'routine' | 'session' | 'consultation';
+    title: string;
+    start: Date;
+    end: Date;
+    status?: string;
+    clientId?: string;
+  }
+  const [serverEvents, setServerEvents] = useState<CalendarEvent[]>([]);
+  
+  
   // Cargar eventos de Google Calendar cuando el usuario esté autenticado
   useEffect(() => {
     if (isAuthenticated) {
@@ -233,6 +268,160 @@ const ClientDashboard: React.FC = () => {
       getEvents(startOfMonth, endOfMonth);
     }
   }, [isAuthenticated, getEvents]);
+
+  // Cargar eventos del servidor para el cliente (rutinas, sesiones, consultas)
+  useEffect(() => {
+    const fetchClientCalendarEvents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const id = clientId || user?.id || localStorage.getItem('userId') || '';
+        if (!id || !token) {
+          setServerEvents([]);
+          return;
+        }
+
+        const params = new URLSearchParams();
+        params.set('clientId', id);
+        // Limitar por mes actual para obtener solo eventos relevantes
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        params.set('startDate', startOfMonth.toISOString());
+        params.set('endDate', endOfMonth.toISOString());
+
+        const [routinesRes, sessionsRes, consultationsRes] = await Promise.all([
+          axios.get(`/routine-schedule`, { params: Object.fromEntries(params) }),
+          axios.get(`/appointments`, { params: Object.fromEntries(params) }),
+          axios.get(`/appointments/consultations`, { params: Object.fromEntries(params) })
+        ]);
+
+        const routinesJson = routinesRes?.data ?? [];
+        const sessionsJson = sessionsRes?.data ?? [];
+        const consultationsJson = consultationsRes?.data ?? [];
+
+        const normalizeArray = (raw: any) => Array.isArray(raw) ? raw : (raw?.data || []);
+        const normalizeDate = (v: any) => v ? new Date(v) : undefined;
+
+        const mapEvent = (ap: any, forcedType: 'routine' | 'session' | 'consultation'): CalendarEvent | null => {
+          const start = normalizeDate(ap.startTime || ap.start || ap.dateStart || ap.start_date);
+          const end = normalizeDate(ap.endTime || ap.end || ap.dateEnd || ap.end_date);
+          if (!start || !end) return null;
+          const title = ap.title || ap.name || (forcedType === 'routine' ? 'Rutina' : forcedType === 'session' ? 'Sesión' : 'Consulta');
+          const status = ap.status || ap.state || ap.currentStatus || '';
+          const cid = String(ap.clientId || ap.client?.id || ap.client?.clientId || id);
+          return {
+            id: String(ap.id || ap._id || `${forcedType}-${start.toISOString()}`),
+            type: forcedType,
+            title,
+            start,
+            end,
+            status,
+            clientId: cid
+          };
+        };
+
+        const onlyActiveForClient = (ev: CalendarEvent | null) => {
+          if (!ev) return false;
+          const statusUpper = String(ev.status || '').toUpperCase();
+          // Mostrar sólo activos; excluir cancelados
+          const isActive = statusUpper === 'ACTIVE' || statusUpper === 'SCHEDULED' || statusUpper === '';
+          const sameClient = !ev.clientId || ev.clientId === id;
+          return isActive && sameClient;
+        };
+
+        // Filtrar por tipo real antes de mapear para evitar clasificaciones incorrectas
+        const getTypeUpper = (ap: any) => String(ap?.type || ap?.category || ap?.eventType || '').toUpperCase();
+
+        const routines = normalizeArray(routinesJson)
+          .filter((ap: any) => getTypeUpper(ap) === 'ROUTINE')
+          .map((ap: any) => mapEvent(ap, 'routine'))
+          .filter(onlyActiveForClient) as CalendarEvent[];
+
+        const sessions = normalizeArray(sessionsJson)
+          .filter((ap: any) => getTypeUpper(ap) === 'SESSION')
+          .map((ap: any) => mapEvent(ap, 'session'))
+          .filter(onlyActiveForClient) as CalendarEvent[];
+
+        const consultations = normalizeArray(consultationsJson)
+          .filter((ap: any) => {
+            const t = getTypeUpper(ap);
+            return t === 'CONSULTATION' || t === 'CONSULTA' || String(ap?.type).toLowerCase() === 'consultation';
+          })
+          .map((ap: any) => mapEvent(ap, 'consultation'))
+          .filter(onlyActiveForClient) as CalendarEvent[];
+
+        setServerEvents([
+          ...routines,
+          ...sessions,
+          ...consultations
+        ]);
+      } catch (error) {
+        console.error('Error al cargar eventos del servidor:', error);
+        setServerEvents([]);
+      }
+    };
+
+    // Cargar al iniciar y actualizar cuando cambie clientId o user.id
+    fetchClientCalendarEvents();
+
+    // Actualizar periódicamente para evitar depender de notificaciones (cada 60s)
+    const interval = window.setInterval(fetchClientCalendarEvents, 60000);
+    return () => window.clearInterval(interval);
+  }, [clientId, user?.id]);
+
+  // Obtener conteo de notificaciones no leídas para la campanita
+  useEffect(() => {
+    let interval: number | undefined;
+    const fetchUnreadCount = async () => {
+      try {
+        const id = user?.id || localStorage.getItem('userId') || '';
+        if (!id) return;
+        const { count } = await clientApi.getUnreadNotificationCount(id);
+        setUnreadNotifications(count || 0);
+      } catch (error) {
+        console.error('Error obteniendo conteo de notificaciones:', error);
+      }
+    };
+
+    // Cargar al iniciar
+    fetchUnreadCount();
+    // Refrescar periódicamente (cada 30s)
+    interval = window.setInterval(fetchUnreadCount, 30000);
+
+    return () => {
+      if (interval) window.clearInterval(interval);
+    };
+  }, [user?.id]);
+
+  // Suscribirse a eventos de notificación vía WebSocket
+  useEffect(() => {
+    subscribeToNotificationEvents({
+      onNew: () => {
+        setUnreadNotifications((prev) => Math.max((prev || 0) + 1, 1));
+      },
+      onRead: (payload: any) => {
+        if (payload?.all) {
+          setUnreadNotifications(0);
+        } else {
+          setUnreadNotifications((prev) => Math.max((prev || 0) - 1, 0));
+        }
+      }
+    });
+    return () => {
+      unsubscribeFromNotificationEvents();
+    };
+  }, [subscribeToNotificationEvents, unsubscribeFromNotificationEvents]);
+
+  // Activar highlight sutil cuando aumenta el conteo de mensajes no leídos
+  useEffect(() => {
+    if (unreadMessages > (prevUnreadRef.current || 0)) {
+      setIsMessageIconHighlight(true);
+      const t = window.setTimeout(() => setIsMessageIconHighlight(false), 900);
+      return () => window.clearTimeout(t);
+    }
+    prevUnreadRef.current = unreadMessages;
+  }, [unreadMessages]);
+
 
   // Función para cargar datos del dashboard
   const loadDashboardData = async () => {
@@ -310,6 +499,64 @@ const ClientDashboard: React.FC = () => {
     loadDashboardData();
   }, [user]);
 
+  // Obtener contador de mensajes no leídos al montar (y cuando cambie el usuario)
+  useEffect(() => {
+    const fetchUnreadMessages = async () => {
+      try {
+        const res = await axios.get(`/messages/unread-count`);
+        const payload = res?.data;
+        const count = typeof payload?.unreadCount !== 'undefined' ? payload.unreadCount : (payload?.count ?? 0);
+        setUnreadMessages(Number(count) || 0);
+      } catch (e) {
+        setUnreadMessages(0);
+      }
+    };
+    fetchUnreadMessages();
+  }, [user]);
+
+  // Obtener el último mensaje recibido y el nombre del entrenador
+  useEffect(() => {
+    const fetchLastMessage = async () => {
+      try {
+        const res = await axios.get(`/messages/conversations`);
+        const payload: any = res?.data ?? null;
+        const items: any[] = Array.isArray(payload)
+          ? payload
+          : (Array.isArray(payload?.data)
+              ? payload.data
+              : (Array.isArray(payload?.data?.data) ? payload.data.data : []));
+        if (!items || !items.length) {
+          setLastMessagePreview(null);
+          return;
+        }
+
+        const mapped = items
+          .map((item: any) => {
+            const u = item.user || {};
+            const name = u?.trainerProfile?.name || u?.clientProfile?.name || u?.name || u?.email || 'Usuario';
+            return {
+              name,
+              content: item?.lastMessage?.content || '',
+              time: item?.lastMessage?.createdAt || ''
+            };
+          })
+          .filter((x: any) => x.content);
+
+        if (!mapped.length) {
+          setLastMessagePreview(null);
+          return;
+        }
+
+        mapped.sort((a: any, b: any) => new Date(b.time).getTime() - new Date(a.time).getTime());
+        const latest = mapped[0];
+        setLastMessagePreview({ trainerName: latest.name, content: latest.content, time: latest.time });
+      } catch (e) {
+        setLastMessagePreview(null);
+      }
+    };
+    fetchLastMessage();
+  }, [user]);
+
   // useEffect para forzar re-render cuando cambien las métricas
   useEffect(() => {
     if (progressMetrics) {
@@ -375,13 +622,25 @@ const ClientDashboard: React.FC = () => {
              eventDate.getFullYear() === currentDate.getFullYear();
     });
     
+    // Filtrar eventos del servidor por día
+    const dayServerEvents = serverEvents.filter(ev => {
+      const d = new Date(ev.start);
+      return d.getDate() === day &&
+             d.getMonth() === currentDate.getMonth() &&
+             d.getFullYear() === currentDate.getFullYear();
+    });
+
     return {
       localTrainings,
       googleEvents: dayGoogleEvents,
-      hasEvents: localTrainings.length > 0 || dayGoogleEvents.length > 0,
+      serverEvents: dayServerEvents,
+      hasEvents: localTrainings.length > 0 || dayGoogleEvents.length > 0 || dayServerEvents.length > 0,
       hasLocalTraining: localTrainings.length > 0,
       hasGoogleEvent: dayGoogleEvents.length > 0,
-      hasBoth: localTrainings.length > 0 && dayGoogleEvents.length > 0
+      hasServerEvent: dayServerEvents.length > 0,
+      hasBoth: (localTrainings.length > 0 && dayGoogleEvents.length > 0) ||
+               (localTrainings.length > 0 && dayServerEvents.length > 0) ||
+               (dayGoogleEvents.length > 0 && dayServerEvents.length > 0)
     };
   };
 
@@ -395,7 +654,8 @@ const ClientDashboard: React.FC = () => {
     setSelectedDate(clickedDate);
     setSelectedDayEvents({
       localTrainings: dayEvents.localTrainings,
-      googleEvents: dayEvents.googleEvents
+      googleEvents: dayEvents.googleEvents,
+      serverEvents: dayEvents.serverEvents
     });
     setIsModalOpen(true);
   };
@@ -404,7 +664,7 @@ const ClientDashboard: React.FC = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedDate(null);
-    setSelectedDayEvents({ localTrainings: [], googleEvents: [] });
+    setSelectedDayEvents({ localTrainings: [], googleEvents: [], serverEvents: [] });
   };
 
   const handleEditTraining = (training: any) => {
@@ -580,6 +840,53 @@ const ClientDashboard: React.FC = () => {
     setShowPaymentHistoryModal(true);
   };
 
+  // Abrir modal de calendario/entrenamientos para una fecha específica (desde notificaciones)
+  const openTrainingModalForDate = (dateISO?: string) => {
+    try {
+      const targetDate = dateISO ? new Date(dateISO) : new Date();
+      setSelectedDate(targetDate);
+
+      // Filtrar entrenamientos locales por fecha
+      const localTrainings = mockTrainingSchedule.filter(training => {
+        const d = new Date(training.date);
+        return (
+          d.getDate() === targetDate.getDate() &&
+          d.getMonth() === targetDate.getMonth() &&
+          d.getFullYear() === targetDate.getFullYear()
+        );
+      });
+
+      // Filtrar eventos de Google por fecha
+      const dayGoogleEvents = googleEvents.filter(event => {
+        const raw = event.start.dateTime || event.start.date || '';
+        if (!raw) return false;
+        const d = new Date(raw);
+        return (
+          d.getDate() === targetDate.getDate() &&
+          d.getMonth() === targetDate.getMonth() &&
+          d.getFullYear() === targetDate.getFullYear()
+        );
+      });
+
+      // Incluir eventos del servidor en el modal
+      const currentDate = new Date();
+      const dayServerEvents = serverEvents.filter(ev => {
+        const d = new Date(ev.start);
+        return (
+          d.getDate() === targetDate.getDate() &&
+          d.getMonth() === targetDate.getMonth() &&
+          d.getFullYear() === targetDate.getFullYear()
+        );
+      });
+
+      setSelectedDayEvents({ localTrainings, googleEvents: dayGoogleEvents, serverEvents: dayServerEvents });
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error('Error abriendo modal de entrenamientos:', err);
+      setIsModalOpen(true);
+    }
+  };
+
   const handleMakePayment = () => {
     toast.info('Función de pago en desarrollo');
   };
@@ -689,7 +996,9 @@ const ClientDashboard: React.FC = () => {
                 </div>
               ) : (
                 <h1 onClick={() => setIsEditingNickname(true)} className="cursor-pointer">
-                  {nickname || user?.name || 'Usuario'}
+                  <span className="greeting">Hola, </span>
+                  <span className="user-name-display">{nickname || user?.name || 'Usuario'}</span>
+                  <span className="wave"> 👋</span>
                 </h1>
               )}
             </div>
@@ -752,7 +1061,7 @@ const ClientDashboard: React.FC = () => {
             <div className="card bg-[#1e1e1e] rounded-xl p-6 shadow-md">
               <div className="calendar-header">
                 <h2>Calendario de entrenamientos</h2>
-                <button className="request-change-btn bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg" onClick={handleRequestChange}>Solicitar cambio</button>
+                <button className="request-change-btn bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg" style={{ marginBottom: 8 }} onClick={handleRequestChange}>Solicitar cambio</button>
               </div>
               <div className="calendar-grid">
                 {/* Desktop/Tablet Month View */}
@@ -778,9 +1087,21 @@ const ClientDashboard: React.FC = () => {
                     
                     let dayClass = 'calendar-day';
                     if (isToday) dayClass += ' today';
-                    if (dayEvents.hasBoth) dayClass += ' has-both-events';
-                    else if (dayEvents.hasLocalTraining) dayClass += ' has-training';
-                    else if (dayEvents.hasGoogleEvent) dayClass += ' has-google-event';
+                    if (dayEvents.hasBoth) {
+                      dayClass += ' has-both-events';
+                    } else if (dayEvents.hasServerEvent) {
+                      const hasRoutine = dayEvents.serverEvents?.some(ev => ev.type === 'routine');
+                      const hasSession = dayEvents.serverEvents?.some(ev => ev.type === 'session');
+                      const hasConsultation = dayEvents.serverEvents?.some(ev => ev.type === 'consultation');
+                      // Prioridad visual: sesión (naranja) > consulta (violeta) > rutina (rojo)
+                      if (hasSession) dayClass += ' has-server-session';
+                      else if (hasConsultation) dayClass += ' has-server-consultation';
+                      else if (hasRoutine) dayClass += ' has-server-routine';
+                    } else if (dayEvents.hasLocalTraining) {
+                      dayClass += ' has-training';
+                    } else if (dayEvents.hasGoogleEvent) {
+                      dayClass += ' has-google-event';
+                    }
                     
                     return (
                       <div 
@@ -790,9 +1111,23 @@ const ClientDashboard: React.FC = () => {
                       >
                         <span className="calendar-day-number">{day}</span>
                         {dayEvents.hasEvents && (
-                          <div className="day-indicators">
-                            {dayEvents.hasLocalTraining && <div className="training-indicator"></div>}
-                            {dayEvents.hasGoogleEvent && <div className="google-indicator"></div>}
+                          <div className="day-indicators" style={{ display: 'flex', gap: 4 }}>
+                            {dayEvents.hasLocalTraining && <div className="training-indicator" />}
+                            {dayEvents.hasGoogleEvent && <div className="google-indicator" />}
+                            {dayEvents.hasServerEvent && (
+                              <>
+                                {/* Indicadores por tipo de evento del servidor */}
+                                {dayEvents.serverEvents?.some(ev => ev.type === 'routine') && (
+                                  <div title="Rutina" style={{ width: 8, height: 8, borderRadius: 999, background: '#ff4757' }} />
+                                )}
+                                {dayEvents.serverEvents?.some(ev => ev.type === 'session') && (
+                                  <div title="Sesión" style={{ width: 8, height: 8, borderRadius: 999, background: '#f59e0b' }} />
+                                )}
+                                {dayEvents.serverEvents?.some(ev => ev.type === 'consultation') && (
+                                  <div title="Consulta" style={{ width: 8, height: 8, borderRadius: 999, background: '#8b5cf6' }} />
+                                )}
+                              </>
+                            )}
                           </div>
                         )}
                       </div>
@@ -863,15 +1198,15 @@ const ClientDashboard: React.FC = () => {
               </div>
               <div className="calendar-legend">
                 <div className="legend-item">
-                  <div className="legend-color training"></div>
+                  <span className="legend-icon" aria-hidden="true">🏋️</span>
                   <span>Entrenamiento local</span>
                 </div>
                 <div className="legend-item">
-                  <div className="legend-color google-event"></div>
+                  <span className="legend-icon" aria-hidden="true">📆</span>
                   <span>Evento Google Calendar</span>
                 </div>
                 <div className="legend-item">
-                  <div className="legend-color both-events"></div>
+                  <span className="legend-icon" aria-hidden="true">🔁</span>
                   <span>Ambos eventos</span>
                 </div>
                 <div className="legend-item">
@@ -931,8 +1266,54 @@ const ClientDashboard: React.FC = () => {
             </div>
           </div>
 
+          {/* Tarjeta de Mensajes */}
+          <div className="dashboard-section messages-card">
+            <div className="card rounded-xl p-6 shadow-md">
+              <div className="card-header">
+                <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  Mensajes
+                  <motion.span
+                    className="messages-icon"
+                    animate={isMessageIconHighlight ? { scale: [1, 1.1, 1], y: [0, -3, 0], opacity: [1, 0.9, 1] } : {}}
+                    transition={{ duration: 0.8 }}
+                    aria-hidden="true"
+                  >
+                    💬
+                  </motion.span>
+                </h2>
+              </div>
+              {lastMessagePreview?.content && (
+                <div className="messages-preview">
+                  <div className="messages-preview-name"><strong>{lastMessagePreview.trainerName}</strong></div>
+                  <div className="messages-preview-content">{truncate(lastMessagePreview.content, 120)}</div>
+                  {lastMessagePreview.time && (
+                    <div className="messages-preview-time">{formatShortTime(lastMessagePreview.time)}</div>
+                  )}
+                </div>
+              )}
+              <div className="messages-summary">
+                {unreadMessages > 0 
+                  ? `Tienes ${unreadMessages} mensajes sin leer.` 
+                  : '📭 No tienes mensajes nuevos. Mantente atento a las notificaciones de tu entrenador.'}
+              </div>
+
+              <div>
+                <button
+                  className="open-messaging-btn"
+                  onClick={() => navigate('/client/messages')}
+                  title="Abrir mensajería"
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <MessageSquare size={16} />
+                    {'Ver bandeja'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Estado de Cuotas */}
-          <div className="dashboard-section payment-management">
+          <div className="dashboard-section payment-management" style={{ marginTop: 16 }}>
             <div className="card bg-[#1e1e1e] rounded-xl p-6 shadow-md">
               <div className="payment-header">
                 <h2>Estado de cuotas</h2>
@@ -978,7 +1359,29 @@ const ClientDashboard: React.FC = () => {
                     <div className="due-date-info">
                       <div className="due-date-label">Próximo pago</div>
                       <div className="due-date-row">
-                        <div className="due-date-icon">
+                        <div className="due-date-icon" title={(() => {
+                          const dueDateStr = paymentStatus?.dueDate;
+                          if (!dueDateStr) return '';
+                          try {
+                            const today = new Date();
+                            const baseToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0, 0);
+                            const due = new Date(dueDateStr);
+                            due.setHours(12, 0, 0, 0);
+                            const diffDays = Math.round((due.getTime() - baseToday.getTime()) / (1000 * 60 * 60 * 24));
+                            const isUpToDate = !!paymentStatus?.isUpToDate;
+                            if (isUpToDate) {
+                              if (diffDays === 0) return 'Vence hoy';
+                              if (diffDays > 0) return `Vence en ${diffDays} día${diffDays === 1 ? '' : 's'}`;
+                              return '';
+                            } else {
+                              if (diffDays === 0) return 'Vence hoy';
+                              if (diffDays > 0) return `Vence en ${diffDays} día${diffDays === 1 ? '' : 's'}`;
+                              return `Venció hace ${Math.abs(diffDays)} día${Math.abs(diffDays) === 1 ? '' : 's'}`;
+                            }
+                          } catch {
+                            return '';
+                          }
+                        })()}>
                           <Clock size={16} />
                         </div>
                         <div className="due-date-value">
@@ -1072,6 +1475,36 @@ const ClientDashboard: React.FC = () => {
         isOpen={showNotificationCenter}
         onClose={() => {
           setShowNotificationCenter(false);
+          // Refrescar conteo al cerrar el centro (por si se leyeron notificaciones)
+          (async () => {
+            try {
+              const id = user?.id || localStorage.getItem('userId') || '';
+              if (!id) return;
+              const { count } = await clientApi.getUnreadNotificationCount(id);
+              setUnreadNotifications(count || 0);
+            } catch (error) {
+              console.error('Error refrescando conteo de notificaciones:', error);
+            }
+          })();
+        }}
+        onOpenRoutineModal={(routineId: string) => {
+          // Abrir el mismo modal de "Ver detalles" que usa el botón del dashboard
+          setSelectedRoutine({ id: routineId });
+          setShowRoutineModal(true);
+          setShowNotificationCenter(false);
+        }}
+        onOpenPaymentHistory={() => {
+          handleViewPaymentHistory();
+          setShowNotificationCenter(false);
+        }}
+        onOpenMessages={(trainerId?: string) => {
+          const to = trainerId ? `?to=${trainerId}` : '';
+          navigate(`/client/messages${to}`);
+          setShowNotificationCenter(false);
+        }}
+        onOpenCalendarEvent={(dateISO?: string) => {
+          openTrainingModalForDate(dateISO);
+          setShowNotificationCenter(false);
         }}
       />
 
@@ -1082,6 +1515,7 @@ const ClientDashboard: React.FC = () => {
         selectedDate={selectedDate}
         localTrainings={selectedDayEvents.localTrainings}
         googleEvents={selectedDayEvents.googleEvents}
+        serverEvents={selectedDayEvents.serverEvents || []}
         onEditTraining={handleEditTraining}
         onDeleteTraining={handleDeleteTraining}
         onCreateTraining={handleCreateTraining}

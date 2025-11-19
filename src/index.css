@@ -5,4 +5,12 @@
 /* Global overflow control to prevent horizontal scroll */
 html, body {
   overflow-x: hidden;
+  /* Enforce dark background to avoid white flashes during HMR/reloads */
+  background-color: #121212;
+  color-scheme: dark;
+}
+
+/* Ensure the root element inherits the dark background immediately */
+#root {
+  background-color: #121212;
 }

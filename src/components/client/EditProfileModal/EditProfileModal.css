@@ -145,13 +145,13 @@
 }
 
 .save-btn {
-  background: #ff4757;
+  background-color: #D62828;
   color: #fff;
 }
 
 .save-btn:hover:not(:disabled) {
-  background: #ff3742;
-  transform: translateY(-1px);
+  background-color: #D62828;
+  transform: none;
 }
 
 .save-btn:disabled {

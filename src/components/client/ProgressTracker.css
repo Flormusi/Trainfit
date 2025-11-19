@@ -22,7 +22,7 @@
 }
 
 .back-link:hover {
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .progress-header h1 {
@@ -55,7 +55,7 @@
   display: block;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ff3b30;
+  color: #D62828;
   margin-bottom: 10px;
 }
 
@@ -81,7 +81,7 @@
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-list {
@@ -105,8 +105,8 @@
 }
 
 .exercise-item.active {
-  background-color: rgba(255, 59, 48, 0.1);
-  border-left: 3px solid #ff3b30;
+  background-color: rgba(214, 40, 40, 0.1);
+  border-left: 3px solid #D62828;
 }
 
 .exercise-item h3 {
@@ -159,7 +159,7 @@
 }
 
 .time-range-btn.active {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
@@ -188,7 +188,7 @@
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .empty-state {
@@ -199,7 +199,7 @@
 
 .start-workout-btn {
   display: inline-block;
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
@@ -259,8 +259,8 @@
 
 .view-details-btn {
   background-color: transparent;
-  border: 1px solid #ff3b30;
-  color: #ff3b30;
+  border: 1px solid #D62828;
+  color: #D62828;
   padding: 8px 16px;
   border-radius: 4px;
   text-decoration: none;
@@ -269,7 +269,7 @@
 }
 
 .view-details-btn:hover {
-  background-color: rgba(255, 59, 48, 0.1);
+  background-color: rgba(214, 40, 40, 0.1);
 }
 
 /* Responsive adjustments */

@@ -11,7 +11,16 @@ import './styles/modern-design.css';
 // import './styles/eliminate-all-white-backgrounds.css';
 
 // Inicializar configuración global de Axios (baseURL, interceptores)
-import './services/axiosConfig';
+import axios from './services/axiosConfig';
+// Inicializa configuración global de Axios
+// Además, ejecuta un health check al arrancar para verificar conectividad con backend
+axios.get('/health')
+  .then((res) => {
+    console.log('[Startup Health] OK:', res.status, res.data);
+  })
+  .catch((err) => {
+    console.warn('[Startup Health] Failed:', err?.response?.status, err?.message);
+  });
 
 const root = document.getElementById('root');
 if (!root) {

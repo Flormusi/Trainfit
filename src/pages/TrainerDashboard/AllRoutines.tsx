@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { AxiosError } from 'axios';
 import { trainerApi } from '../../services/api';
+import axios from '../../services/axiosConfig';
 import { 
   PlusIcon, 
   ArrowLeftIcon, 
@@ -95,22 +96,10 @@ const AllRoutines = () => {
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/trainer/routines/${routineId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        toast.success(`✅ Rutina "${routineName}" eliminada exitosamente.`);
-        // Actualizar la lista de rutinas
-        setRoutines(routines.filter(routine => routine.id !== routineId));
-      } else {
-        throw new Error('Error al eliminar la rutina');
-      }
+      await axios.delete(`/trainer/routines/${routineId}`);
+      toast.success(`✅ Rutina "${routineName}" eliminada exitosamente.`);
+      // Actualizar la lista de rutinas
+      setRoutines(routines.filter(routine => routine.id !== routineId));
     } catch (error) {
       console.error('Error al eliminar la rutina:', error);
       toast.error('❌ Error al eliminar la rutina. Por favor, inténtalo de nuevo.');

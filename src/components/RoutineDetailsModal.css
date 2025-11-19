@@ -1,8 +1,8 @@
 /* Trainfit Color Variables */
 :root {
-  --trainfit-primary: #dc2626;
+  --trainfit-primary: #D62828;
   --trainfit-primary-light: #ef4444;
-  --trainfit-primary-dark: #b91c1c;
+  --trainfit-primary-dark: #FF3B30;
   --trainfit-bg-primary: #000000;
   --trainfit-bg-secondary: #1a1a1a;
   --trainfit-bg-tertiary: #2a2a2a;
@@ -68,6 +68,9 @@
   letter-spacing: 2px;
   margin-bottom: 0.5rem;
   opacity: 0.9;
+  text-shadow:
+    0 0 15px rgba(214, 40, 40, 0.35), /* blur principal */
+    0 0 1px rgba(214, 40, 40, 0.35);  /* spread simulado máximo 1px */
 }
 
 .header-info h2 {
@@ -211,8 +214,10 @@
 
 .exercises-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* Alinea título y contador a la izquierda */
   align-items: center;
+  gap: 16px; /* Espacio entre título y contador */
+  flex-wrap: wrap; /* Evita que se peguen en pantallas pequeñas */
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid var(--trainfit-border);
@@ -232,6 +237,7 @@
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1; /* Evita que el pill se vea más alto que el título */
 }
 
 /* Exercise Card */
@@ -426,8 +432,8 @@
 }
 
 .btn-save {
-  background: linear-gradient(135deg, var(--trainfit-success) 0%, #059669 100%);
-  color: var(--trainfit-text-primary);
+  background-color: #D62828;
+  color: #fff;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -437,8 +443,8 @@
 }
 
 .btn-save:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background-color: #D62828;
+  transform: none;
 }
 
 .btn-save:disabled {

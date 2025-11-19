@@ -10,19 +10,21 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 16px;
+  padding: 24px;
+  padding-top: 72px; /* evita tapar header del sitio */
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .day-events-modal {
-  background: #1A1A1A;
+  background: #242424;
   border-radius: 16px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
   max-width: 600px;
   width: 100%;
-  max-height: calc(100vh - 32px);
+  max-height: none;
   min-height: 300px;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -34,7 +36,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 32px;
   border-bottom: 2px solid #FF4C4C;
   background: #111111;
   color: white;
@@ -113,11 +115,11 @@
 
 .day-events-modal-content {
   flex: 1;
-  overflow-y: auto;
-  padding: 24px;
+  overflow-y: visible;
+  padding: 24px; /* menos espacio, más limpieza */
   box-sizing: border-box;
-  min-height: 0;
-  background: #1A1A1A;
+  min-height: auto;
+  background: #242424;
 }
 
 /* Lista de eventos */
@@ -320,7 +322,7 @@
   .day-events-modal {
     max-width: 90vw;
     width: 100%;
-    max-height: calc(100vh - 32px);
+    max-height: none;
     border-radius: 12px;
   }
   
@@ -407,7 +409,7 @@
   .day-events-modal {
     max-width: 95vw;
     width: 100%;
-    max-height: calc(100vh - 24px);
+    max-height: none;
     border-radius: 10px;
   }
   

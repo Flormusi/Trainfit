@@ -15,6 +15,8 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './UnifiedCalendar.css';
 import './UnifiedCalendar.override.css';
 import { trainerApi } from '../services/api';
+import axios from '../services/axiosConfig';
+import { Toaster, toast } from 'react-hot-toast';
 
 // Hook personalizado para detectar el tamaño de ventana
 const useWindowSize = () => {
@@ -115,7 +117,8 @@ const UnifiedCalendar: React.FC = () => {
   const [newEvent, setNewEvent] = useState({
     title: '',
     description: '',
-    type: 'session' as 'routine' | 'session' | 'consultation',
+    // Usamos valores en español para coincidir con la selección del formulario
+    type: 'sesion' as string,
     clientId: '',
     routineId: '',
     startTime: '',
@@ -127,7 +130,6 @@ const UnifiedCalendar: React.FC = () => {
   useEffect(() => {
     fetchEvents();
     fetchClients();
-    fetchRoutines();
   }, [date, view]);
 
   useEffect(() => {
@@ -176,45 +178,62 @@ const UnifiedCalendar: React.FC = () => {
         endDate: rangeEnd.toISOString()
       });
 
-      const response = await fetch(`/api/appointments?${params.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // Realizar llamadas paralelas: rutinas, sesiones (appointments), consultas
+      const [routinesRes, appointmentsRes, consultationsRes] = await Promise.all([
+        axios.get(`/routine-schedule`, { params: Object.fromEntries(params) }),
+        axios.get(`/appointments`, { params: Object.fromEntries(params) }),
+        axios.get(`/appointments/consultations`, { params: Object.fromEntries(params) })
+      ]);
 
-      if (!response.ok) {
-        console.error('Error al obtener citas:', response.statusText);
-        setEvents([]);
-        return;
-      }
+      const routinesJson = routinesRes?.data ?? [];
+      const appointmentsJson = appointmentsRes?.data ?? [];
+      const consultationsJson = consultationsRes?.data ?? [];
 
-      const appointments = await response.json();
+      const toCalendarEvent = (ap: any): CalendarEvent => {
+        const start = new Date(ap.startTime);
+        const end = new Date(ap.endTime);
+        const clientObj = ap.client || {};
+        const clientName = clientObj.name || clientObj.clientProfile?.name || clientObj.email || 'Cliente';
+        const rawType = String(ap.type || '').toUpperCase();
+        let mappedType: 'routine' | 'session' | 'consultation';
+        if (rawType === 'ROUTINE') mappedType = 'routine';
+        else if (rawType === 'SESSION') mappedType = 'session';
+        else if (rawType === 'CONSULTATION') mappedType = 'consultation';
+        else mappedType = 'session';
+        return {
+          id: String(ap.id),
+          title: ap.title || `Sesión - ${clientName}`,
+          start,
+          end,
+          type: mappedType,
+          status: ap.status,
+          description: ap.description,
+          location: ap.location,
+          notes: ap.notes,
+          client: {
+            id: String(clientObj.id || ap.clientId || ''),
+            name: String(clientName),
+            email: String(clientObj.email || '')
+          }
+        };
+      };
 
-      const mapped: CalendarEvent[] = (Array.isArray(appointments) ? appointments : appointments?.data || [])
-        .map((ap: any): CalendarEvent => {
-          const start = new Date(ap.startTime);
-          const end = new Date(ap.endTime);
-          const clientObj = ap.client || {};
-          const clientName = clientObj.name || clientObj.clientProfile?.name || clientObj.email || 'Cliente';
-          return {
-            id: String(ap.id),
-            title: ap.title || `Sesión - ${clientName}`,
-            start,
-            end,
-            type: 'session',
-            status: ap.status,
-            description: ap.description,
-            location: ap.location,
-            notes: ap.notes,
-            client: {
-              id: String(clientObj.id || ap.clientId || ''),
-              name: String(clientName),
-              email: String(clientObj.email || '')
-            }
-          };
-        });
+      const routines = (Array.isArray(routinesJson) ? routinesJson : routinesJson?.data || [])
+        .filter((ap: any) => ap?.status !== 'CANCELLED')
+        .map(toCalendarEvent)
+        .filter((ev: CalendarEvent) => ev.type === 'routine');
 
-      setEvents(mapped);
+      const sessions = (Array.isArray(appointmentsJson) ? appointmentsJson : appointmentsJson?.data || [])
+        .filter((ap: any) => ap?.status !== 'CANCELLED')
+        .map(toCalendarEvent)
+        .filter((ev: CalendarEvent) => ev.type === 'session');
+
+      const consultations = (Array.isArray(consultationsJson) ? consultationsJson : consultationsJson?.data || [])
+        .filter((ap: any) => ap?.status !== 'CANCELLED')
+        .map(toCalendarEvent)
+        .filter((ev: CalendarEvent) => ev.type === 'consultation');
+
+      setEvents([...routines, ...sessions, ...consultations]);
     } catch (error) {
       console.error('Error al obtener eventos:', error);
       setEvents([]);
@@ -246,21 +265,9 @@ const UnifiedCalendar: React.FC = () => {
     }
   };
 
-  const fetchRoutines = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/routines', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setRoutines(data.data || []);
-      }
-    } catch (error) {
-      console.error('Error al obtener rutinas:', error);
-    }
-  };
+  // Eliminado: la carga de rutinas ya se maneja desde el endpoint de calendario
+  // '/api/routine-schedule' dentro de fetchEvents. Quitamos la llamada redundante
+  // a '/api/routines' que provocaba un 404 innecesario.
 
   const createEvent = async () => {
     if (!newEvent.title || !newEvent.clientId || !newEvent.startTime || !newEvent.endTime) {
@@ -271,28 +278,35 @@ const UnifiedCalendar: React.FC = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const endpoint = newEvent.type === 'routine' ? '/api/routine-schedule' : '/api/appointments';
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          ...newEvent,
-          startTime: new Date(newEvent.startTime).toISOString(),
-          endTime: new Date(newEvent.endTime).toISOString()
-        })
+      // Soportar valores en español e inglés para decidir endpoint
+      const isRoutine = newEvent.type === 'routine' || newEvent.type === 'rutina';
+      const endpoint = isRoutine ? '/routine-schedule' : '/appointments';
+      const response = await axios.post(endpoint, {
+        ...newEvent,
+        startTime: new Date(newEvent.startTime).toISOString(),
+        endTime: new Date(newEvent.endTime).toISOString()
       });
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
+        toast.success('Evento creado con éxito', {
+          duration: 3000,
+          style: { background: '#2d2d2d', color: '#fff' }
+        });
         setShowCreateModal(false);
         resetNewEvent();
         fetchEvents();
+      } else {
+        toast.error('Error al procesar la acción', {
+          duration: 3000,
+          style: { background: '#2d2d2d', color: '#fff' }
+        });
       }
     } catch (error) {
       console.error('Error al crear evento:', error);
+      toast.error('Error al procesar la acción', {
+        duration: 3000,
+        style: { background: '#2d2d2d', color: '#fff' }
+      });
     } finally {
       setLoading(false);
     }
@@ -302,7 +316,8 @@ const UnifiedCalendar: React.FC = () => {
     setNewEvent({
       title: '',
       description: '',
-      type: 'session',
+      // Default en español
+      type: 'sesion',
       clientId: '',
       routineId: '',
       startTime: '',
@@ -315,16 +330,8 @@ const UnifiedCalendar: React.FC = () => {
   const updateEventStatus = async (eventId: string, status: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/appointments/${eventId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status })
-      });
-
-      if (response.ok) {
+      const response = await axios.put(`/appointments/${eventId}`, { status });
+      if (response.status >= 200 && response.status < 300) {
         fetchEvents();
       }
     } catch (error) {
@@ -341,23 +348,16 @@ const UnifiedCalendar: React.FC = () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/appointments/${editingEvent.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title: editValues.title,
-          description: editValues.description,
-          location: editValues.location,
-          notes: editValues.notes,
-          startTime: new Date(editValues.startTime).toISOString(),
-          endTime: new Date(editValues.endTime).toISOString()
-        })
+      const response = await axios.put(`/appointments/${editingEvent.id}`, {
+        title: editValues.title,
+        description: editValues.description,
+        location: editValues.location,
+        notes: editValues.notes,
+        startTime: new Date(editValues.startTime).toISOString(),
+        endTime: new Date(editValues.endTime).toISOString()
       });
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         setEditingEvent(null);
         setEditing(false);
         fetchEvents();
@@ -375,18 +375,29 @@ const UnifiedCalendar: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const event = events.find(e => e.id === eventId);
-      const endpoint = event?.type === 'routine' ? `/api/routine-schedule/${eventId}` : `/api/appointments/${eventId}`;
-      
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        fetchEvents();
+      const endpoint = event?.type === 'routine' ? `/routine-schedule/${eventId}` : `/appointments/${eventId}`;
+      const response = await axios.delete(endpoint);
+      if (response.status >= 200 && response.status < 300) {
+        // Actualización optimista: quitar del estado local inmediatamente
+        setEvents(prev => prev.filter(e => e.id !== eventId));
+        // Notificación y cierre de modal
+        toast.success('Evento eliminado con éxito', {
+          duration: 3000,
+          style: { background: '#2d2d2d', color: '#fff' }
+        });
+        setEditingEvent(null);
+      } else {
+        toast.error('Error al procesar la acción', {
+          duration: 3000,
+          style: { background: '#2d2d2d', color: '#fff' }
+        });
       }
     } catch (error) {
       console.error('Error al eliminar evento:', error);
+      toast.error('Error al procesar la acción', {
+        duration: 3000,
+        style: { background: '#2d2d2d', color: '#fff' }
+      });
     }
   };
 
@@ -406,6 +417,17 @@ const UnifiedCalendar: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const formatTimeRange = (start: string | Date, end: string | Date) => {
+    const s = typeof start === 'string' ? new Date(start) : start;
+    const e = typeof end === 'string' ? new Date(end) : end;
+    const sStr = formatTime(s);
+    const eStr = formatTime(e);
+    if (s.getTime() === e.getTime()) {
+      return sStr;
+    }
+    return `${sStr}–${eStr}`;
   };
 
   const getEventTypeIcon = (type: string) => {
@@ -469,30 +491,43 @@ const UnifiedCalendar: React.FC = () => {
   };
 
   const eventStyleGetter = (event: CalendarEvent) => {
-    let className = 'calendar-event';
-    
-    // Añadir clase específica según el tipo de evento
-    switch (event.type) {
-      case 'routine':
-        className += ' event-rutina';
-        break;
-      case 'session':
-        className += ' event-sesion';
-        break;
-      case 'consultation':
-        className += ' event-consulta';
-        break;
-      default:
-        className += ' event-default';
+    // Normalización completa del tipo (tildes, mayúsculas y espacios)
+    const type = event.type
+      ?.toString()
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0301\u0308]/g, '')
+      .replace(/\s+/g, '');
+
+    // Asignación explícita de color por tipo, contemplando plurales, con fallback rojo
+    let backgroundColor: string;
+    if (["rutina", "routine", "rutinas"].includes(type || '')) {
+      backgroundColor = '#E53935';
+    } else if (["sesion", "session", "sesiones"].includes(type || '')) {
+      backgroundColor = '#FB8C00';
+    } else if (["consulta", "consultation", "consultas"].includes(type || '')) {
+      backgroundColor = '#8E24AA';
+    } else {
+      backgroundColor = '#E53935';
     }
-    
-    return { 
+
+    // Mantener clases específicas por tipo (incluyendo plurales)
+    let className = 'calendar-event';
+    if (["rutina", "routine", "rutinas"].includes(type || '')) className += ' event-rutina';
+    else if (["sesion", "session", "sesiones"].includes(type || '')) className += ' event-sesion';
+    else if (["consulta", "consultation", "consultas"].includes(type || '')) className += ' event-consulta';
+    else className += ' event-default';
+
+    // Mantener diseño indicado (bordes, texto blanco, padding)
+    return {
       className,
       style: {
-        border: 'none',
-        borderRadius: '6px',
-        fontSize: '12px',
-        fontWeight: '500'
+        backgroundColor,
+        color: 'white',
+        borderRadius: '8px',
+        borderLeft: `4px solid ${backgroundColor}`,
+        padding: '2px 6px'
       }
     };
   };
@@ -575,8 +610,25 @@ const UnifiedCalendar: React.FC = () => {
     );
   };
 
+  // Componente de evento personalizado con tooltip en hover
+  const EventComponent: React.FC<{ event: CalendarEvent }> = ({ event }) => {
+    const start = new Date(event.start);
+    const end = new Date(event.end);
+    const time = `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`;
+    const emoji = event.type === 'routine' ? '🔴' : event.type === 'session' ? '🟠' : '🟣';
+    return (
+      <div title={`${emoji} ${event.title} · ${time}`}>{event.title}</div>
+    );
+  };
+
   return (
     <div className="unified-calendar">
+      <Toaster position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: { background: '#2d2d2d', color: '#fff' }
+        }}
+      />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="calendar-header">
@@ -705,6 +757,7 @@ const UnifiedCalendar: React.FC = () => {
             )}
 
             <Calendar
+              {...({ showCurrentTimeIndicator: false } as any)}
               localizer={localizer}
               events={events}
               startAccessor="start"
@@ -718,7 +771,7 @@ const UnifiedCalendar: React.FC = () => {
               onView={setView}
               date={date}
               onNavigate={setDate}
-              components={{ dateCellWrapper: DateCellWrapper }}
+              components={{ dateCellWrapper: DateCellWrapper, event: EventComponent }}
               messages={{
                 next: "Siguiente",
                 previous: "Anterior",
@@ -736,12 +789,12 @@ const UnifiedCalendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Leyenda como chips horizontales */}
+        {/* Leyenda inferior con puntos de color y etiquetas */}
         <div className="calendar-legend">
           <div className="legend-items">
-            <div className="legend-chip legend-rutina">🔴 Rutinas</div>
-            <div className="legend-chip legend-sesion">🟠 Sesiones</div>
-            <div className="legend-chip legend-consulta">🟣 Consultas</div>
+            <div className="legend-item"><span className="legend-dot legend-rutina" /> <span>Rutinas</span></div>
+            <div className="legend-item"><span className="legend-dot legend-sesion" /> <span>Sesiones</span></div>
+            <div className="legend-item"><span className="legend-dot legend-consulta" /> <span>Consultas</span></div>
           </div>
         </div>
       </div>
@@ -769,12 +822,12 @@ const UnifiedCalendar: React.FC = () => {
                   <label className="form-label">Tipo *</label>
                   <select
                     value={newEvent.type}
-                    onChange={(e) => setNewEvent({...newEvent, type: e.target.value as any})}
+                    onChange={(e) => setNewEvent({...newEvent, type: e.target.value})}
                     className="form-select"
                   >
-                    <option value="session">Sesión</option>
-                    <option value="consultation">Consulta</option>
-                    <option value="routine">Rutina</option>
+                    <option value="sesion">Sesión</option>
+                    <option value="consulta">Consulta</option>
+                    <option value="rutina">Rutina</option>
                   </select>
                 </div>
 
@@ -864,7 +917,12 @@ const UnifiedCalendar: React.FC = () => {
         <div className="event-modal-overlay" onClick={() => setEditingEvent(null)}>
           <div className="event-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2 className="modal-title">{editingEvent.title || 'Detalle del Evento'}</h2>
+              <h2 className="modal-title">
+                <span className={`type-dot ${editingEvent.type === 'routine' ? 'dot-rutina' : editingEvent.type === 'session' ? 'dot-sesion' : 'dot-consulta'}`}></span>
+                {getTypeLabel(editingEvent.type)}
+                {`  —  `}
+                {editingEvent.client?.name || editingEvent.client?.email || 'Cliente'}
+              </h2>
               <button
                 onClick={() => setEditingEvent(null)}
                 className="modal-close"
@@ -897,7 +955,7 @@ const UnifiedCalendar: React.FC = () => {
                     </div>
                     <div className="form-group" style={{ display: 'grid', gap: 6 }}>
                       <label className="form-label">Horario</label>
-                      <div className="form-input">{new Date(editingEvent.start).toLocaleDateString('es-ES')} • {formatTime(editingEvent.start)}–{formatTime(editingEvent.end)}</div>
+                      <div className="form-input">{new Date(editingEvent.start).toLocaleDateString('es-ES')} • {formatTimeRange(editingEvent.start, editingEvent.end)}</div>
                     </div>
                   </div>
 
@@ -988,12 +1046,12 @@ const UnifiedCalendar: React.FC = () => {
               <div className="modal-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                 {!editing ? (
                   <>
-                    <button type="button" className="btn-save" onClick={() => setEditing(true)}>
+                    <button type="button" className="btn-secondary" onClick={() => setEditing(true)}>
                       Editar
                     </button>
                     <button
                       type="button"
-                      className="btn-save"
+                      className="btn-confirm"
                       onClick={() => { updateEventStatus(editingEvent.id, 'CONFIRMED'); setEditingEvent(null); }}
                       title="Confirmar"
                     >
@@ -1001,7 +1059,7 @@ const UnifiedCalendar: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn-save"
+                      className="btn-completed"
                       onClick={() => { updateEventStatus(editingEvent.id, 'COMPLETED'); setEditingEvent(null); }}
                       title="Marcar como completado"
                     >
@@ -1009,7 +1067,7 @@ const UnifiedCalendar: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn-save"
+                      className="btn-no-show"
                       onClick={() => { updateEventStatus(editingEvent.id, 'NO_SHOW'); setEditingEvent(null); }}
                       title="Marcar como no presentado"
                     >
@@ -1017,7 +1075,7 @@ const UnifiedCalendar: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn-cancel"
+                      className="btn-danger"
                       onClick={() => { updateEventStatus(editingEvent.id, 'CANCELLED'); setEditingEvent(null); }}
                       title="Cancelar evento"
                     >
@@ -1025,19 +1083,19 @@ const UnifiedCalendar: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn-cancel"
+                      className="btn-danger"
                       onClick={() => { deleteEvent(editingEvent.id); setEditingEvent(null); }}
                       title="Eliminar evento"
                     >
                       Eliminar
                     </button>
-                    <button type="button" className="btn-cancel" onClick={() => setEditingEvent(null)}>
+                    <button type="button" className="btn-close-primary" onClick={() => setEditingEvent(null)}>
                       Cerrar
                     </button>
                   </>
                 ) : (
                   <>
-                    <button type="button" className="btn-cancel" onClick={() => setEditing(false)}>
+                    <button type="button" className="btn-close-primary" onClick={() => setEditing(false)}>
                       Cancelar edición
                     </button>
                     <button

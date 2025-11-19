@@ -31,6 +31,23 @@ interface WorkoutPlan {
   targetGroup: string;
 }
 
+// Forma mínima esperada por EditWorkoutPlan
+interface EditableExercise {
+  id: number;
+  name: string;
+  sets: number;
+  reps: number;
+  rest: number;
+}
+
+interface EditableWorkoutPlan {
+  id: number;
+  name: string;
+  description: string;
+  exercises: EditableExercise[];
+  targetGroup: string;
+}
+
 interface Client {
   id: number;
   name: string;
@@ -46,7 +63,7 @@ const WorkoutPlan = () => {
   const [error, setError] = useState('');
   const [clientsLoading, setClientsLoading] = useState(true);
   const [clientsError, setClientsError] = useState('');
-  const [selectedPlanForEdit, setSelectedPlanForEdit] = useState<WorkoutPlan | null>(null);
+  const [selectedPlanForEdit, setSelectedPlanForEdit] = useState<EditableWorkoutPlan | null>(null);
 
   useEffect(() => {
     fetchWorkoutPlans();
@@ -99,7 +116,20 @@ const WorkoutPlan = () => {
   };
 
   const handleEditClick = (plan: WorkoutPlan) => {
-    setSelectedPlanForEdit(plan);
+    const editable: EditableWorkoutPlan = {
+      id: plan.id,
+      name: plan.name,
+      description: plan.description,
+      targetGroup: plan.targetGroup,
+      exercises: plan.exercises.map((ex) => ({
+        id: Number((ex as any).id),
+        name: ex.name,
+        sets: ex.sets ?? 0,
+        reps: ex.reps ?? 0,
+        rest: ex.rest ?? 60,
+      })),
+    };
+    setSelectedPlanForEdit(editable);
   };
 
   const handleAssignClick = (planId: number) => {
@@ -125,14 +155,15 @@ const WorkoutPlan = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
       ) : error ? (
-        <div className="text-red-600 p-4 text-center">{error}</div>
+        <div className="p-4 text-center" style={{ color: '#ff3b30' }}>{error}</div>
       ) : (
         <>
           <div className="flex justify-between items-center mb-6">
             <h4 className="text-lg font-medium">Available Plans</h4>
             <button 
               onClick={() => setShowCreateForm(true)}
-              className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition duration-150 ease-in-out flex items-center gap-2"
+              className="px-6 py-3 text-white font-semibold rounded-lg shadow-lg transition duration-150 ease-in-out flex items-center gap-2"
+              style={{ backgroundColor: '#D62828' }}
             >
               <PlusCircleIcon className="h-5 w-5" />
               Crear Nueva Rutina
@@ -175,7 +206,8 @@ const WorkoutPlan = () => {
                   </button>
                   <button 
                     onClick={() => handleDeletePlan(plan.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="transition-colors"
+                    style={{ color: '#D62828' }}
                   >
                     Delete
                   </button>

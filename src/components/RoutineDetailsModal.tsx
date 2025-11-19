@@ -11,6 +11,9 @@ interface Exercise {
   sets: number;
   reps: number;
   weight?: number;
+  // Campos alternativos que pueden venir del backend
+  series?: number | string;
+  weightsPerSeries?: (number | string)[];
   restTime?: number;
   notes?: string;
   image_url?: string;
@@ -115,10 +118,18 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         reader.onloadend = () => resolve(reader.result as string);
         reader.readAsDataURL(blob);
       });
-    } catch (error) {
-      console.warn('Error loading image:', error);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn('Error loading image:', msg);
       return null;
     }
+  };
+
+  // Helper para dar aire a números tipo '12-10-8' → '12 · 10 · 8'
+  const formatDelimited = (value: any) => {
+    const s = String(value ?? '').trim();
+    if (!s) return '-';
+    return s.includes('-') ? s.split('-').map(v => v.trim()).join(' · ') : s;
   };
 
   const downloadPDF = async () => {
@@ -137,24 +148,63 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       const trainfitLightGray = [156, 163, 175] as [number, number, number];
       const trainfitWhite = [255, 255, 255] as [number, number, number];
 
-      // Header con diseño Trainfit profesional
-      pdf.setFillColor(...trainfitRed);
+      // Header con diseño Trainfit profesional (banner negro)
+      pdf.setFillColor(...trainfitBlack);
       pdf.rect(0, 0, pageWidth, 35, 'F');
       
-      // Logo TRAINFIT
-      pdf.setTextColor(...trainfitWhite);
-      pdf.setFontSize(18);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('TRAINFIT', 15, 15);
+      // Logo TRAINFIT (carga desde /public/images)
+      try {
+        const logoResp = await fetch('/images/logo-trainfit.png');
+        const logoBlob = await logoResp.blob();
+        const logoBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(logoBlob);
+        });
+        const imgEl = new Image();
+        imgEl.src = logoBase64;
+        await new Promise((resolve) => { imgEl.onload = resolve; });
+        const naturalW = (imgEl.naturalWidth || 0);
+        const naturalH = (imgEl.naturalHeight || 0);
+        const targetH = 16;
+        const targetW = naturalW && naturalH ? (targetH * (naturalW / naturalH)) : 24;
+        pdf.addImage(imgEl, 'PNG', 12, 9, targetW, targetH);
+      } catch (error) {
+        // Fallback al texto si falla la carga del logo
+        pdf.setTextColor(...trainfitWhite);
+        pdf.setFontSize(18);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('TRAINFIT', 15, 15);
+      }
       
-      // Subtítulo
+      // Subtítulo junto al logo
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...trainfitWhite);
       pdf.text('FITNESS & TRAINING', 15, 25);
-      
-      // Título de la rutina centrado
-      pdf.setFontSize(24);
-      pdf.text(routine.name.toUpperCase(), pageWidth / 2, 22, { align: 'center' });
+
+      // Título grande: Plan de Entrenamiento - Día X (centrado)
+      const dayTitle = routine.name || 'Rutina';
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(26);
+      pdf.text(`Plan de Entrenamiento - ${dayTitle}`, pageWidth / 2, 22, { align: 'center' });
+
+      // Subtítulo con cliente, fecha y progreso
+      const storedUserStr = localStorage.getItem('user');
+      let currentClientName = 'N/A';
+      try {
+        currentClientName = storedUserStr ? (JSON.parse(storedUserStr)?.name || 'N/A') : 'N/A';
+      } catch {
+        currentClientName = 'N/A';
+      }
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      pdf.text(`Cliente: ${currentClientName} • Fecha: ${new Date().toLocaleDateString('es-ES')} • Progreso: 0%`, pageWidth / 2, 30, { align: 'center' });
+
+      // Separador decorativo bajo el header
+      pdf.setDrawColor(230, 230, 230);
+      pdf.setLineWidth(0.5);
+      pdf.line(15, 35, pageWidth - 15, 35);
       
       yPosition = 45;
       pdf.setTextColor(...trainfitBlack);
@@ -163,7 +213,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       pdf.setFillColor(...trainfitDarkGray);
       pdf.rect(15, yPosition, pageWidth - 30, 25, 'F');
       pdf.setDrawColor(...trainfitLightGray);
-      pdf.setLineWidth(0.3);
+      pdf.setLineWidth(0.25);
       pdf.rect(15, yPosition, pageWidth - 30, 25);
       
       pdf.setFontSize(12);
@@ -177,7 +227,13 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       const infoY = yPosition + 16;
       pdf.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 20, infoY);
       pdf.text(`Ejercicios: ${routine.exercises.length}`, pageWidth / 2 - 30, infoY);
-      pdf.text(`Series Totales: ${routine.exercises.reduce((total, ex) => total + ex.sets, 0)}`, pageWidth - 80, infoY);
+      // Series Totales: soporte para sets o series (string/number) y evitar NaN
+      const totalSeries = routine.exercises.reduce((total, ex: any) => {
+        const raw = ex.sets ?? ex.series;
+        const parsed = typeof raw === 'string' ? parseInt(raw, 10) : Number(raw);
+        return total + (Number.isFinite(parsed) ? parsed : 0);
+      }, 0);
+      pdf.text(`Series Totales: ${totalSeries}`, pageWidth - 80, infoY);
       if (routine.description) {
         pdf.text(`Descripción: ${routine.description.substring(0, 50)}...`, 20, infoY + 6);
       }
@@ -192,8 +248,9 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
            if (exercise.image_url) {
              try {
                imageBase64 = await getImageAsBase64(exercise.image_url);
-             } catch (error) {
-               console.warn(`Error cargando imagen para ${exercise.name}:`, error);
+             } catch (error: unknown) {
+               const msg = error instanceof Error ? error.message : String(error);
+               console.warn(`Error cargando imagen para ${exercise.name}:`, msg);
              }
            }
            return { ...exercise, imageBase64 };
@@ -209,13 +266,16 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
        );
 
       // Tabla de ejercicios
+      // Usamos márgenes fijos de 15mm y ajustamos columnas para que el ancho total
+      // sea exactamente pageWidth - 30mm, evitando recortes y desbordes.
       const tableHeaders = ['#', 'Imagen', 'Ejercicio', 'Series', 'Reps', 'Peso', 'Descanso'];
-      const colWidths = [18, 40, 85, 28, 28, 28, 35];
-      const tableWidth = colWidths.reduce((sum, width) => sum + width, 0);
-      const tableStartX = (pageWidth - tableWidth) / 2;
+      const tableStartX = 15;
+      const tableWidth = pageWidth - 30; // respetar márgenes
+      const colWidths = [12, 46, 80, 22, 34, 34, 39]; // suma = 267mm = tableWidth
       let xPosition = tableStartX;
 
       // Encabezados de tabla
+      // Evitamos símbolos especiales en headers para asegurar tipografía consistente
       pdf.setFillColor(...trainfitRed);
       pdf.rect(tableStartX, yPosition, tableWidth, 14, 'F');
       pdf.setTextColor(...trainfitWhite);
@@ -234,7 +294,9 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       // Filas de ejercicios
       for (let index = 0; index < exercisesWithImages.length; index++) {
         const exercise = exercisesWithImages[index];
-        const rowHeight = 35;
+        // Si hay notas, damos un poco más de altura a la fila
+        const hasNotes = !!(exercise as any).notes && String((exercise as any).notes).trim() !== '';
+        const rowHeight = hasNotes ? 54 : 50;
 
         if (yPosition + rowHeight > pageHeight - 25) {
           pdf.addPage();
@@ -266,7 +328,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 
         // Bordes de celda
         pdf.setDrawColor(...trainfitLightGray);
-        pdf.setLineWidth(0.3);
+        pdf.setLineWidth(0.25);
         xPosition = tableStartX;
         
         colWidths.forEach((width) => {
@@ -277,30 +339,36 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         // Contenido de las celdas
         xPosition = tableStartX;
         
-        // Número de ejercicio con círculo rojo
+        // Número de ejercicio con círculo rojo (radio ajustado para no tocar bordes)
         pdf.setFillColor(...trainfitRed);
         const circleX = xPosition + colWidths[0]/2;
         const circleY = yPosition + rowHeight/2;
-        pdf.circle(circleX, circleY, 6, 'F');
+        pdf.circle(circleX, circleY, 5, 'F');
         pdf.setTextColor(...trainfitWhite);
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.text((index + 1).toString(), circleX, circleY + 2, { align: 'center' });
         xPosition += colWidths[0];
 
-        // Imagen del ejercicio
+        // Imagen del ejercicio (padding simétrico y proporción preservada)
         pdf.setTextColor(...trainfitBlack);
         pdf.setFont('helvetica', 'normal');
         if (exercise.imageBase64) {
           try {
-            const maxImgWidth = 30;
-            const maxImgHeight = 25;
-            const imgPadding = 3;
-            
-            const imgX = xPosition + imgPadding;
-            const imgY = yPosition + (rowHeight - maxImgHeight) / 2;
-            
-            pdf.addImage(exercise.imageBase64, 'JPEG', imgX, imgY, maxImgWidth, maxImgHeight);
+            const boxPadding = 4;
+            const boxW = colWidths[1] - boxPadding * 2;
+            const boxH = rowHeight - 12; // aire vertical
+            const imgEl = new Image();
+            imgEl.src = exercise.imageBase64 as string;
+            await new Promise((resolve) => { imgEl.onload = resolve; });
+            const iW = imgEl.naturalWidth || 1;
+            const iH = imgEl.naturalHeight || 1;
+            const scale = Math.min(boxW / iW, boxH / iH);
+            const targetW = Math.max(1, Math.min(iW * scale, boxW));
+            const targetH = Math.max(1, Math.min(iH * scale, boxH));
+            const imgX = xPosition + boxPadding + (boxW - targetW) / 2;
+            const imgY = yPosition + (rowHeight - targetH) / 2;
+            pdf.addImage(imgEl, 'JPEG', imgX, imgY, targetW, targetH);
           } catch (error) {
             console.warn('Error adding image to PDF:', error);
             pdf.setFontSize(8);
@@ -312,40 +380,144 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         }
         xPosition += colWidths[1];
 
-        // Resto de información
+        // Nombre del ejercicio + notas del entrenador (si existen)
         pdf.setFontSize(10);
-        pdf.text(exercise.name, xPosition + 2, yPosition + rowHeight/2, { maxWidth: colWidths[2] - 4 });
+        pdf.setTextColor(...trainfitBlack);
+        const nameY = yPosition + (hasNotes ? rowHeight/2 - 4 : rowHeight/2);
+        pdf.text(exercise.name, xPosition + 3, nameY, { maxWidth: colWidths[2] - 6 });
+
+        // Notas por ejercicio: segunda línea en cursiva y gris
+        if (hasNotes) {
+          const rawNotes = String((exercise as any).notes);
+          const notesLines = pdf.splitTextToSize(rawNotes, colWidths[2] - 6);
+          const limitedLines = Array.isArray(notesLines) ? notesLines.slice(0, 2) : [notesLines];
+          pdf.setFont('helvetica', 'italic');
+          pdf.setTextColor(110, 110, 110);
+          const notesStartY = nameY + 8;
+          limitedLines.forEach((line: string, i: number) => {
+            pdf.text(line, xPosition + 3, notesStartY + i * 4);
+          });
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(...trainfitBlack);
+        }
         xPosition += colWidths[2];
         
-        pdf.text((getDisplayValue(exercise, 'sets') || 0).toString(), xPosition + colWidths[3]/2, yPosition + rowHeight/2, { align: 'center' });
+        // Series (fallback a 'series' si 'sets' no está)
+        {
+          const seriesRaw = (editedExercises[exercise.id]?.sets ?? exercise.sets ?? (exercise as any).series);
+          const seriesText = (seriesRaw !== undefined && seriesRaw !== null && String(seriesRaw).trim() !== '')
+            ? String(seriesRaw)
+            : '-';
+          pdf.text(seriesText, xPosition + colWidths[3]/2, yPosition + rowHeight/2, { align: 'center' });
+        }
         xPosition += colWidths[3];
         
-        pdf.text((getDisplayValue(exercise, 'reps') || 0).toString(), xPosition + colWidths[4]/2, yPosition + rowHeight/2, { align: 'center' });
+        // Reps (envolver para que no se desborde)
+        {
+          const repsText = formatDelimited((getDisplayValue(exercise, 'reps') || 0).toString());
+          const maxWidth = colWidths[4] - 6; // padding lateral
+          const lines = pdf.splitTextToSize(repsText, maxWidth);
+          const visible = Array.isArray(lines) ? lines.slice(0, 2) : [lines];
+          const lineHeight = 4;
+          const centerY = yPosition + rowHeight/2;
+          const startY = centerY - ((visible.length - 1) * lineHeight) / 2;
+          visible.forEach((line: string, i: number) => {
+            pdf.text(line, xPosition + colWidths[4]/2, startY + i * lineHeight, { align: 'center' });
+          });
+        }
         xPosition += colWidths[4];
         
-        const weight = getDisplayValue(exercise, 'weight');
-        pdf.text(weight ? `${weight} kg` : '-', xPosition + colWidths[5]/2, yPosition + rowHeight/2, { align: 'center' });
+        // Peso: usar weightsPerSeries si existe, si no weight básico
+        const rawWeights = (exercise as any).weightsPerSeries;
+        const joinedWeights = Array.isArray(rawWeights) && rawWeights.length > 0
+          ? rawWeights.map((w: any) => String(w).replace(/kg/gi, '').trim()).join('-')
+          : (editedExercises[exercise.id]?.weight ?? exercise.weight);
+        const weightText = (joinedWeights !== undefined && joinedWeights !== null && String(joinedWeights).trim() !== '')
+          ? `${formatDelimited(String(joinedWeights).replace(/kg/gi, '').trim())} kg`
+          : '-';
+        // Peso (envolver si es necesario)
+        {
+          const maxWidthW = colWidths[5] - 6;
+          const wLines = pdf.splitTextToSize(weightText, maxWidthW);
+          const wVisible = Array.isArray(wLines) ? wLines.slice(0, 2) : [wLines];
+          const lineHeight = 4;
+          const centerY = yPosition + rowHeight/2;
+          const startY = centerY - ((wVisible.length - 1) * lineHeight) / 2;
+          wVisible.forEach((line: string, i: number) => {
+            pdf.text(line, xPosition + colWidths[5]/2, startY + i * lineHeight, { align: 'center' });
+          });
+        }
         xPosition += colWidths[5];
         
-        pdf.text(exercise.restTime ? `${exercise.restTime}s` : '-', xPosition + colWidths[6]/2, yPosition + rowHeight/2, { align: 'center' });
+        // Descanso
+        pdf.text((exercise.restTime !== undefined && exercise.restTime !== null) ? `${exercise.restTime}s` : '-', xPosition + colWidths[6]/2, yPosition + rowHeight/2, { align: 'center' });
         
         yPosition += rowHeight;
       }
       
+      // Footer con branding y número de página (igual que el PDF del entrenador)
+      const footerHeight = 22;
+      const footerY = pageHeight - footerHeight;
+      const totalPages = pdf.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        pdf.setPage(p);
+        pdf.setFillColor(...trainfitBlack);
+        pdf.rect(0, footerY, pageWidth, footerHeight, 'F');
+        pdf.setTextColor(...trainfitWhite);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.text('Trainfit - Tu entrenamiento a medida', pageWidth / 2, footerY + 14, { align: 'center' });
+        pdf.setFontSize(8);
+        pdf.text(`Página ${p} de ${totalPages}`, pageWidth - 20, footerY + 14, { align: 'right' });
+      }
+
       // Descargar el PDF
       const fileName = `rutina-${routine.name.replace(/\s+/g, '-').toLowerCase()}.pdf`;
       pdf.save(fileName);
       
       toast.success('Rutina descargada exitosamente en PDF');
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('Error downloading PDF:', msg);
       toast.error('Error al descargar la rutina');
     }
   };
 
   const getDisplayValue = (exercise: Exercise, field: 'weight' | 'sets' | 'reps') => {
     const editedValue = editedExercises[exercise.id]?.[field];
-    return editedValue !== undefined ? editedValue : exercise[field];
+    if (editedValue !== undefined && editedValue !== null) return editedValue;
+
+    if (field === 'sets') {
+      const raw: any = exercise.sets ?? exercise.series;
+      if (typeof raw === 'string') {
+        const n = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+        return Number.isFinite(n) ? n : '';
+      }
+      return raw ?? '';
+    }
+
+    if (field === 'weight') {
+      const raw: any = exercise.weight ?? (Array.isArray(exercise.weightsPerSeries) ? exercise.weightsPerSeries[0] : undefined);
+      if (Array.isArray(raw)) {
+        const first = raw[0];
+        const n = typeof first === 'string' ? parseFloat(String(first).replace(/kg/gi, '').trim()) : Number(first);
+        return Number.isFinite(n) ? n : '';
+      }
+      if (typeof raw === 'string') {
+        const n = parseFloat(raw.replace(/kg/gi, '').trim());
+        return Number.isFinite(n) ? n : '';
+      }
+      return raw ?? '';
+    }
+
+    // reps: si viene como cadena tipo "12-10-8", tomar la primera
+    const r: any = exercise.reps as any;
+    if (typeof r === 'string') {
+      const first = r.split(/[\-,·]/)[0]?.trim();
+      const n = parseInt(first, 10);
+      return Number.isFinite(n) ? n : '';
+    }
+    return r ?? '';
   };
 
   if (!isOpen) return null;
@@ -404,7 +576,13 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                     <div className="stat-label">Ejercicios</div>
                   </div>
                   <div className="stat-card">
-                    <div className="stat-number">{routine.exercises.reduce((total, ex) => total + ex.sets, 0)}</div>
+                    <div className="stat-number">{
+                      routine.exercises.reduce((total, ex: any) => {
+                        const raw = ex.sets ?? ex.series;
+                        const parsed = typeof raw === 'string' ? parseInt(String(raw).replace(/[^0-9]/g, ''), 10) : Number(raw);
+                        return total + (Number.isFinite(parsed) ? parsed : 0);
+                      }, 0)
+                    }</div>
                     <div className="stat-label">Series Totales</div>
                   </div>
                   <div className="stat-card">
@@ -426,9 +604,15 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                           <div className="exercise-title-section">
                             <h4>{exercise.name}</h4>
                             <div className="exercise-quick-stats">
-                              <span className="quick-stat">{exercise.sets} series</span>
-                              <span className="quick-stat">{exercise.reps} reps</span>
-                              {exercise.weight && <span className="quick-stat">{exercise.weight} kg</span>}
+                              <span className="quick-stat">{(exercise.sets ?? exercise.series) ? `${String(exercise.sets ?? exercise.series).toString()} series` : 'SERIES'}</span>
+                              <span className="quick-stat">{exercise.reps ? `${String(exercise.reps)} reps` : 'REPS'}</span>
+                              {(exercise.weight ?? (exercise.weightsPerSeries && exercise.weightsPerSeries[0] !== undefined)) && (
+                                <span className="quick-stat">{
+                                  `${String(
+                                    exercise.weight ?? (Array.isArray(exercise.weightsPerSeries) ? exercise.weightsPerSeries[0] : '')
+                                  ).replace(/kg/gi, '').trim()} kg`
+                                }</span>
+                              )}
                             </div>
                           </div>
                           {exercise.image_url && (

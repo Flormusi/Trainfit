@@ -121,8 +121,20 @@ const RoutineDetails = () => {
                 <p className="exercise-target">{exercise.targetMuscles}</p>
               </div>
               <div className="exercise-sets">
-                {exercise.sets}×{exercise.reps}
+                {(exercise.sets ?? exercise.series ?? '-')}
+                ×{(exercise.reps ?? '-')}
               </div>
+              {((Array.isArray(exercise.weightsPerSeries) && exercise.weightsPerSeries.length > 0) || (exercise.weight && String(exercise.weight).trim() !== '')) && (
+                <div className="exercise-weight" title="Peso">
+                  {(() => {
+                    const raw = Array.isArray(exercise.weightsPerSeries) && exercise.weightsPerSeries.length > 0
+                      ? exercise.weightsPerSeries.map(w => String(w).replace(/kg/gi, '').trim()).join('-')
+                      : String(exercise.weight).replace(/kg/gi, '').trim();
+                    const formatted = raw.includes('-') ? raw.split('-').map(v => v.trim()).join(' · ') : raw;
+                    return `${formatted} kg`;
+                  })()}
+                </div>
+              )}
               <div className="exercise-status">
                 <input 
                   type="checkbox" 
@@ -169,7 +181,9 @@ const RoutineDetails = () => {
                       type="number" 
                       value={workoutLog[activeExercise.id]?.weight || ''}
                       onChange={(e) => handleLogChange(activeExercise.id, 'weight', e.target.value)}
-                      placeholder="0"
+                      placeholder={(Array.isArray(activeExercise.weightsPerSeries) && activeExercise.weightsPerSeries.length > 0)
+                        ? String(activeExercise.weightsPerSeries[0]).replace(/kg/gi, '').trim()
+                        : String(activeExercise.weight ?? '').replace(/kg/gi, '').trim()}
                     />
                   </div>
                   <div className="log-field">
@@ -178,7 +192,7 @@ const RoutineDetails = () => {
                       type="number" 
                       value={workoutLog[activeExercise.id]?.sets || ''}
                       onChange={(e) => handleLogChange(activeExercise.id, 'sets', e.target.value)}
-                      placeholder={activeExercise.sets}
+                      placeholder={activeExercise.sets ?? activeExercise.series ?? ''}
                     />
                   </div>
                   <div className="log-field">

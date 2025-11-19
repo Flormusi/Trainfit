@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../services/axiosConfig';
 import './TodayExercises.css';
 
 const TodayExercises = ({ exercises, clientId, onProgressRecord }) => {
@@ -14,7 +14,7 @@ const TodayExercises = ({ exercises, clientId, onProgressRecord }) => {
 
   const recordProgress = async (exerciseId) => {
     try {
-      await axios.post(`/api/clients/${clientId}/progress`, {
+      await axios.post(`/clients/${clientId}/progress`, {
         exerciseId,
         weight: exerciseWeights[exerciseId] || 0
       });

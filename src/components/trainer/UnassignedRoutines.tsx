@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { workoutPlanService } from '../../services/workoutPlanService';
 import { toast } from 'react-hot-toast';
+import axios from '../../services/axiosConfig';
 import { useNavigate } from 'react-router-dom';
 
 interface Exercise {
@@ -59,22 +60,10 @@ const UnassignedRoutines = () => {
     if (!confirmDelete) return;
 
     try {
-      // Aquí iría la llamada al API para eliminar la rutina
-      const response = await fetch(`/api/trainer/routines/${planId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        toast.success(`✅ Rutina "${planName}" eliminada exitosamente.`);
-        // Actualizar la lista de rutinas
-        fetchUnassignedPlans();
-      } else {
-        throw new Error('Error al eliminar la rutina');
-      }
+      await axios.delete(`/trainer/routines/${planId}`);
+      toast.success(`✅ Rutina "${planName}" eliminada exitosamente.`);
+      // Actualizar la lista de rutinas
+      fetchUnassignedPlans();
     } catch (error) {
       console.error('Error al eliminar la rutina:', error);
       toast.error('❌ Error al eliminar la rutina. Por favor, inténtalo de nuevo.');
@@ -86,7 +75,7 @@ const UnassignedRoutines = () => {
   }
 
   if (error) {
-    return <div className="text-center py-4 text-red-500">{error}</div>;
+    return <div className="text-center py-4" style={{ color: '#ff3b30' }}>{error}</div>;
   }
 
   return (
@@ -117,7 +106,8 @@ const UnassignedRoutines = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleAssignClick(plan.id)}
-                  className="flex-1 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
+                  className="flex-1 text-white py-2 px-4 rounded transition-colors"
+                  style={{ backgroundColor: '#D62828' }}
                 >
                   Asignar Rutina
                 </button>
@@ -130,7 +120,8 @@ const UnassignedRoutines = () => {
                 </button>
                 <button
                   onClick={() => handleDeleteClick(plan.id, plan.name)}
-                  className="bg-red-600 text-white py-2 px-3 rounded hover:bg-red-700 transition-colors"
+                  className="text-white py-2 px-3 rounded transition-colors"
+                  style={{ backgroundColor: '#D62828' }}
                   title="Eliminar rutina"
                 >
                   🗑️

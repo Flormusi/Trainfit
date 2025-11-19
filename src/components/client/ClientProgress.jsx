@@ -79,8 +79,8 @@ const ClientProgress = () => {
         {
           label: getMetricLabel(activeMetric),
           data: metricData.values,
-          borderColor: '#ff3b30',
-          backgroundColor: 'rgba(255, 59, 48, 0.1)',
+          borderColor: '#D62828',
+          backgroundColor: 'rgba(214, 40, 40, 0.12)',
           tension: 0.4,
           fill: true
         }
@@ -99,7 +99,7 @@ const ClientProgress = () => {
         {
           label: 'Workouts Completed',
           data: progressData.workouts.counts,
-          backgroundColor: '#ff3b30',
+          backgroundColor: '#D62828',
           borderRadius: 6
         }
       ]
@@ -117,12 +117,12 @@ const ClientProgress = () => {
         {
           label: 'Current Strength',
           data: progressData.strength.values,
-          backgroundColor: 'rgba(255, 59, 48, 0.7)',
-          borderColor: '#ff3b30',
-          pointBackgroundColor: '#ff3b30',
+          backgroundColor: 'rgba(214, 40, 40, 0.7)',
+          borderColor: '#D62828',
+          pointBackgroundColor: '#D62828',
           pointBorderColor: '#fff',
           pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#ff3b30'
+          pointHoverBorderColor: '#D62828'
         }
       ]
     };

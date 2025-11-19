@@ -22,7 +22,7 @@
 }
 
 .back-link:hover {
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .routine-header h1 {
@@ -69,7 +69,7 @@
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-item {
@@ -88,8 +88,8 @@
 }
 
 .exercise-item.active {
-  background-color: rgba(255, 59, 48, 0.1);
-  border-left: 3px solid #ff3b30;
+  background-color: rgba(214, 40, 40, 0.1);
+  border-left: 3px solid #D62828;
 }
 
 .exercise-item.completed {
@@ -99,7 +99,7 @@
 .exercise-number {
   width: 30px;
   height: 30px;
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -157,7 +157,7 @@
 .exercise-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-category {
@@ -248,8 +248,8 @@
 
 .complete-btn {
   background-color: transparent;
-  border: 1px solid #ff3b30;
-  color: #ff3b30;
+  border: 1px solid #D62828;
+  color: #D62828;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -258,11 +258,11 @@
 }
 
 .complete-btn:hover {
-  background-color: rgba(255, 59, 48, 0.1);
+  background-color: rgba(214, 40, 40, 0.1);
 }
 
 .complete-btn.completed {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
@@ -282,7 +282,7 @@
 }
 
 .save-progress-btn {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border: none;
   padding: 12px 30px;
@@ -294,7 +294,7 @@
 }
 
 .save-progress-btn:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
 }
 
 /* Responsive adjustments */

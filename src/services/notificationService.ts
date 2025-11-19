@@ -4,10 +4,11 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'payment_reminder' | 'system' | 'routine_update' | 'appointment' | 'general';
+  type: 'payment_reminder' | 'system' | 'routine_update' | 'appointment' | 'general' | 'routine_assigned' | 'progress_update' | 'new_client' | 'goal_achieved' | 'message';
   isRead: boolean;
   createdAt: string;
   userId: string;
+  routineId?: string;
 }
 
 export interface NotificationResponse {
@@ -128,6 +129,16 @@ class NotificationService {
     switch (type) {
       case 'payment_reminder':
         return '💳';
+      case 'routine_assigned':
+        return '🏋️';
+      case 'progress_update':
+        return '📈';
+      case 'new_client':
+        return '🧑‍🤝‍🧑';
+      case 'goal_achieved':
+        return '🏆';
+      case 'message':
+        return '💬';
       case 'routine_update':
         return '💪';
       case 'appointment':
@@ -146,6 +157,16 @@ class NotificationService {
     switch (type) {
       case 'payment_reminder':
         return 'text-red-600';
+      case 'routine_assigned':
+        return 'text-blue-600';
+      case 'progress_update':
+        return 'text-green-600';
+      case 'new_client':
+        return 'text-purple-600';
+      case 'goal_achieved':
+        return 'text-yellow-600';
+      case 'message':
+        return 'text-cyan-600';
       case 'routine_update':
         return 'text-blue-600';
       case 'appointment':

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosConfig';
 
 export interface MembershipTier {
   id: number;
@@ -9,7 +9,8 @@ export interface MembershipTier {
   isPopular?: boolean;
 }
 
-const API_URL = 'http://localhost:3001/api';
+// Base URL gestionada por axiosConfig (VITE_API_URL en producción, '/api' en dev)
+// const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 // This service will be used to fetch membership tiers from the backend
 // For now, we'll use static data until the backend endpoint is implemented
@@ -17,7 +18,7 @@ export const membershipService = {
   async getMembershipTiers(): Promise<MembershipTier[]> {
     try {
       // When the backend endpoint is ready, uncomment this code
-      // const response = await axios.get(`${API_URL}/membership-tiers`);
+      // const response = await axios.get('/membership-tiers');
       // return response.data;
       
       // For now, return static data

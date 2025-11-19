@@ -47,6 +47,7 @@ export interface RoutineData {
   duration: string; 
   notes?: string;
   exercises: ExerciseData[];
+  totalWeeks?: number;
 }
 
 const EditRoutinePage: React.FC = () => {
@@ -59,6 +60,7 @@ const EditRoutinePage: React.FC = () => {
     duration: '',
     notes: '',
     exercises: [],
+    totalWeeks: 4,
   });
   const [availableExercises, setAvailableExercises] = useState<any[]>([]); 
   const [filteredExercises, setFilteredExercises] = useState<any[]>([]);
@@ -101,7 +103,8 @@ const EditRoutinePage: React.FC = () => {
               clientId: routine.clientId || '',
               duration: routine.duration || '',
               notes: routine.notes || '',
-              exercises: routine.exercises || []
+              exercises: routine.exercises || [],
+              totalWeeks: typeof routine.totalWeeks === 'number' && !isNaN(routine.totalWeeks) ? routine.totalWeeks : 4,
             });
 
             // Inicializar términos de búsqueda con los nombres de ejercicios existentes
@@ -169,7 +172,7 @@ const EditRoutinePage: React.FC = () => {
     const { name, value } = e.target;
     setRoutineData((prevData: RoutineData) => ({ 
       ...prevData,
-      [name]: value,
+      [name]: name === 'totalWeeks' ? Math.max(1, parseInt(value || '4', 10)) : value,
     }));
   };
 
@@ -383,6 +386,21 @@ const EditRoutinePage: React.FC = () => {
                     className="w-full px-4 py-3 bg-[#2a2a2a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
                     placeholder="Ej: 4 semanas, 45 minutos"
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                    Total de semanas
+                  </label>
+                  <input
+                    type="number"
+                    name="totalWeeks"
+                    min={1}
+                    value={typeof routineData.totalWeeks === 'number' ? routineData.totalWeeks : 4}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-[#2a2a2a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
+                    placeholder="Ej: 4"
                   />
                 </div>
               </div>

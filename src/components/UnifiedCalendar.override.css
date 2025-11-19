@@ -32,3 +32,8 @@
   width: 100% !important;
   cursor: pointer !important;
 }
+
+/* Ocultar la línea de hora actual (indicador rojo de React Big Calendar) de forma global */
+:global(.rbc-current-time-indicator) {
+  display: none !important;
+}

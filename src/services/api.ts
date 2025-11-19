@@ -654,6 +654,12 @@ export const clientApi = {
     return response.data;
   },
   
+  // Conteo de notificaciones no leídas del cliente
+  getUnreadNotificationCount: async (clientId: string): Promise<{ count: number }> => {
+    const response = await axios.get(`/clients/${clientId}/notifications/unread-count`);
+    return response.data;
+  },
+  
   markNotificationAsRead: async (clientId: string, notificationId: string) => {
     const response = await axios.put(`/clients/${clientId}/notifications/${notificationId}`, { read: true });
     return response.data;

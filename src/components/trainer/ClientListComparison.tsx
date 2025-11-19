@@ -88,12 +88,9 @@ const ClientListComparison: React.FC = () => {
         <div style={{ textAlign: 'center' }}>
           <h1 style={{
             margin: '0',
-            color: '#ffffff',
+            color: '#D62828',
             fontSize: '2.5rem',
-            fontWeight: '700',
-            background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            fontWeight: '700'
           }}>
             Dashboard de Clientes: Comparación
           </h1>
@@ -144,7 +141,7 @@ const ClientListComparison: React.FC = () => {
           onClick={() => navigate('/trainer/clients-improved')}
           style={{
             padding: '16px 32px',
-            background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+            background: '#D62828',
             color: 'white',
             border: 'none',
             borderRadius: '12px',
@@ -152,14 +149,6 @@ const ClientListComparison: React.FC = () => {
             fontSize: '1.1rem',
             cursor: 'pointer',
             transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
           }}
         >
           ⚡ Ver Versión Mejorada

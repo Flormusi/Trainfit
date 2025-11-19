@@ -92,6 +92,15 @@
   transition: all 0.2s ease;
 }
 
+.server-event-card {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #333;
+  transition: all 0.2s ease;
+}
+
 .training-card:hover,
 .google-event-card:hover {
   border-color: #ff4757;

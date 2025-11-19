@@ -109,7 +109,7 @@ const TrainerDashboard: React.FC = () => {
   const handleViewClientsClick = () => navigate("/trainer/clients");
   const handleMessagesClick = () => navigate("/trainer/messages");
   const handleSecurityClick = () => navigate("/trainer/security");
-  const handleViewRoutinesClick = () => setShowRoutineManagement(true);
+  const handleViewRoutinesClick = () => navigate("/trainer/routines/library");
 
   const unassignedRoutines = Math.max(
     0,

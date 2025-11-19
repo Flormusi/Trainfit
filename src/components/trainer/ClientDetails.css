@@ -36,10 +36,10 @@
 
 .back-link:hover {
   color: #ffffff;
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(214, 40, 40, 0.1);
+  border-color: rgba(214, 40, 40, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+  box-shadow: 0 8px 25px rgba(214, 40, 40, 0.15);
 }
 
 .trainfit-logo {
@@ -49,13 +49,11 @@
 .trainfit-logo h2 {
   font-size: 2rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ef4444 0%, #f97316 50%, #eab308 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #D62828 !important;
   margin: 0;
   letter-spacing: -0.02em;
-  text-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+  text-shadow: 0 0 8px rgba(214, 40, 40, 0.6), 0 0 24px rgba(214, 40, 40, 0.35);
+  filter: drop-shadow(0 0 6px rgba(214, 40, 40, 0.5)) drop-shadow(0 0 12px rgba(214, 40, 40, 0.25));
 }
 
 .client-profile {
@@ -1540,7 +1538,7 @@
 }
 
 .empty-state-btn {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -1548,13 +1546,14 @@
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   text-decoration: none;
   display: inline-block;
 }
 
 .empty-state-btn:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
+  box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.1);
 }
 
 /* Responsive adjustments */

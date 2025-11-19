@@ -49,6 +49,7 @@ export interface RoutineData {
   notes?: string;
   exercises: ExerciseData[];
   trainingObjective: string;
+  totalWeeks?: number;
 }
 
 const CreateRoutinePage: React.FC = () => {
@@ -63,6 +64,7 @@ const CreateRoutinePage: React.FC = () => {
     notes: '',
     exercises: [],
     trainingObjective: '',
+    totalWeeks: 4,
   });
   const [availableExercises, setAvailableExercises] = useState<any[]>([]); 
   const [filteredExercises, setFilteredExercises] = useState<any[]>([]);
@@ -277,7 +279,7 @@ const CreateRoutinePage: React.FC = () => {
     const { name, value } = e.target;
     setRoutineData((prevData: RoutineData) => ({ 
       ...prevData,
-      [name]: value,
+      [name]: name === 'totalWeeks' ? Math.max(1, parseInt(value || '4', 10)) : value,
     }));
   };
 
@@ -531,6 +533,7 @@ const CreateRoutinePage: React.FC = () => {
     try {
       const payload = {
         ...routineData,
+        totalWeeks: typeof routineData.totalWeeks === 'number' && !isNaN(routineData.totalWeeks) ? routineData.totalWeeks : 4,
         exercises: routineData.exercises.map((ex, idx) => {
           const isPyr = pyramidalEnabled[idx] && (weightsPerSeries[idx]?.length === PYRAMIDAL_SEQUENCE.length);
           const weightsArray = isPyr
@@ -603,6 +606,15 @@ const CreateRoutinePage: React.FC = () => {
     }
   };
 
+  const handleBackClick = () => {
+    const state: any = location.state || {};
+    if (state.fromLibrary) {
+      navigate('/trainer/routines/library', { state: { folder: state.folder } });
+      return;
+    }
+    handleDashboardClick();
+  };
+
   // Actualizar la sección de renderizado para mostrar las imágenes
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white p-6">
@@ -616,10 +628,10 @@ const CreateRoutinePage: React.FC = () => {
             <p className="text-gray-400 mt-2">Diseña una rutina personalizada para tu cliente</p>
           </div>
           <button
-            onClick={handleDashboardClick}
+            onClick={handleBackClick}
             className="px-6 py-3 bg-transparent border border-[#555555] hover:bg-[#333333] hover:border-[#777777] rounded-lg font-medium transition-all duration-300"
           >
-            ← Volver al Dashboard
+            ← {((location.state as any)?.fromLibrary) ? 'Volver a la Biblioteca' : 'Volver al Dashboard'}
           </button>
         </div>
 
@@ -724,6 +736,22 @@ const CreateRoutinePage: React.FC = () => {
                   placeholder="Ej: 45 minutos"
                   className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2" htmlFor="totalWeeks">
+                  Total de semanas
+                </label>
+                <input
+                  type="number"
+                  id="totalWeeks"
+                  name="totalWeeks"
+                  min={1}
+                  value={typeof routineData.totalWeeks === 'number' ? routineData.totalWeeks : 4}
+                  onChange={handleChange}
+                  placeholder="Ej: 4"
+                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
                 />
               </div>
 

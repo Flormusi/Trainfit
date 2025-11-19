@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DayEventsModal from './DayEventsModal';
 import EventModal from './EventModal';
 import './TrainerCalendar.css';
+import axios from '../services/axiosConfig';
 import './responsive-calendar.css';
 
 interface TrainingEvent {
@@ -36,22 +37,9 @@ const TrainerCalendar: React.FC<TrainerCalendarProps> = ({
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        console.error('No hay token de autenticación');
-        return;
-      }
-
-      const response = await fetch('/api/appointments', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const appointments = await response.json();
+      const response = await axios.get('/appointments');
+      if (response.status >= 200 && response.status < 300) {
+        const appointments = response?.data ?? [];
         
         // Convertir appointments a formato TrainingEvent
         const trainingEvents: TrainingEvent[] = appointments.map((appointment: any) => ({
@@ -70,8 +58,6 @@ const TrainerCalendar: React.FC<TrainerCalendarProps> = ({
         }));
 
         setEvents(trainingEvents);
-      } else {
-        console.error('Error al obtener appointments:', response.statusText);
       }
     } catch (error) {
       console.error('Error al cargar eventos:', error);
@@ -298,17 +284,9 @@ const TrainerCalendar: React.FC<TrainerCalendarProps> = ({
                 notes: event.notes || ''
               };
 
-              const response = await fetch('/api/appointments', {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(appointmentData)
-              });
-
-              if (response.ok) {
-                const newAppointment = await response.json();
+              const response = await axios.post('/appointments', appointmentData);
+              if (response.status >= 200 && response.status < 300) {
+                const newAppointment = response?.data ?? {};
                 
                 // Convertir el nuevo appointment a formato TrainingEvent
                 const newEvent: TrainingEvent = {

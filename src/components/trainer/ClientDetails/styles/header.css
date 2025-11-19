@@ -42,6 +42,17 @@
   margin-right: 5px;
 }
 
+/* Logo Trainfit con glow sutil (solo texto) */
+.trainfit-logo h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #D62828 !important;
+  margin: 0;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 8px rgba(214, 40, 40, 0.6), 0 0 24px rgba(214, 40, 40, 0.35);
+  filter: drop-shadow(0 0 6px rgba(214, 40, 40, 0.5)) drop-shadow(0 0 12px rgba(214, 40, 40, 0.25));
+}
+
 /* Estilos responsivos */
 @media (max-width: 768px) {
   .client-header {

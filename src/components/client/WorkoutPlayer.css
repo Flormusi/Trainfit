@@ -20,7 +20,7 @@
 }
 
 .back-link:hover {
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .player-header h1 {
@@ -56,7 +56,7 @@
 
 .progress-fill {
   height: 100%;
-  background-color: #ff3b30;
+  background-color: #D62828;
   border-radius: 5px;
   transition: width 0.3s ease;
 }
@@ -90,7 +90,7 @@
 }
 
 .week-tab.active {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
@@ -116,7 +116,7 @@
 }
 
 .day-tab.active {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
@@ -130,7 +130,7 @@
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .empty-exercises {
@@ -171,7 +171,7 @@
 }
 
 .table-row.completed {
-  background-color: rgba(255, 59, 48, 0.1);
+  background-color: rgba(214, 40, 40, 0.1);
 }
 
 .col-exercise, 
@@ -208,7 +208,7 @@
 .exercise-number {
   width: 30px;
   height: 30px;
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -269,26 +269,26 @@
 }
 
 .table-row input:focus {
-  outline: 1px solid #ff3b30;
+  outline: 1px solid #D62828;
 }
 
 .complete-btn {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
-  border: 1px solid #ff3b30;
-  background-color: transparent;
-  color: #ff3b30;
+  border: none;
+  background-color: #D62828;
+  color: #fff;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .complete-btn:hover {
-  background-color: rgba(255, 59, 48, 0.1);
+  background-color: #D62828;
 }
 
 .complete-btn.completed {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
@@ -307,7 +307,7 @@
   margin-top: 0;
   margin-bottom: 10px;
   font-size: 1rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-note-item p {
@@ -403,7 +403,7 @@
 .exercise-details h2 {
   font-size: 1.8rem;
   margin: 0 0 20px 0;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-instructions {
@@ -466,7 +466,7 @@
   display: block;
   font-size: 1.8rem;
   font-weight: 600;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-description {
@@ -523,7 +523,7 @@
 }
 
 .weight-input-container input:focus {
-  outline: 1px solid #ff3b30;
+  outline: 1px solid #D62828;
 }
 
 .last-weight {
@@ -565,12 +565,12 @@
 }
 
 .nav-btn.next {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
 .nav-btn.next:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
 }
 
 /* Workout Completed Screen */
@@ -599,7 +599,7 @@
 .completion-card h1 {
   font-size: 2.5rem;
   margin: 0 0 30px 0;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .completion-stats {
@@ -642,22 +642,22 @@
 }
 
 .action-btn.primary {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
 .action-btn.primary:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
 }
 
 .action-btn.secondary {
   background-color: transparent;
-  border: 1px solid #ff3b30;
-  color: #ff3b30;
+  border: 1px solid #D62828;
+  color: #D62828;
 }
 
 .action-btn.secondary:hover {
-  background-color: rgba(255, 59, 48, 0.1);
+  background-color: rgba(214, 40, 40, 0.1);
 }
 
 /* Loading and Error States */

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './RoutineDetails.css';
+import axios from '../services/axiosConfig';
 
 const RoutineDetails = () => {
   const { routineId, clientId } = useParams();
@@ -22,27 +23,16 @@ const RoutineDetails = () => {
     const fetchRoutineDetails = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        
         let url;
         if (isTrainerView) {
-          url = `/api/trainer/routines/${routineId}`;
+          url = `/trainer/routines/${routineId}`;
         } else {
-          url = `/api/client/routines/${routineId}`;
+          // Ruta correcta para obtener detalles de rutina como cliente
+          url = `/routines/${routineId}`;
         }
 
-        const response = await fetch(url, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Error al cargar los detalles de la rutina');
-        }
-
-        const data = await response.json();
+        const response = await axios.get(url);
+        const data = response?.data ?? {};
         setRoutine(data.data || data);
       } catch (err) {
         setError(err.message);
@@ -53,6 +43,36 @@ const RoutineDetails = () => {
 
     fetchRoutineDetails();
   }, [routineId, isTrainerView]);
+
+  // Normalizar día y asegurar que exista al menos el día 1
+  const getDayNumber = (value) => {
+    if (typeof value === 'number') return value || 1;
+    if (typeof value === 'string') {
+      const n = parseInt(value, 10);
+      return Number.isNaN(n) ? 1 : n;
+    }
+    return 1;
+  };
+
+  // Agrupar ejercicios por día con normalización
+  const { exercisesByDay, days } = useMemo(() => {
+    const byDay = {};
+    const exs = Array.isArray(routine?.exercises) ? routine.exercises : [];
+    exs.forEach((exercise) => {
+      const d = getDayNumber(exercise?.day);
+      if (!byDay[d]) byDay[d] = [];
+      byDay[d].push(exercise);
+    });
+    const ds = Object.keys(byDay).map((k) => parseInt(k, 10)).sort((a, b) => a - b);
+    return { exercisesByDay: byDay, days: ds };
+  }, [routine]);
+
+  // Ajustar activeDay al primer día válido cuando cambie la rutina
+  useEffect(() => {
+    if (days.length > 0 && !days.includes(activeDay)) {
+      setActiveDay(days[0]);
+    }
+  }, [days]);
 
   const handleDayChange = (day) => {
     setActiveDay(day);
@@ -83,28 +103,21 @@ const RoutineDetails = () => {
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem('token');
       let url;
-      
       if (isTrainerView) {
-        url = `/api/trainer/routines/${routineId}`;
+        url = `/trainer/routines/${routineId}`;
       } else {
-        url = `/api/client/routines/${routineId}`;
+        url = `/client/routines/${routineId}`;
       }
 
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        alert(`✅ Rutina "${routine.name}" eliminada exitosamente.`);
-        navigate(-1); // Volver a la página anterior
+      await axios.delete(url);
+      alert(`✅ Rutina "${routine.name}" eliminada exitosamente.`);
+      const fromLibrary = (location.state && location.state.fromLibrary) || false;
+      const folder = location.state && location.state.folder;
+      if (fromLibrary) {
+        navigate('/trainer/routines/library', { state: { folder } });
       } else {
-        throw new Error('Error al eliminar la rutina');
+        navigate(-1); // Volver a la página anterior
       }
     } catch (error) {
       console.error('Error al eliminar la rutina:', error);
@@ -136,23 +149,24 @@ const RoutineDetails = () => {
     return <div className="error-message">Routine not found</div>;
   }
 
-  // Group exercises by day
-  const exercisesByDay = {};
-  routine.exercises.forEach(exercise => {
-    if (!exercisesByDay[exercise.day]) {
-      exercisesByDay[exercise.day] = [];
-    }
-    exercisesByDay[exercise.day].push(exercise);
-  });
-
-  // Get unique days
-  const days = Object.keys(exercisesByDay).map(Number).sort((a, b) => a - b);
+  // exercisesByDay y days ya están normalizados arriba
 
   return (
     <div className="routine-details">
       <div className="details-header">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          ← Volver
+        <button
+          className="back-button"
+          onClick={() => {
+            const fromLibrary = (location.state && location.state.fromLibrary) || false;
+            const folder = location.state && location.state.folder;
+            if (fromLibrary) {
+              navigate('/trainer/routines/library', { state: { folder } });
+            } else {
+              navigate(-1);
+            }
+          }}
+        >
+          {((location.state && location.state.fromLibrary) ? '← Volver a la biblioteca' : '← Volver')}
         </button>
         <div className="header-title">
           <h1>{routine.name}</h1>

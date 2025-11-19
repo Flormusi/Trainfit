@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode, useCa
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import type { LoginCredentials, User } from '../services/authService';
-import axios from 'axios';
+import axios from '../services/axiosConfig';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -106,6 +106,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return !!token && !!storedUser;
   }, []);
 
+  // Auto-login de desarrollo para facilitar pruebas de sockets y navegación
+  useEffect(() => {
+    const enabled = String(import.meta.env.VITE_DEV_AUTO_LOGIN || '').toLowerCase() === 'true';
+    const email = String(import.meta.env.VITE_DEV_LOGIN_EMAIL || '');
+    const password = String(import.meta.env.VITE_DEV_LOGIN_PASSWORD || '');
+
+    if (enabled) {
+      const hasSession = isAuthenticated();
+      if (!hasSession && email && password) {
+        console.log('[AuthContext] Dev auto-login enabled. Attempting login for:', email);
+        // Usa el mismo flujo de login para mantener navegación y toasts
+        login({ email, password });
+      }
+    }
+  }, [login, isAuthenticated]);
+
   const saveOnboardingData = useCallback(async (data: any) => {
     console.log('[AuthContext] Saving onboarding data:', data);
     try {
@@ -120,14 +136,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       // Hacer la llamada al backend para guardar los datos de onboarding
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/users/${user.id}/onboarding`,
-        data,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+        `/users/${user.id}/onboarding`,
+        data
       );
 
       console.log('[AuthContext] Onboarding data saved successfully:', response.data);

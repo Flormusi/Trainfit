@@ -228,13 +228,13 @@
 }
 
 .btn-save {
-  background-color: var(--trainfit-primary);
-  color: white;
+  background-color: #D62828;
+  color: #fff;
 }
 
 .btn-save:hover:not(:disabled) {
-  background-color: var(--trainfit-primary-dark);
-  transform: translateY(-1px);
+  background-color: #D62828;
+  transform: none;
 }
 
 .btn-delete {

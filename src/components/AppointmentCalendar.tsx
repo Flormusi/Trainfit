@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from '../services/axiosConfig';
 import { Calendar, Clock, Plus, ArrowLeft, Edit, Trash2, Check, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -50,25 +51,18 @@ const AppointmentCalendar: React.FC = () => {
 
   const fetchAppointments = async () => {
     try {
-      const token = localStorage.getItem('token');
       const startOfDay = new Date(selectedDate);
       startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date(selectedDate);
       endOfDay.setHours(23, 59, 59, 999);
 
-      const response = await fetch(
-        `/api/appointments?start=${startOfDay.toISOString()}&end=${endOfDay.toISOString()}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+      const response = await axios.get('/appointments', {
+        params: {
+          start: startOfDay.toISOString(),
+          end: endOfDay.toISOString()
         }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setAppointments(data.data);
-      }
+      });
+      setAppointments(response.data.data);
     } catch (error) {
       console.error('Error al obtener citas:', error);
     }
@@ -76,18 +70,8 @@ const AppointmentCalendar: React.FC = () => {
 
   const fetchClients = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const API_URL = import.meta.env.VITE_API_URL || '/api';
-      const response = await fetch(`${API_URL}/clients`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setClients(data.data);
-      }
+      const response = await axios.get('/clients');
+      setClients(response.data.data);
     } catch (error) {
       console.error('Error al obtener clientes:', error);
     }
@@ -101,21 +85,12 @@ const AppointmentCalendar: React.FC = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/appointments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          ...newAppointment,
-          startTime: new Date(newAppointment.startTime).toISOString(),
-          endTime: new Date(newAppointment.endTime).toISOString()
-        })
+      const response = await axios.post('/appointments', {
+        ...newAppointment,
+        startTime: new Date(newAppointment.startTime).toISOString(),
+        endTime: new Date(newAppointment.endTime).toISOString()
       });
-
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         setShowCreateModal(false);
         setNewAppointment({
           title: '',
@@ -137,19 +112,8 @@ const AppointmentCalendar: React.FC = () => {
 
   const updateAppointmentStatus = async (appointmentId: string, status: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status })
-      });
-
-      if (response.ok) {
-        fetchAppointments();
-      }
+      await axios.patch(`/appointments/${appointmentId}`, { status });
+      fetchAppointments();
     } catch (error) {
       console.error('Error al actualizar cita:', error);
     }
@@ -159,17 +123,8 @@ const AppointmentCalendar: React.FC = () => {
     if (!confirm('¿Estás seguro de que quieres eliminar esta cita?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        fetchAppointments();
-      }
+      await axios.delete(`/appointments/${appointmentId}`);
+      fetchAppointments();
     } catch (error) {
       console.error('Error al eliminar cita:', error);
     }

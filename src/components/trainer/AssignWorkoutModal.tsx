@@ -46,7 +46,7 @@ const AssignWorkoutModal = ({ planId, clients, onClose, onAssign, loading, error
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
           </div>
         ) : error ? (
-          <div className="text-red-600 text-center py-4">{error}</div>
+          <div className="text-center py-4" style={{ color: '#ff3b30' }}>{error}</div>
         ) : (
           <div className="space-y-4">
             <div>

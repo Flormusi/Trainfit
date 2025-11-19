@@ -233,7 +233,7 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ isOpen, onClose, onSelect
 
     try {
       // Primero intentar obtener una rutina prediseñada
-      const presetResponse = await axios.get('/api/routines/templates/preset', {
+      const presetResponse = await axios.get('/routines/templates/preset', {
         params: {
           trainingObjective: generateParams.objetivo,
           level: generateParams.nivel,
@@ -272,7 +272,7 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ isOpen, onClose, onSelect
 
     try {
       // Si no hay rutina prediseñada, generar automáticamente
-      const response = await axios.post('/api/routines/templates', generateParams);
+      const response = await axios.post('/routines/templates', generateParams);
       
       if (response.data && response.data.success) {
         const generatedTemplate = response.data.data;

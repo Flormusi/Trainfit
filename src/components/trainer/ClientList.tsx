@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button, Modal } from 'react-bootstrap';
@@ -32,6 +32,37 @@ const ClientList: React.FC = () => {
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTier, setFilterTier] = useState('all');
+  const [openActionsClientId, setOpenActionsClientId] = useState<string | number | null>(null);
+  const menuContainerRef = useRef<HTMLDivElement | null>(null);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // Cierre automático del menú de acciones al hacer click fuera o presionar Esc
+  useEffect(() => {
+    if (openActionsClientId == null) {
+      menuContainerRef.current = null;
+      menuButtonRef.current = null;
+      return;
+    }
+
+    const handleDocMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (menuContainerRef.current && menuContainerRef.current.contains(target)) return;
+      if (menuButtonRef.current && menuButtonRef.current.contains(target)) return;
+      setOpenActionsClientId(null);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenActionsClientId(null);
+    };
+
+    document.addEventListener('mousedown', handleDocMouseDown);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleDocMouseDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openActionsClientId]);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -178,7 +209,8 @@ const ClientList: React.FC = () => {
         borderRadius: '12px',
         border: 'none',
         outline: 'none',
-        boxShadow: 'none'
+        boxShadow: '0 8px 24px rgba(214, 40, 40, 0.12), 0 4px 12px rgba(0, 0, 0, 0.35)',
+        borderTop: '3px solid #D62828'
       }}>
         {/* Primera fila: Botón volver y botón agregar */}
         <div style={{
@@ -235,37 +267,25 @@ const ClientList: React.FC = () => {
             alignItems: 'center',
             gap: '8px',
             padding: '12px 20px',
-            background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+            background: 'linear-gradient(135deg, #D62828 0%, #E83E3E 100%)',
             color: 'white',
-            border: '1px solid rgba(220, 38, 38, 0.3)',
+            border: 'none',
             borderRadius: '12px',
             fontWeight: '600',
             cursor: 'pointer',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'all 0.2s ease',
             fontSize: '0.9rem',
-            boxShadow: `
-              0 8px 24px rgba(220, 38, 38, 0.3),
-              0 4px 12px rgba(0, 0, 0, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2)
-            `
+            boxShadow: '0 10px 20px rgba(214, 40, 40, 0.28)'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = `
-              0 12px 32px rgba(220, 38, 38, 0.4),
-              0 4px 16px rgba(0, 0, 0, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2)
-            `;
+            e.currentTarget.style.filter = 'brightness(1.08)';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.boxShadow = '0 12px 24px rgba(214, 40, 40, 0.33)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+            e.currentTarget.style.filter = 'none';
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = `
-              0 8px 24px rgba(220, 38, 38, 0.3),
-              0 4px 12px rgba(0, 0, 0, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2)
-            `;
+            e.currentTarget.style.boxShadow = '0 10px 20px rgba(214, 40, 40, 0.28)';
           }}
           >
             <span style={{
@@ -294,7 +314,7 @@ const ClientList: React.FC = () => {
             border: 'none',
             outline: 'none',
             boxShadow: 'none',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+            textShadow: '0 0 8px rgba(214, 40, 40, 0.5), 0 0 24px rgba(214, 40, 40, 0.25)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -328,7 +348,8 @@ const ClientList: React.FC = () => {
         borderRadius: '12px',
         border: 'none',
         outline: 'none',
-        boxShadow: 'none'
+        boxShadow: '0 8px 24px rgba(214, 40, 40, 0.12), 0 4px 12px rgba(0, 0, 0, 0.35)',
+        borderTop: '3px solid #D62828'
       }}>
         <div style={{
           display: 'flex',
@@ -557,37 +578,25 @@ const ClientList: React.FC = () => {
               onClick={handleAddClient} 
               style={{
                 padding: '12px 20px',
-                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                background: 'linear-gradient(135deg, #D62828 0%, #E83E3E 100%)',
                 color: 'white',
-                border: '1px solid rgba(220, 38, 38, 0.3)',
+                border: 'none',
                 borderRadius: '12px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'all 0.2s ease',
                 fontSize: '1rem',
-                boxShadow: `
-                  0 8px 24px rgba(220, 38, 38, 0.3),
-                  0 4px 12px rgba(0, 0, 0, 0.2),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                `
+                boxShadow: '0 10px 20px rgba(214, 40, 40, 0.28)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = `
-                  0 12px 32px rgba(220, 38, 38, 0.4),
-                  0 4px 16px rgba(0, 0, 0, 0.2),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                `;
+                e.currentTarget.style.filter = 'brightness(1.08)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 12px 24px rgba(214, 40, 40, 0.33)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+                e.currentTarget.style.filter = 'none';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = `
-                  0 8px 24px rgba(220, 38, 38, 0.3),
-                  0 4px 12px rgba(0, 0, 0, 0.2),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                `;
+                e.currentTarget.style.boxShadow = '0 10px 20px rgba(214, 40, 40, 0.28)';
               }}
             >
               Agregar Primer Cliente
@@ -604,53 +613,164 @@ const ClientList: React.FC = () => {
               : isDesktop 
                 ? 'repeat(auto-fill, minmax(280px, 1fr))' 
                 : 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: isTablet ? '12px' : '16px',
+          gap: '12px',
           border: 'none',
           outline: 'none',
           boxShadow: 'none'
         }}>
           {filteredClients.map((client) => (
             <div key={client.id} style={{
-              background: 'linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%)',
-              borderRadius: '20px',
-              padding: isTablet ? '16px' : '24px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: `
-                0 12px 32px rgba(0, 0, 0, 0.4),
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05)
-              `,
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
+              borderRadius: '12px',
+              padding: isTablet ? '12px' : '16px',
+              border: 'none',
+              borderTop: '2px solid #D62828',
+              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.35), 0 8px 18px rgba(214, 40, 40, 0.16)',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease, border 0.15s ease',
               display: 'flex',
               flexDirection: 'column',
-              gap: window.innerWidth > 768 ? '16px' : '12px',
+              alignItems: 'center',
+              gap: '12px',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              minHeight: '200px'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = `
-                0 20px 48px rgba(0, 0, 0, 0.5),
-                0 8px 24px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1)
-              `;
-              e.currentTarget.style.borderColor = 'rgba(220, 38, 38, 0.2)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.42), 0 10px 20px rgba(214, 40, 40, 0.18)';
+              e.currentTarget.style.border = '1px solid rgba(214, 40, 40, 0.24)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = `
-                0 12px 32px rgba(0, 0, 0, 0.4),
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05)
-              `;
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.35), 0 8px 18px rgba(214, 40, 40, 0.16)';
+              e.currentTarget.style.border = 'none';
             }}
             >
+              {/* Ícono de menú (⋮) arriba a la derecha */}
+              <div style={{ position: 'absolute', top: 8, right: 8 }}>
+                <button
+                  aria-label="Más acciones"
+                  onClick={(e) => {
+                    setOpenActionsClientId(openActionsClientId === client.id ? null : client.id);
+                    // Micro-animación del ícono ⋮
+                    e.currentTarget.style.transform = 'scale(0.92)';
+                    setTimeout(() => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }, 140);
+                  }}
+                  ref={(el) => {
+                    if (openActionsClientId === client.id) {
+                      menuButtonRef.current = el as HTMLButtonElement | null;
+                    }
+                  }}
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    color: '#bbb',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s ease, color 0.2s ease, transform 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.color = '#fff';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                    e.currentTarget.style.color = '#bbb';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  title="Más acciones"
+                >
+                  ⋮
+                </button>
+                {openActionsClientId === client.id && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                    top: '36px',
+                      minWidth: '180px',
+                      background: '#1f1f1f',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '8px',
+                      boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
+                    padding: '6px',
+                    zIndex: 1000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    opacity: 0,
+                    transform: 'scale(0.98) translateY(-2px)',
+                    transition: 'opacity 160ms ease-out, transform 160ms ease-out',
+                    willChange: 'opacity, transform'
+                  }}
+                    ref={(el) => {
+                      menuContainerRef.current = el;
+                      if (el) {
+                        requestAnimationFrame(() => {
+                          el.style.opacity = '1';
+                          el.style.transform = 'scale(1) translateY(0)';
+                        });
+                      }
+                    }}
+                  >
+                    <button
+                      onClick={() => { setOpenActionsClientId(null); handleAssignRoutine(client.id); }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px',
+                        border: 'none',
+                        borderRadius: '6px',
+                        background: 'transparent',
+                        color: '#ddd',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Asignar rutina
+                    </button>
+                    <button
+                      onClick={() => { setOpenActionsClientId(null); navigate(`/trainer/messages?to=${client.id}`); }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px',
+                        border: 'none',
+                        borderRadius: '6px',
+                        background: 'transparent',
+                        color: '#ddd',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Enviar mensaje
+                    </button>
+                    <button
+                      onClick={() => { setOpenActionsClientId(null); handleDeleteClick(client); }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px',
+                        border: 'none',
+                        borderRadius: '6px',
+                        background: 'transparent',
+                        color: '#e57373',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                )}
+              </div>
               <div style={{
                 width: '60px',
                 height: '60px',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                background: 'linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -658,9 +778,7 @@ const ClientList: React.FC = () => {
                 fontSize: '1.5rem',
                 fontWeight: '700',
                 margin: '0 auto',
-                border: 'none',
-                outline: 'none',
-                boxShadow: 'none'
+                boxShadow: '0 0 8px rgba(214, 40, 40, 0.35)'
               }}>
                 {client.name.charAt(0).toUpperCase()}
               </div>
@@ -725,134 +843,31 @@ const ClientList: React.FC = () => {
                 )}
               </div>
 
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                marginTop: 'auto',
-                border: 'none',
-                outline: 'none',
-                boxShadow: 'none'
-              }}>
+              <div style={{ marginTop: 'auto', textAlign: 'center' }}>
                 <button 
                   onClick={() => handleViewClient(client.id)}
                   style={{
-                    padding: '10px 16px',
-                    border: '1px solid rgba(220, 38, 38, 0.3)',
-                    borderRadius: '8px',
-                    fontWeight: '500',
+                    padding: '8px 14px',
+                    border: 'none',
+                    borderRadius: '9999px',
+                    fontWeight: 600,
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'background 0.2s ease, transform 0.1s ease',
                     textAlign: 'center',
                     background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-                    color: 'white',
-                    boxShadow: `
-                      0 4px 12px rgba(220, 38, 38, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `
+                    color: 'white'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)';
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
                     e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = `
-                      0 6px 16px rgba(220, 38, 38, 0.4),
-                      0 2px 8px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = `
-                      0 4px 12px rgba(220, 38, 38, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `;
                   }}
-                  title="Ver perfil completo"
+                  title="Ver Perfil"
                 >
                   Ver Perfil
-                </button>
-                <button 
-                  onClick={() => handleAssignRoutine(client.id)}
-                  style={{
-                    padding: '10px 16px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    textAlign: 'center',
-                    background: 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
-                    color: 'white',
-                    boxShadow: `
-                      0 4px 12px rgba(0, 0, 0, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                    `
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #4b5563 0%, #374151 100%)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = `
-                      0 6px 16px rgba(0, 0, 0, 0.4),
-                      0 2px 8px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #374151 0%, #1f2937 100%)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = `
-                      0 4px 12px rgba(0, 0, 0, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                    `;
-                  }}
-                  title="Asignar nueva rutina"
-                >
-                  Asignar Rutina
-                </button>
-                <button 
-                  onClick={() => handleDeleteClick(client)}
-                  style={{
-                    padding: '10px 16px',
-                    border: '1px solid rgba(127, 29, 29, 0.3)',
-                    borderRadius: '8px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    textAlign: 'center',
-                    background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)',
-                    color: 'white',
-                    boxShadow: `
-                      0 4px 12px rgba(127, 29, 29, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #991b1b 0%, #b91c1c 100%)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = `
-                      0 6px 16px rgba(127, 29, 29, 0.4),
-                      0 2px 8px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = `
-                      0 4px 12px rgba(127, 29, 29, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `;
-                  }}
-                  title="Eliminar cliente"
-                >
-                  Eliminar
                 </button>
               </div>
             </div>

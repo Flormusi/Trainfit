@@ -346,13 +346,13 @@ const ClientListImproved: React.FC = () => {
           borderRadius: '12px',
           color: '#ffffff'
         }}>
-          <h3 style={{ color: '#ef4444', marginBottom: '16px' }}>Error al cargar clientes</h3>
+          <h3 style={{ color: '#ff3b30', marginBottom: '16px' }}>Error al cargar clientes</h3>
           <p style={{ marginBottom: '24px' }}>{error}</p>
           <button 
             onClick={() => window.location.reload()} 
             style={{
               padding: '12px 24px',
-              background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+              background: '#D62828',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -416,7 +416,7 @@ const ClientListImproved: React.FC = () => {
             onClick={() => navigate('/add-client')} 
             style={{
               padding: '12px 24px',
-              background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+              background: '#D62828',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -732,12 +732,12 @@ const ClientListImproved: React.FC = () => {
                       fontWeight: '600',
                       textTransform: 'uppercase',
                       background: client.membership_tier === 'premium' 
-                        ? 'rgba(220, 38, 38, 0.2)' 
+                        ? 'rgba(214, 40, 40, 0.2)' 
                         : client.membership_tier === 'pro'
                         ? 'rgba(245, 158, 11, 0.2)'
                         : 'rgba(156, 163, 175, 0.2)',
                       color: client.membership_tier === 'premium' 
-                        ? '#ef4444' 
+                        ? '#D62828' 
                         : client.membership_tier === 'pro'
                         ? '#f59e0b'
                         : '#9ca3af'
@@ -763,7 +763,7 @@ const ClientListImproved: React.FC = () => {
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
                       textAlign: 'center',
-                      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                      background: '#D62828',
                       color: 'white'
                     }}
                   >
@@ -779,7 +779,7 @@ const ClientListImproved: React.FC = () => {
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
                       textAlign: 'center',
-                      background: 'linear-gradient(135deg, #4b5563 0%, #374151 100%)',
+                      background: '#D62828',
                       color: 'white'
                     }}
                   >
@@ -795,7 +795,7 @@ const ClientListImproved: React.FC = () => {
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
                       textAlign: 'center',
-                      background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)',
+                      background: '#D62828',
                       color: 'white'
                     }}
                   >
@@ -823,7 +823,7 @@ const ClientListImproved: React.FC = () => {
                 disabled={currentPage === 1}
                 style={{
                   padding: '8px 12px',
-                  background: currentPage === 1 ? '#404040' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                  background: currentPage === 1 ? '#404040' : '#D62828',
                   color: currentPage === 1 ? '#666' : 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -856,7 +856,7 @@ const ClientListImproved: React.FC = () => {
                       style={{
                         padding: '8px 12px',
                         background: pageNumber === currentPage 
-                          ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' 
+                          ? '#D62828' 
                           : '#404040',
                         color: 'white',
                         border: 'none',
@@ -876,7 +876,7 @@ const ClientListImproved: React.FC = () => {
                 disabled={currentPage === paginationInfo.totalPages}
                 style={{
                   padding: '8px 12px',
-                  background: currentPage === paginationInfo.totalPages ? '#404040' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                  background: currentPage === paginationInfo.totalPages ? '#404040' : '#D62828',
                   color: currentPage === paginationInfo.totalPages ? '#666' : 'white',
                   border: 'none',
                   borderRadius: '6px',

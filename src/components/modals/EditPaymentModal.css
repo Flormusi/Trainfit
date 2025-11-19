@@ -188,14 +188,13 @@
 }
 
 .btn-save {
-  background-color: #3b82f6;
+  background-color: #D62828;
   color: white;
 }
 
 .btn-save:hover:not(:disabled) {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background-color: #D62828;
+  transform: none;
 }
 
 .btn-cancel:disabled,

@@ -2,10 +2,7 @@
 .trainer-client-progress-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  color: white;
-  background-color: #1a1a1a;
-  min-height: 100vh;
+  width: 100%;
 }
 
 .progress-header {
@@ -249,6 +246,88 @@
   font-weight: bold;
 }
 
+/* === Summary Section (Resumen del cliente) - Scoped === */
+.client-summary-card {
+  background-color: #1E1E1E;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  border: 1px solid #333;
+}
+
+.client-summary-card .summary-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 14px 0;
+  text-align: left;
+}
+
+.client-summary-card .summary-title .underline {
+  display: inline-block;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ef4444;
+}
+
+.client-summary-card .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 32px;
+}
+
+/* Lista vertical tipo ficha */
+.client-summary-card .summary-list {
+  display: grid;
+  row-gap: 18px;
+}
+
+/* Bloque de progreso al final */
+.client-summary-card .summary-progress {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid #2C2C2C; /* línea divisoria sutil arriba del bloque */
+  display: grid;
+  row-gap: 16px;
+}
+
+/* Subtítulo sutil para el bloque de progreso */
+.client-summary-card .summary-progress-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #d0d0d0; /* gris claro */
+  font-size: 14px; /* tamaño solicitado */
+  font-weight: 600; /* semibold */
+  letter-spacing: 0.02em;
+  margin-top: 24px; /* más espacio entre “Nivel” y “Progreso” */
+  margin-bottom: 8px;
+}
+
+.client-summary-card .summary-column {
+  display: grid;
+  row-gap: 18px;
+}
+
+.client-summary-card .summary-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 24px;
+}
+
+.client-summary-card .summary-label {
+  color: #ccc;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.client-summary-card .summary-value {
+  color: white;
+  font-size: 15px;
+  font-weight: 400; /* valores en regular */
+  text-align: right;
+}
+
 .measurement-change.positive {
   color: #28a745;
 }
@@ -341,4 +420,75 @@
   .chart-placeholder {
     height: 150px;
   }
+}
+/* Layout adjustments: min-height and consistent vertical gap */
+.client-summary-card {
+  min-height: 260px; /* más compacto, consistente con cards del panel */
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* gap-3 equivalente */
+  width: 100%;
+  margin: 16px 0 24px; /* 16px desde el título, sin centrado horizontal */
+  align-self: flex-start; /* evita centrado vertical en contenedores flex/grid */
+  padding: 14px 20px; /* vertical reducido para que no flote */
+  background-color: #1E1E1E; /* fondo gris oscuro solicitado */
+  border-radius: 8px; /* misma proporción que otras cards de esta vista */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* sombra más sutil */
+  border: 1px solid #333; /* borde coherente */
+}
+
+/* Ensure grid sections keep constant spacing across rows and columns */
+.client-summary-card .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* dos columnas */
+  gap: 12px 24px; /* espaciamiento uniforme */
+}
+
+/* Lists of items stack with consistent spacing */
+.client-summary-card .summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Avoid double spacing when using gap-based layout */
+.client-summary-card .summary-item {
+  margin-bottom: 0;
+}
+
+/* Título con línea inferior roja (reemplaza subrayado previo) */
+.client-summary-card .summary-title {
+  border-bottom: 1px solid #C71C1C; /* rojo marca TrainFit */
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  font-size: 20px; /* alinear con .client-info h2 */
+  font-weight: 600;
+  color: #fff;
+}
+.client-summary-card .summary-title .underline {
+  display: none; /* ocultar subrayado anterior */
+}
+
+/* Keep divider tight; rely on parent gap for spacing */
+.client-summary-card .summary-progress {
+  margin-top: 12px; /* aire moderado para no flotar */
+  border-top: 1px solid #3A3A3A; /* línea divisoria gris */
+  padding-top: 12px;
+}
+
+/* Jerarquía visual de etiquetas y valores */
+.client-summary-card .summary-label {
+  color: #C4C4C4; /* gris claro */
+  font-weight: 600; /* etiquetas en bold/semibold */
+}
+.client-summary-card .summary-value {
+  color: #FFFFFF; /* blanco puro */
+  font-weight: 400; /* valores en regular */
+  font-size: 16px; /* alinear con .detail-value */
+}
+
+/* Ocupa todo el ancho en pantallas pequeñas */
+@media (max-width: 900px) {
+  .client-summary-card { width: 100%; max-width: none; }
+  .client-summary-card .summary-grid { grid-template-columns: 1fr; }
 }

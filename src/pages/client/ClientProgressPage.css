@@ -266,15 +266,15 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #D62828;
   color: white;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  box-shadow: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  background-color: #D62828;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-secondary {
@@ -379,10 +379,7 @@
 .metric-value {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #D62828;
   margin-bottom: 8px;
 }
 

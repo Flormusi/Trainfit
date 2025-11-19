@@ -57,13 +57,13 @@ const DashboardCharts: React.FC = () => {
             <Line
               type="monotone"
               dataKey="FlorenciaM"
-              stroke="#e63946"
+              stroke="#D62828"
               strokeWidth={2}
             />
             <Line
               type="monotone"
               dataKey="Cliente2"
-              stroke="#8884d8"
+              stroke="#F04E3E"
               strokeWidth={2}
             />
           </LineChart>
@@ -79,7 +79,7 @@ const DashboardCharts: React.FC = () => {
             <XAxis dataKey="month" stroke="#aaa" />
             <YAxis stroke="#aaa" />
             <Tooltip />
-            <Bar dataKey="entrenamientos" fill="#e63946" barSize={40} />
+            <Bar dataKey="entrenamientos" fill="#D62828" barSize={40} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -93,7 +93,7 @@ const DashboardCharts: React.FC = () => {
             <XAxis dataKey="month" stroke="#aaa" />
             <YAxis stroke="#aaa" />
             <Tooltip />
-            <Bar dataKey="nuevos" fill="#e63946" barSize={40} />
+            <Bar dataKey="nuevos" fill="#D62828" barSize={40} />
           </BarChart>
         </ResponsiveContainer>
       </div>

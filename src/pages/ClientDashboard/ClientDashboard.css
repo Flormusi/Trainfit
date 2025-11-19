@@ -67,6 +67,23 @@
   .client-dashboard-page .dashboard-header .header-actions { gap: 8px; }
 }
 
+/* Botón de notificaciones: círculo rojo compacto con icono centrado */
+.client-dashboard-page .dashboard-header .notification-btn {
+  background-image: linear-gradient(to right, #dc2626, #ef4444);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 10px; /* similar a rounded-lg */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 16px; /* tamaño del emoji de campana */
+}
+
+.client-dashboard-page .dashboard-header .notification-btn:focus { outline: none; }
+
 .client-dashboard-page .user-avatar {
   width: 64px;
   height: 64px;
@@ -120,220 +137,26 @@
   justify-content: center;
   text-align: center;
   font-weight: 700;
-  margin: 0;
-  padding: 0;
+  color: #cbd5e1;
 }
 
-.client-dashboard-page .calendar-day {
-  aspect-ratio: 1 / 1;
-  display: grid;
-  place-items: center;
-  border: 1px solid #333;
-  background: #1b1b1b;
-  border-radius: 10px;
-  min-width: 0;
-  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 100ms ease;
-}
-
-/* Interacción clara: mano y resaltado al pasar el cursor */
-.client-dashboard-page .calendar-day:not(.empty) {
-  cursor: pointer;
-}
-.client-dashboard-page .calendar-day:not(.empty):hover {
-  background: #242424;
-  border-color: #4b4b4b;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.06) inset;
-  transform: translateY(-1px);
-}
-.client-dashboard-page .calendar-day:not(.empty):active {
-  transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.20), 0 0 0 1px rgba(255,255,255,0.05) inset;
-}
-.client-dashboard-page .calendar-day:not(.empty):focus-visible {
-  outline: 2px solid rgba(255,255,255,0.25);
-  outline-offset: 2px;
-}
-
-/* Resaltado por tipo de evento (hover) */
-.client-dashboard-page .calendar-day.has-training:hover {
-  border-color: #60A5FA;
-  box-shadow: 0 0 0 1px rgba(96,165,250,.55) inset, 0 6px 16px rgba(0,0,0,0.25);
-}
-.client-dashboard-page .calendar-day.has-google-event:hover {
-  border-color: #FBBF24;
-  box-shadow: 0 0 0 1px rgba(251,191,36,.55) inset, 0 6px 16px rgba(0,0,0,0.25);
-}
-.client-dashboard-page .calendar-day.has-both-events:hover {
-  border-color: #FF6B5A;
-  background: linear-gradient(135deg, rgba(231,76,60,.12), rgba(243,156,18,.12));
-  box-shadow: 0 0 0 1px rgba(255,107,90,.55) inset, 0 6px 16px rgba(0,0,0,0.25);
-}
-.client-dashboard-page .calendar-day.today:hover {
-  border-color: #34D399;
-  box-shadow: 0 0 0 1px rgba(52,211,153,.55) inset, 0 6px 16px rgba(0,0,0,0.25);
-}
-
-.client-dashboard-page .calendar-day-number {
-  color: #fff;
-  font-weight: 700;
-}
-
-.client-dashboard-page .calendar-day.today {
-  border-color: #10B981;
-  box-shadow: 0 0 0 1px rgba(16,185,129,.35) inset;
-}
-
-.client-dashboard-page .calendar-day.has-training {
-  border-color: #3B82F6;
-  box-shadow: 0 0 0 1px rgba(59,130,246,.35) inset;
-}
-
-.client-dashboard-page .calendar-day.has-google-event {
-  border-color: #F59E0B;
-  box-shadow: 0 0 0 1px rgba(245,158,11,.35) inset;
-}
-
-.client-dashboard-page .calendar-day.has-both-events {
-  border-color: #E74C3C;
-  box-shadow: 0 0 0 1px rgba(231,76,60,.45) inset;
-  background: linear-gradient(135deg, rgba(231,76,60,.10), rgba(243,156,18,.10));
-}
-
-/* Indicators */
-.client-dashboard-page .day-indicators {
-  display: flex;
-  gap: 4px;
-  margin-top: 6px;
-}
-
-.client-dashboard-page .training-indicator,
-.client-dashboard-page .google-indicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.client-dashboard-page .training-indicator { background: #3B82F6; }
-.client-dashboard-page .google-indicator { background: #F59E0B; }
-
-/* Buttons */
-.client-dashboard-page .btn {
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-}
-
-.client-dashboard-page .btn-primary,
-.client-dashboard-page .routine-details-btn {
-  background: linear-gradient(90deg, #E74C3C, #F39C12);
-  color: #fff;
-}
-
-.client-dashboard-page .btn-secondary {
-  background: #2D6CDF;
-  color: #fff;
-}
-
-.client-dashboard-page .request-change-btn {
-  background-image: linear-gradient(90deg, #E74C3C, #F39C12);
-  color: #fff;
-}
-
-.client-dashboard-page .btn-danger {
-  background: #C0392B;
-  color: #fff;
-}
-
-/* ============================= */
-/* Responsive Styles             */
-/* ============================= */
-
-/* Ajuste de tamaño del nombre (h1) en el header */
-.client-dashboard-page .dashboard-header h1 { font-size: 1.6rem; }
-
-/* 1024px–1199px */
-@media (max-width: 1199px) {
-  .client-dashboard-page .dashboard-container { max-width: 1024px; }
-}
-
-/* 768px–1023px */
-@media (max-width: 1023px) {
-  .client-dashboard-page .dashboard-content { grid-template-columns: 1fr 1fr; }
-  .client-dashboard-page .user-avatar { width: 56px; height: 56px; }
-}
-
-/* 600px–899px */
-@media (max-width: 899px) {
-  .client-dashboard-page .dashboard-content { grid-template-columns: 1fr; }
-  .client-dashboard-page .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-  .client-dashboard-page .calendar-day { min-height: 44px; }
-}
-
-/* ≤767px */
-@media (max-width: 767px) {
-  .client-dashboard-page .dashboard-header h1 { font-size: 1.5rem; }
-  .client-dashboard-page .user-avatar { width: 52px; height: 52px; }
-  .client-dashboard-page .calendar-day { min-height: 40px; }
-}
-
-/* ≤599px */
-@media (max-width: 599px) {
-  .client-dashboard-page .dashboard-header h1 { font-size: 1.375rem; }
-  .client-dashboard-page .user-avatar { width: 48px; height: 48px; }
-  .client-dashboard-page .calendar-day { min-height: 38px; }
-}
-
-/* ≤479px */
-@media (max-width: 479px) {
-  .client-dashboard-page .dashboard-header h1 { font-size: 1.25rem; }
-  .client-dashboard-page .user-avatar { width: 44px; height: 44px; }
-  .client-dashboard-page .calendar-day { min-height: 36px; font-size: 0.7rem; }
-}
-
-
-/* Métricas de progreso - nueva UI */
-.dashboard-section.progress-metrics .progress-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.dashboard-section.progress-metrics .metric-block {
-  background: #222;
-  border-radius: 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.dashboard-section.progress-metrics .metric-label {
-  font-size: 0.85rem;
-  color: #aaa;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* Métricas de progreso */
 .dashboard-section.progress-metrics .metric-value {
   font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #E74C3C, #F39C12);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #D62828;
 }
 
 .dashboard-section.progress-metrics .metric-subtext {
   font-size: 0.8rem;
   color: #6f6f6f;
   font-weight: 500;
+}
+
+/* Etiquetas legibles en Métricas de progreso */
+.dashboard-section.progress-metrics .metric-label {
+  color: #bbb;
+  font-weight: 600;
 }
 
 /* Header y card proporcionales dentro de Métricas de progreso */
@@ -370,128 +193,7 @@
   margin-top: 12px;
 }
 
-/* ===== Overrides solicitados por el usuario ===== */
-/* 1) Header más compacto */
-.client-dashboard-page .dashboard-header {
-  padding-block: 8px;
-  margin: 0 0 16px;
-}
 
-/* 2) Grid más balanceado entre calendario y métricas */
-.client-dashboard-page .dashboard-content {
-  grid-template-columns: 1.25fr 1fr;
-}
-
-/* 2a) Calendario ajustado al contenido (sin espacio negro extra) */
-.client-dashboard-page .calendar-grid {
-  grid-template-rows: auto auto;
-}
-
-/* 2b) Tipografía de textos del calendario en gris claro para mejor legibilidad */
-.client-dashboard-page .day-header,
-.client-dashboard-page .calendar-legend span,
-.client-dashboard-page .weekly-training-type {
-  color: #BDC3C7;
-}
-
-/* Mostrar la leyenda del calendario (restaurado) */
-.client-dashboard-page .calendar-legend {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
-/* Ítems y colores de la leyenda */
-.client-dashboard-page .calendar-legend .legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #BDC3C7;
-}
-.client-dashboard-page .calendar-legend .legend-color {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-}
-.client-dashboard-page .calendar-legend .legend-color.training { background: #3B82F6; }
-.client-dashboard-page .calendar-legend .legend-color.google-event { background: #F59E0B; }
-.client-dashboard-page .calendar-legend .legend-color.both-events { background: #E74C3C; }
-.client-dashboard-page .calendar-legend .legend-color.today { background: #10B981; }
-
-/* 3a) Aumentar presencia del bloque de métricas dentro de su card */
-.dashboard-section.progress-metrics .progress-metrics {
-  gap: 18px;
-}
-
-/* 2c) Compactar aún más el calendario para balance visual */
-.client-dashboard-page .calendar-day-headers,
-.client-dashboard-page .calendar-days {
-  gap: 6px;
-}
-.client-dashboard-page .calendar-day {
-  border-radius: 8px;
-}
-
-/* Ocultar la vista semanal móvil debajo del calendario */
-.client-dashboard-page .calendar-weekly-mobile {
-  display: none;
-}
-
-/* 4) Consistencia general de espacios y contraste */
-.client-dashboard-page .section-title { margin-bottom: 10px; }
-.client-dashboard-page .card { padding: 18px; }
-
-/* ===== Márgenes exteriores iguales para bloques ===== */
-.client-dashboard-page .dashboard-section {
-  margin: 20px 0; /* solo margen vertical; sin margen lateral para alinear con el header */
-  padding: 16px; /* espacio interno uniforme en cada bloque */
-  box-sizing: border-box;
-}
-
-/* ===== Responsive anti-overflow & alignment rules ===== */
-/* Evitar scroll horizontal y mantener ancho contenido */
-.client-dashboard-page { overflow-x: hidden; }
-.client-dashboard-page .dashboard-header,
-.client-dashboard-page .dashboard-content,
-.client-dashboard-page .dashboard-left-column,
-.client-dashboard-page .dashboard-right-column {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-/* Padding lateral consistente en desktop */
-.client-dashboard-page .dashboard-content-wrapper,
-.client-dashboard-page .dashboard-main-content,
-.client-dashboard-page .dashboard-header,
-.client-dashboard-page .dashboard-content {
-  padding-inline: 20px;
-}
-
-/* Alinear márgenes del header con el contenido: igual que el contenedor, sin márgenes laterales extras */
-.client-dashboard-page .dashboard-header { margin-left: 0; margin-right: 0; }
-
-/* Columnas ocupan el ancho disponible en mobile */
-@media (max-width: 899px) {
-  .client-dashboard-page .dashboard-content { grid-template-columns: 1fr; }
-}
-
-/* Mobile: padding lateral 10px y márgenes consistentes */
-@media (max-width: 599px) {
-  .client-dashboard-page .dashboard-content-wrapper,
-  .client-dashboard-page .dashboard-main-content,
-  .client-dashboard-page .dashboard-header,
-  .client-dashboard-page .dashboard-content {
-    padding-inline: 10px;
-  }
-  .client-dashboard-page .dashboard-section { margin: 10px 0; }
-  .client-dashboard-page .dashboard-header { margin-left: 0; margin-right: 0; }
-}
-
-/* Botón “Ver detalles” consistente */
 /* ===== Bloque “Tu Rutina del Mes” ===== */
 .client-dashboard-page .routine-overview .routine-content {
   display: flex;
@@ -520,6 +222,11 @@
   color: #bbb; /* gris claro */
 }
 
+/* Nombre de la rutina legible sobre fondo oscuro */
+.client-dashboard-page .routine-overview .routine-name {
+  color: #bbb;
+}
+
 /* Espaciado entre bloques del grid */
 .client-dashboard-page .dashboard-content { gap: 20px; }
 
@@ -527,10 +234,11 @@
 .client-dashboard-page .routine-overview .card { background-color: #1e1e1e; }
 
 /* Título de "TU RUTINA DEL MES" más chico */
-.client-dashboard-page .routine-overview .card h2 { font-size: 1rem; }
+.client-dashboard-page .routine-overview .card h2 { font-size: 1.25rem; font-weight: 700; line-height: 1.6; }
 /* Regla más específica por si hay overrides */
-.client-dashboard-page .routine-overview .card.main-routine-card h2 { font-size: 1rem !important; }
-
+.client-dashboard-page .routine-overview .card.main-routine-card h2 { font-size: 1.35rem !important; }
+/* Ajuste de padding en la card principal de rutina */
+.client-dashboard-page .routine-overview .card.main-routine-card { padding: 1.75rem; }
 /* Fondo oscuro forzado para la card del calendario */
 .client-dashboard-page .training-calendar .card { background-color: #1e1e1e; }
 
@@ -570,7 +278,7 @@
  .client-dashboard-page .payment-management .status-text { color: #fff; font-weight: 600; text-align: center; }
  .client-dashboard-page .payment-management .status-details { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; }
  .client-dashboard-page .payment-management .payment-amount-section { display: flex; flex-direction: column; align-items: center; }
- 
+
  /* Próximo pago */
  .client-dashboard-page .payment-management .due-date-section { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
  .client-dashboard-page .payment-management .due-date-icon { display: inline-flex; align-items: center; justify-content: center; color: #9aa5b1; background: none; border: none; width: auto; height: auto; padding: 0; }
@@ -603,8 +311,8 @@
  .client-dashboard-page .payment-management .btn-payment { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; }
  .client-dashboard-page .payment-management .btn-payment.secondary { background-color: #2a2a2a; color: #fff; border: 1px solid #3a3a3a; }
  .client-dashboard-page .payment-management .btn-payment.secondary:hover { background-color: #333333; border-color: #4a4a4a; }
- .client-dashboard-page .payment-management .btn-payment.primary { background-image: linear-gradient(90deg, #E74C3C, #F39C12); color: #fff; font-weight: 600; border: none; box-shadow: 0 6px 18px rgba(231, 76, 60, 0.28); }
- .client-dashboard-page .payment-management .btn-payment.primary:hover { filter: brightness(1.05); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35); }
+.client-dashboard-page .payment-management .btn-payment.primary { background-color: #D62828; color: #fff; font-weight: 600; border: none; box-shadow: none; }
+.client-dashboard-page .payment-management .btn-payment.primary:hover { background-color: #D62828; box-shadow: none; }
  
  /* Responsive padding y gap (más compacto en pantallas pequeñas) */
 @media (max-width: 1023px) {
@@ -650,7 +358,644 @@
 .client-dashboard-page .payment-management .payment-overview { gap: 20px; }
 .client-dashboard-page .payment-management .payment-block { padding: 18px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 180px; }
 .client-dashboard-page .payment-management .total-value { font-size: 1.35rem; font-weight: 700; }
-.client-dashboard-page .payment-management .amount-value { font-size: 1.15rem; font-weight: 600; }
+
+/* Badge "Pago al día" minimal */
+.client-dashboard-page .payment-management .status-badge.up-to-date { box-shadow: none; }
+
+/* Barra de progreso por estado */
+.client-dashboard-page .payment-management .payment-progress.paid .progress-fill {
+  background-image: linear-gradient(to right, #10b981, #34d399);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .payment-progress.pending .progress-fill {
+  background-image: linear-gradient(to right, #f59e0b, #fbbf24);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .payment-progress.overdue .progress-fill {
+  background-image: linear-gradient(to right, #ef4444, #f87171);
+  box-shadow: none;
+}
+
+/* Texto de estado por estado */
+.client-dashboard-page .payment-management .payment-status-section .status-indicator.paid ~ .status-details .status-text { color: #10b981; }
+.client-dashboard-page .payment-management .payment-status-section .status-indicator.pending ~ .status-details .status-text { color: #f59e0b; }
+.client-dashboard-page .payment-management .payment-status-section .status-indicator.overdue ~ .status-details .status-text { color: #ef4444; }
+
+/* Botón "Ver historial" con mayor visibilidad y coherencia estética */
+.client-dashboard-page .payment-management .btn-payment { padding: 12px 18px; font-size: 0.95rem; font-weight: 600; }
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-green {
+  background-color: transparent;
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-green:hover {
+  background-color: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.60);
+}
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-amber {
+  background-color: transparent;
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-amber:hover {
+  background-color: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.60);
+}
+
+/* Responsive layout corregido */
+@media (max-width: 1200px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .client-dashboard-page .payment-management .payment-block {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .client-dashboard-page .payment-management .payment-header h2 { 
+    font-size: 1rem; 
+  }
+  .client-dashboard-page .payment-management .payment-block { 
+    padding: 12px;
+    min-width: 0;
+  }
+  .client-dashboard-page .payment-management .payment-status-section { 
+    padding: 0; 
+    gap: 8px; 
+    flex-wrap: nowrap;
+  }
+  .client-dashboard-page .payment-management .due-date-section { 
+    gap: 8px; 
+  }
+  .client-dashboard-page .payment-management .payment-actions { 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: 8px;
+  }
+  .client-dashboard-page .payment-management .payment-actions .btn-payment { 
+    width: 100%; 
+    justify-content: center; 
+  }
+  .client-dashboard-page .payment-management .status-badge { 
+    padding: 4px 8px; 
+    font-size: 0.8rem; 
+  }
+}
+
+@media (max-width: 480px) {
+  .client-dashboard-page .payment-management .total-value { 
+    font-size: 1.1rem; 
+    white-space: nowrap;
+  }
+  .client-dashboard-page .payment-management .amount-value { 
+    font-size: 0.95rem; 
+    white-space: nowrap;
+  }
+  .client-dashboard-page .payment-management .payment-block {
+    padding: 10px;
+  }
+}
+
+/* Prevenir overflow de texto y layout roto (ajustado) */
+.client-dashboard-page .payment-management .payment-block { 
+  min-width: 0; 
+  overflow: visible;
+  overflow-wrap: normal;
+}
+.client-dashboard-page .payment-management .total-value,
+.client-dashboard-page .payment-management .amount-value { 
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  text-align: center;
+}
+.client-dashboard-page .payment-management .progress-info { 
+  gap: 8px;
+  min-width: 0;
+}
+.client-dashboard-page .payment-management .progress-value { 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+  text-align: right;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.client-dashboard-page .payment-management .progress-label { 
+  white-space: nowrap;
+}
+
+/* === Leyenda del calendario: layout e iconos === */
+.client-dashboard-page .calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.client-dashboard-page .legend-item { display: inline-flex; align-items: center; gap: 8px; color: #fff; }
+.client-dashboard-page .legend-item .legend-icon { font-size: 16px; line-height: 1; display: inline-block; }
+.client-dashboard-page .legend-item .legend-color { width: 14px; height: 14px; border-radius: 4px; border: 1px solid #333; }
+.client-dashboard-page .legend-item .legend-color.today { background-color: #10B981; }
+
+/* === Mensajes: contraste y botón === */
+.client-dashboard-page .messages-card .card { background-color: #1e1e1e; }
+.client-dashboard-page .messages-card .messages-summary { color: #9CA3AF; }
+.client-dashboard-page .messages-card .messages-icon { display: inline-flex; align-items: center; }
+.client-dashboard-page .messages-card .messages-preview { color: #aaa; }
+.client-dashboard-page .messages-card .messages-preview-name { color: #fff; margin-bottom: 4px; }
+.client-dashboard-page .messages-card .messages-preview-content { color: #ddd; margin-bottom: 4px; }
+.client-dashboard-page .messages-card .messages-preview-time { color: #9aa5b1; font-size: 0.9rem; }
+.client-dashboard-page .messages-card .open-messaging-btn {
+  background-image: linear-gradient(90deg, #E74C3C, #F39C12);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+.client-dashboard-page .messages-card .open-messaging-btn:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.client-dashboard-page .messages-card .status-badge {
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  padding: 2px 8px;
+}
+ .client-dashboard-page .payment-management .payment-block { background-color: #232323; border: 1px solid #2f2f2f; border-radius: 12px; padding: 18px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); min-height: 180px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+ 
+ /* Tipografías y etiquetas */
+ .client-dashboard-page .payment-management .payment-amount-section .total-label,
+ .client-dashboard-page .payment-management .payment-amount-section .amount-label,
+ .client-dashboard-page .payment-management .due-date-label,
+ .client-dashboard-page .payment-management .progress-label { color: #cbd5e1; font-size: 0.9rem; font-weight: 500; }
+ .client-dashboard-page .payment-management .total-value { color: #fff; font-size: 1.25rem; font-weight: 700; margin-top: 4px; margin-bottom: 8px; }
+ .client-dashboard-page .payment-management .amount-label { margin-top: 6px; }
+ .client-dashboard-page .payment-management .amount-value { color: #fff; font-size: 1.1rem; font-weight: 600; margin-top: 4px; }
+ 
+ /* Estado de pago */
+ .client-dashboard-page .payment-management .payment-status-section { display: inline-flex; align-items: center; justify-content: flex-start; gap: 8px; background-color: transparent; border: none; border-radius: 10px; padding: 0; width: auto; }
+ .client-dashboard-page .payment-management .status-indicator { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9999px; color: #fff; }
+ .client-dashboard-page .payment-management .status-indicator.paid { background-color: transparent; color: #10b981; box-shadow: none; border: 1px solid rgba(16, 185, 129, 0.45); }
+ .client-dashboard-page .payment-management .status-indicator.pending { background-color: transparent; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.45); }
+ .client-dashboard-page .payment-management .status-indicator.overdue { background-color: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.45); }
+ .client-dashboard-page .payment-management .status-text { color: #fff; font-weight: 600; text-align: center; }
+ .client-dashboard-page .payment-management .status-details { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; }
+ .client-dashboard-page .payment-management .payment-amount-section { display: flex; flex-direction: column; align-items: center; }
+
+ /* Próximo pago */
+ .client-dashboard-page .payment-management .due-date-section { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+ .client-dashboard-page .payment-management .due-date-icon { display: inline-flex; align-items: center; justify-content: center; color: #9aa5b1; background: none; border: none; width: auto; height: auto; padding: 0; }
+ .client-dashboard-page .payment-management .due-date-info { display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
+.client-dashboard-page .payment-management .due-date-label { color: #cbd5e1; font-size: 0.95rem; font-weight: 600; text-align: center; }
+.client-dashboard-page .payment-management .due-date-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.client-dashboard-page .payment-management .due-date-value { color: #fff; font-size: 1.05rem; font-weight: 600; text-align: center; }
+ .client-dashboard-page .payment-management .due-date-relative { color: #cbd5e1; font-size: 0.85rem; }
+ 
+ /* Historial y progreso */
+ .client-dashboard-page .payment-management .payment-progress { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; text-align: center; }
+.client-dashboard-page .payment-management .payment-progress .progress-title { font-weight: 600; color: #cbd5e1; margin-bottom: 6px; font-size: 1rem; }
+.client-dashboard-page .payment-management .payment-progress .progress-months { color: #9aa5b1; font-weight: 400; font-size: 0.95rem; margin-bottom: 6px; }
+.client-dashboard-page .payment-management .payment-progress .progress-bar { width: 100%; max-width: 380px; margin-inline: auto; }
+.client-dashboard-page .payment-management .progress-info { 
+  display: grid; 
+  grid-template-columns: auto 1fr; 
+  align-items: center; 
+  column-gap: 12px; 
+  min-width: 0;
+  width: 100%;
+}
+.client-dashboard-page .payment-management .progress-label { color: #cbd5e1; justify-self: start; }
+.client-dashboard-page .payment-management .progress-value { color: #fff; font-weight: 600; justify-self: end; display: inline-block; text-align: right; }
+.client-dashboard-page .payment-management .progress-bar { position: relative; height: 10px; background-color: #1f1f1f; border: 1px solid #2a2a2a; border-radius: 9999px; overflow: hidden; }
+.client-dashboard-page .payment-management .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background-image: linear-gradient(to right, #f59e0b, #fbbf24); border-radius: inherit; box-shadow: none; transition: width 0.4s ease; }
+ 
+ /* Acciones */
+ .client-dashboard-page .payment-management .payment-actions { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+ .client-dashboard-page .payment-management .btn-payment { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; }
+ .client-dashboard-page .payment-management .btn-payment.secondary { background-color: #2a2a2a; color: #fff; border: 1px solid #3a3a3a; }
+ .client-dashboard-page .payment-management .btn-payment.secondary:hover { background-color: #333333; border-color: #4a4a4a; }
+.client-dashboard-page .payment-management .btn-payment.primary { background-color: #D62828; color: #fff; font-weight: 600; border: none; box-shadow: none; }
+.client-dashboard-page .payment-management .btn-payment.primary:hover { background-color: #D62828; box-shadow: none; }
+ 
+ /* Responsive padding y gap (más compacto en pantallas pequeñas) */
+@media (max-width: 1023px) {
+  .client-dashboard-page .dashboard-content-wrapper,
+  .client-dashboard-page .dashboard-main-content,
+  .client-dashboard-page .dashboard-header {
+    padding-inline: 18px;
+  }
+  .client-dashboard-page .dashboard-content { /* gap solamente, sin padding-inline */ gap: 16px; }
+}
+@media (max-width: 899px) {
+  .client-dashboard-page .dashboard-content-wrapper,
+  .client-dashboard-page .dashboard-main-content {
+    padding-inline: 16px;
+  }
+  .client-dashboard-page .dashboard-content { /* gap solamente, sin padding-inline */ gap: 14px; }
+}
+@media (max-width: 599px) {
+  .client-dashboard-page .dashboard-content-wrapper,
+  .client-dashboard-page .dashboard-main-content {
+    padding-inline: 10px;
+  }
+  .client-dashboard-page .dashboard-content { /* gap solamente, sin padding-inline */ gap: 12px; }
+}
+
+/* Alturas equilibradas de los tres bloques principales */
+.client-dashboard-page .routine-overview .card,
+.client-dashboard-page .training-calendar .card,
+.client-dashboard-page .progress-metrics .card {
+  min-height: 260px;
+}
+
+/* Mostrar el calendario completo sin scrollbar lateral */
+.client-dashboard-page .training-calendar .card {
+  max-height: none;
+  overflow: visible;
+}
+
+/* --- Estado de cuotas: refinamiento visual y responsive --- */
+
+/* Espaciado y jerarquía */
+.client-dashboard-page .payment-management .payment-header { margin-bottom: 18px; }
+.client-dashboard-page .payment-management .payment-overview { gap: 20px; }
+.client-dashboard-page .payment-management .payment-block { padding: 18px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 180px; }
+.client-dashboard-page .payment-management .total-value { font-size: 1.35rem; font-weight: 700; }
+
+/* Badge "Pago al día" minimal */
+.client-dashboard-page .payment-management .status-badge.up-to-date { box-shadow: none; }
+
+/* Barra de progreso por estado */
+.client-dashboard-page .payment-management .payment-progress.paid .progress-fill {
+  background-image: linear-gradient(to right, #10b981, #34d399);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .payment-progress.pending .progress-fill {
+  background-image: linear-gradient(to right, #f59e0b, #fbbf24);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .payment-progress.overdue .progress-fill {
+  background-image: linear-gradient(to right, #ef4444, #f87171);
+  box-shadow: none;
+}
+
+/* Texto de estado por estado */
+.client-dashboard-page .payment-management .payment-status-section .status-indicator.paid ~ .status-details .status-text { color: #10b981; }
+.client-dashboard-page .payment-management .payment-status-section .status-indicator.pending ~ .status-details .status-text { color: #f59e0b; }
+.client-dashboard-page .payment-management .payment-status-section .status-indicator.overdue ~ .status-details .status-text { color: #ef4444; }
+
+/* Botón "Ver historial" con mayor visibilidad y coherencia estética */
+.client-dashboard-page .payment-management .btn-payment { padding: 12px 18px; font-size: 0.95rem; font-weight: 600; }
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-green {
+  background-color: transparent;
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-green:hover {
+  background-color: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.60);
+}
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-amber {
+  background-color: transparent;
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: none;
+}
+.client-dashboard-page .payment-management .btn-payment.secondary.accent-amber:hover {
+  background-color: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.60);
+}
+
+/* Responsive layout corregido */
+@media (max-width: 1200px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .client-dashboard-page .payment-management .payment-block {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .client-dashboard-page .payment-management .payment-overview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .client-dashboard-page .payment-management .payment-header h2 { 
+    font-size: 1rem; 
+  }
+  .client-dashboard-page .payment-management .payment-block { 
+    padding: 12px;
+    min-width: 0;
+  }
+  .client-dashboard-page .payment-management .payment-status-section { 
+    padding: 0; 
+    gap: 8px; 
+    flex-wrap: nowrap;
+  }
+  .client-dashboard-page .payment-management .due-date-section { 
+    gap: 8px; 
+  }
+  .client-dashboard-page .payment-management .payment-actions { 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: 8px;
+  }
+  .client-dashboard-page .payment-management .payment-actions .btn-payment { 
+    width: 100%; 
+    justify-content: center; 
+  }
+  .client-dashboard-page .payment-management .status-badge { 
+    padding: 4px 8px; 
+    font-size: 0.8rem; 
+  }
+}
+
+@media (max-width: 480px) {
+  .client-dashboard-page .payment-management .total-value { 
+    font-size: 1.1rem; 
+    white-space: nowrap;
+  }
+  .client-dashboard-page .payment-management .amount-value { 
+    font-size: 0.95rem; 
+    white-space: nowrap;
+  }
+  .client-dashboard-page .payment-management .payment-block {
+    padding: 10px;
+  }
+}
+
+/* Prevenir overflow de texto y layout roto (ajustado) */
+.client-dashboard-page .payment-management .payment-block { 
+  min-width: 0; 
+  overflow: visible;
+  overflow-wrap: normal;
+}
+.client-dashboard-page .payment-management .total-value,
+.client-dashboard-page .payment-management .amount-value { 
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  text-align: center;
+}
+.client-dashboard-page .payment-management .progress-info { 
+  gap: 8px;
+  min-width: 0;
+}
+.client-dashboard-page .payment-management .progress-value { 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+  text-align: right;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.client-dashboard-page .payment-management .progress-label { 
+  white-space: nowrap;
+}
+
+/* === Calendario mensual: celdas visibles y contrastadas === */
+.client-dashboard-page .calendar-days .calendar-day {
+  position: relative;
+  background-color: #1c1c1c;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  min-height: 72px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 8px;
+}
+.client-dashboard-page .calendar-days .calendar-day.empty {
+  background: transparent;
+  border: 1px dashed #2a2a2a;
+}
+.client-dashboard-page .calendar-day.today { border-color: #10B981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35); }
+.client-dashboard-page .calendar-day.has-training { border-color: #E74C3C; }
+.client-dashboard-page .calendar-day.has-google-event { border-color: #0EA5E9; }
+.client-dashboard-page .calendar-day.has-both-events { border-color: #8B5CF6; }
+.client-dashboard-page .calendar-day.has-server-routine { border-color: #E53935; }
+.client-dashboard-page .calendar-day.has-server-session { border-color: #FB8C00; }
+.client-dashboard-page .calendar-day.has-server-consultation { border-color: #8E24AA; }
+.client-dashboard-page .calendar-day .calendar-day-number { font-weight: 700; color: #fff; }
+
+/* Indicadores compactos dentro de las celdas */
+.client-dashboard-page .day-indicators {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.client-dashboard-page .day-indicators .training-indicator,
+.client-dashboard-page .day-indicators .google-indicator {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+.client-dashboard-page .day-indicators .training-indicator { background-color: #E74C3C; }
+.client-dashboard-page .day-indicators .google-indicator { background-color: #0EA5E9; }
+
+/* === Vista semanal móvil === */
+.client-dashboard-page .calendar-weekly-mobile { display: none; }
+.client-dashboard-page .weekly-scroll-container { display: flex; gap: 10px; overflow-x: auto; padding-block: 10px; }
+.client-dashboard-page .weekly-day-card {
+  background-color: #1c1c1c;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.client-dashboard-page .weekly-day-card.today { border-color: #10B981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35); }
+.client-dashboard-page .weekly-day-card.has-training { border-color: #E74C3C; }
+.client-dashboard-page .weekly-day-name { font-size: 0.8rem; font-weight: 600; color: #a0a0a0; }
+.client-dashboard-page .weekly-day-number { font-size: 1.25rem; font-weight: 700; color: #fff; }
+.client-dashboard-page .weekly-training-indicator { width: 8px; height: 8px; border-radius: 9999px; background-color: #E74C3C; }
+.client-dashboard-page .weekly-training-type { font-size: 0.75rem; color: #bbb; font-weight: 500; }
+
+@media (max-width: 767px) {
+  .client-dashboard-page .calendar-grid .calendar-day-headers,
+  .client-dashboard-page .calendar-grid .calendar-days {
+    display: none; /* Ocultar vista mensual */
+  }
+  .client-dashboard-page .calendar-weekly-mobile {
+    display: block; /* Mostrar vista semanal */
+  }
+}
+ .client-dashboard-page .payment-management .payment-block { background-color: #232323; border: 1px solid #2f2f2f; border-radius: 12px; padding: 18px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); min-height: 180px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+ 
+ /* Tipografías y etiquetas */
+ .client-dashboard-page .payment-management .payment-amount-section .total-label,
+ .client-dashboard-page .payment-management .payment-amount-section .amount-label,
+ .client-dashboard-page .payment-management .due-date-label,
+ .client-dashboard-page .payment-management .progress-label { color: #cbd5e1; font-size: 0.9rem; font-weight: 500; }
+ .client-dashboard-page .payment-management .total-value { color: #fff; font-size: 1.25rem; font-weight: 700; margin-top: 4px; margin-bottom: 8px; }
+ .client-dashboard-page .payment-management .amount-label { margin-top: 6px; }
+ .client-dashboard-page .payment-management .amount-value { color: #fff; font-size: 1.1rem; font-weight: 600; margin-top: 4px; }
+ 
+ /* Estado de pago */
+ .client-dashboard-page .payment-management .payment-status-section { display: inline-flex; align-items: center; justify-content: flex-start; gap: 8px; background-color: transparent; border: none; border-radius: 10px; padding: 0; width: auto; }
+ .client-dashboard-page .payment-management .status-indicator { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9999px; color: #fff; }
+ .client-dashboard-page .payment-management .status-indicator.paid { background-color: transparent; color: #10b981; box-shadow: none; border: 1px solid rgba(16, 185, 129, 0.45); }
+ .client-dashboard-page .payment-management .status-indicator.pending { background-color: transparent; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.45); }
+ .client-dashboard-page .payment-management .status-indicator.overdue { background-color: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.45); }
+ .client-dashboard-page .payment-management .status-text { color: #fff; font-weight: 600; text-align: center; }
+ .client-dashboard-page .payment-management .status-details { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; }
+ .client-dashboard-page .payment-management .payment-amount-section { display: flex; flex-direction: column; align-items: center; }
+
+ /* Próximo pago */
+ .client-dashboard-page .payment-management .due-date-section { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+ .client-dashboard-page .payment-management .due-date-icon { display: inline-flex; align-items: center; justify-content: center; color: #9aa5b1; background: none; border: none; width: auto; height: auto; padding: 0; }
+ .client-dashboard-page .payment-management .due-date-info { display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
+.client-dashboard-page .payment-management .due-date-label { color: #cbd5e1; font-size: 0.95rem; font-weight: 600; text-align: center; }
+.client-dashboard-page .payment-management .due-date-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.client-dashboard-page .payment-management .due-date-value { color: #fff; font-size: 1.05rem; font-weight: 600; text-align: center; }
+ .client-dashboard-page .payment-management .due-date-relative { color: #cbd5e1; font-size: 0.85rem; }
+ 
+ /* Historial y progreso */
+ .client-dashboard-page .payment-management .payment-progress { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; text-align: center; }
+.client-dashboard-page .payment-management .payment-progress .progress-title { font-weight: 600; color: #cbd5e1; margin-bottom: 6px; font-size: 1rem; }
+.client-dashboard-page .payment-management .payment-progress .progress-months { color: #9aa5b1; font-weight: 400; font-size: 0.95rem; margin-bottom: 6px; }
+.client-dashboard-page .payment-management .payment-progress .progress-bar { width: 100%; max-width: 380px; margin-inline: auto; }
+.client-dashboard-page .payment-management .progress-info { 
+  display: grid; 
+  grid-template-columns: auto 1fr; 
+  align-items: center; 
+  column-gap: 12px; 
+  min-width: 0;
+  width: 100%;
+}
+.client-dashboard-page .payment-management .progress-label { color: #cbd5e1; justify-self: start; }
+.client-dashboard-page .payment-management .progress-value { color: #fff; font-weight: 600; justify-self: end; display: inline-block; text-align: right; }
+.client-dashboard-page .payment-management .progress-bar { position: relative; height: 10px; background-color: #1f1f1f; border: 1px solid #2a2a2a; border-radius: 9999px; overflow: hidden; }
+.client-dashboard-page .payment-management .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background-image: linear-gradient(to right, #f59e0b, #fbbf24); border-radius: inherit; box-shadow: none; transition: width 0.4s ease; }
+ 
+ /* Acciones */
+ .client-dashboard-page .payment-management .payment-actions { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+ .client-dashboard-page .payment-management .btn-payment { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; }
+ .client-dashboard-page .payment-management .btn-payment.secondary { background-color: #2a2a2a; color: #fff; border: 1px solid #3a3a3a; }
+ .client-dashboard-page .payment-management .btn-payment.secondary:hover { background-color: #333333; border-color: #4a4a4a; }
+.client-dashboard-page .payment-management .btn-payment.primary { background-color: #D62828; color: #fff; font-weight: 600; border: none; box-shadow: none; }
+.client-dashboard-page .payment-management .btn-payment.primary:hover { background-color: #D62828; box-shadow: none; }
+ 
+ /* Responsive padding y gap (más compacto en pantallas pequeñas) */
+@media (max-width: 1023px) {
+  .client-dashboard-page .dashboard-content-wrapper,
+  .client-dashboard-page .dashboard-main-content,
+  .client-dashboard-page .dashboard-header {
+    padding-inline: 18px;
+  }
+  .client-dashboard-page .dashboard-content { /* gap solamente, sin padding-inline */ gap: 16px; }
+}
+@media (max-width: 899px) {
+  .client-dashboard-page .dashboard-content-wrapper,
+  .client-dashboard-page .dashboard-main-content {
+    padding-inline: 16px;
+  }
+  .client-dashboard-page .dashboard-content { /* gap solamente, sin padding-inline */ gap: 14px; }
+}
+@media (max-width: 599px) {
+  .client-dashboard-page .dashboard-content-wrapper,
+  .client-dashboard-page .dashboard-main-content {
+    padding-inline: 10px;
+  }
+  .client-dashboard-page .dashboard-content { /* gap solamente, sin padding-inline */ gap: 12px; }
+}
+
+/* Alturas equilibradas de los tres bloques principales */
+.client-dashboard-page .routine-overview .card,
+.client-dashboard-page .training-calendar .card,
+.client-dashboard-page .progress-metrics .card {
+  min-height: 260px;
+}
+
+/* Mostrar el calendario completo sin scrollbar lateral */
+.client-dashboard-page .training-calendar .card {
+  max-height: none;
+  overflow: visible;
+}
+
+/* --- Estado de cuotas: refinamiento visual y responsive --- */
+
+/* Espaciado y jerarquía */
+.client-dashboard-page .payment-management .payment-header { margin-bottom: 18px; }
+.client-dashboard-page .payment-management .payment-overview { gap: 20px; }
+.client-dashboard-page .payment-management .payment-block { padding: 18px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 180px; }
+.client-dashboard-page .payment-management .total-value { font-size: 1.35rem; font-weight: 700; }
 
 /* Badge "Pago al día" minimal */
 .client-dashboard-page .payment-management .status-badge.up-to-date { box-shadow: none; }

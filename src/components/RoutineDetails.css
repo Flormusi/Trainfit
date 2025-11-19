@@ -354,7 +354,7 @@
 }
 
 .record-progress-btn {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border: none;
   padding: 12px 24px;
@@ -365,7 +365,7 @@
 }
 
 .record-progress-btn:hover {
-  background-color: #e0301a;
+  background-color: #D62828;
 }
 
 .loading,

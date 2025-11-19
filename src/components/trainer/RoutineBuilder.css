@@ -20,7 +20,7 @@
 }
 
 .back-link:hover {
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .builder-header h1 {
@@ -78,7 +78,9 @@ input[type="text"]:focus,
 input[type="number"]:focus,
 textarea:focus,
 select:focus {
-  outline: 1px solid #ff3b30;
+  outline: none;
+  border: 1px solid #D62828;
+  box-shadow: 0 0 0 3px rgba(214, 40, 40, 0.1);
 }
 
 .exercise-search h2,
@@ -87,7 +89,7 @@ select:focus {
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-search h3 {
@@ -147,18 +149,19 @@ select:focus {
 }
 
 .add-exercise-btn {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .add-exercise-btn:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
+  box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.1);
 }
 
 .no-results {
@@ -197,7 +200,7 @@ select:focus {
 .exercise-number {
   width: 30px;
   height: 30px;
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -251,7 +254,7 @@ select:focus {
 }
 
 .remove-btn:hover {
-  color: #ff3b30;
+  color: #D62828;
 }
 
 .exercise-body {
@@ -320,7 +323,7 @@ select:focus {
 }
 
 .save-routine-btn {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
   border: none;
   padding: 12px 24px;
@@ -328,11 +331,12 @@ select:focus {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .save-routine-btn:hover {
-  background-color: #e6352c;
+  background-color: #D62828;
+  box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.1);
 }
 
 /* Weekly Plan Styles */
@@ -359,7 +363,7 @@ select:focus {
 }
 
 .week-tab.active {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 
@@ -385,7 +389,7 @@ select:focus {
 }
 
 .day-tab.active {
-  background-color: #ff3b30;
+  background-color: #D62828;
   color: #fff;
 }
 

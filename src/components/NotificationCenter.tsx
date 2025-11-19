@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, Calendar, Clock, Plus, X, Check, Trash2, CheckCheck } from 'lucide-react';
 import notificationService, { Notification } from '../services/notificationService';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
+import axios from '../services/axiosConfig';
 
 interface Reminder {
   id: string;
@@ -34,6 +36,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
     reminderType: 'GENERAL' as 'WORKOUT' | 'APPOINTMENT' | 'GENERAL'
   });
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (isVisible) {
@@ -62,26 +65,14 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
 
   const fetchReminders = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/reminders', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        const json = await response.json();
-        const normalized = Array.isArray(json)
-          ? json
-          : Array.isArray((json as any)?.data)
-            ? (json as any).data
-            : [];
-        setReminders(normalized);
-      } else {
-        console.error('Error al obtener recordatorios:', response.statusText);
-        setReminders([]);
-      }
+      const response = await axios.get('/reminders');
+      const json = response?.data;
+      const normalized = Array.isArray(json)
+        ? json
+        : Array.isArray((json as any)?.data)
+          ? (json as any).data
+          : [];
+      setReminders(normalized);
     } catch (error) {
       console.error('Error fetching reminders:', error);
       setReminders([]);
@@ -122,26 +113,15 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
 
   const createReminder = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/reminders', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newReminder)
+      await axios.post('/reminders', newReminder);
+      setShowReminderModal(false);
+      setNewReminder({
+        title: '',
+        message: '',
+        reminderTime: '',
+        reminderType: 'GENERAL'
       });
-      
-      if (response.ok) {
-        setShowReminderModal(false);
-        setNewReminder({
-          title: '',
-          message: '',
-          reminderTime: '',
-          reminderType: 'GENERAL'
-        });
-        fetchReminders();
-      }
+      fetchReminders();
     } catch (error) {
       console.error('Error creating reminder:', error);
     }
@@ -149,18 +129,8 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
 
   const deleteReminder = async (reminderId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/reminders/${reminderId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        setReminders(prev => prev.filter(reminder => reminder.id !== reminderId));
-      }
+      await axios.delete(`/reminders/${reminderId}`);
+      setReminders(prev => prev.filter(reminder => reminder.id !== reminderId));
     } catch (error) {
       console.error('Error deleting reminder:', error);
     }
@@ -185,6 +155,59 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
 
   const formatDate = (dateString: string) => {
     return notificationService.formatNotificationDate(dateString);
+  };
+
+  // Navegar según tipo/rol al hacer clic
+  const handleNotificationClick = async (notification: Notification & { routineId?: string }) => {
+    try {
+      if (!notification.isRead) {
+        await markAsRead(notification.id);
+      }
+
+      const normalizedType = (notification.type || '').toLowerCase();
+      const role = (user?.role || '').toString().toUpperCase();
+      const userId = (user as any)?.id;
+
+      if (normalizedType === 'routine_assigned' && notification.routineId) {
+        if (role === 'TRAINER') {
+          navigate(`/trainer/routines/${notification.routineId}`);
+        } else {
+          navigate(`/client/${userId}/routine/${notification.routineId}`);
+        }
+        onClose();
+        return;
+      }
+
+      if (normalizedType === 'payment_reminder') {
+        if (role === 'TRAINER') {
+          navigate('/trainer/payments');
+        } else {
+          navigate('/client/subscription');
+        }
+        onClose();
+        return;
+      }
+
+      if (normalizedType === 'progress_update') {
+        if (role === 'TRAINER') {
+          navigate('/trainer/clients');
+        } else {
+          navigate('/client/progress');
+        }
+        onClose();
+        return;
+      }
+
+      // Fallbacks
+      if (role === 'TRAINER') {
+        navigate('/trainer');
+      } else if (userId) {
+        navigate(`/client-dashboard/${userId}`);
+      }
+      onClose();
+    } catch (error) {
+      console.error('Error al manejar clic de notificación:', error);
+    }
   };
 
   const formatReminderTime = (dateString: string) => {
@@ -284,7 +307,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
                           ? 'bg-red-900/20 border-red-500/40 hover:bg-red-900/30'
                           : 'bg-[#1e1e1e] border-[#333] hover:bg-[#2a2a2a]'
                       }`}
-                      onClick={() => !notification.isRead && markAsRead(notification.id)}
+                      onClick={() => handleNotificationClick(notification)}
                     >
                       <div className="flex items-start space-x-3">
                         <div className="text-2xl">{getNotificationIcon(notification.type)}</div>

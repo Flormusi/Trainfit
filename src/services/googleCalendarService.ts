@@ -5,9 +5,9 @@
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
 // Google Calendar API configuration
-const CLIENT_ID = '571621235878-4snhh9pjm3hlb4gng0c0p5kkggn4eiqn.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-const REDIRECT_URI = 'https://trainfit.vercel.app/auth/google/callback';
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = import.meta.env.VITE_GOOGLE_CLIENT_SECRET;
+const REDIRECT_URI = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
 
 interface TrainingEvent {
   id?: string;

@@ -28,6 +28,17 @@ interface PaymentStatus {
   dueDate?: string;
   isUpToDate: boolean;
 }
+// 🔧 Corrige imágenes que vienen con localhost desde el backend
+const normalizeImageUrl = (url?: string) => {
+  if (!url) return "";
+
+  const API_BASE = import.meta.env.VITE_API_URL.replace("/api", "");
+
+  // Si viene con localhost, lo convertimos a Render
+  return url.startsWith("http://localhost")
+    ? url.replace("http://localhost:5002", API_BASE)
+    : url;
+};
 
 interface ProgressMetrics {
   weight?: string;
@@ -952,11 +963,12 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
         <div className="user-info">
           <div className="user-avatar relative cursor-pointer" onClick={() => document.getElementById('profile-image-input')?.click()}>
             {profileImage ? (
-              <img 
-                src={profileImage} 
-                alt="Foto de perfil" 
-                className="w-full h-full object-cover rounded-full"
-              />
+              <img
+  src={normalizeImageUrl(profileImage)}
+  alt="Foto de perfil"
+  className="w-full h-full object-cover rounded-full"
+/>
+
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center text-[0.6rem] font-semibold leading-[1.1]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="mb-1">

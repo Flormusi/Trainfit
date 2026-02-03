@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de IDs de Rutina - TrainFit</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+        .tab:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .instructions {
+            background: #e8f4fd;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        .feature h3 {
+            color: #28a745;
+            margin-top: 0;
+        }
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+        .copy-btn:hover {
+            background: #5a6fd8;
+        }
+        .copy-btn:active {
+            background: #4c63d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Verificación de IDs de Rutina</h1>
+        
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('instructions')">📋 Instrucciones</button>
+                <button class="tab" onclick="showTab('features')">✨ Características</button>
+                <button class="tab" onclick="showTab('script')">💻 Script</button>
+            </div>
+            
+            <div id="instructions" class="tab-content active">
+                <div class="instructions">
+                    <h2>📋 Cómo usar esta herramienta</h2>
+                    <p>Esta herramienta te ayudará a diagnosticar problemas con los IDs de rutina en TrainFit y verificar por qué el modal no se abre.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 1: Navegar a la página del cliente</h3>
+                    <p>Ve a la página de progreso del cliente donde están los botones "Ver Detalles" que no funcionan:</p>
+                    <div class="code-block">http://localhost:5173/trainer/clients/[CLIENT_ID]/progress</div>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 2: Abrir las herramientas de desarrollador</h3>
+                    <p>Presiona <strong>F12</strong> o <strong>Ctrl+Shift+I</strong> (Cmd+Option+I en Mac) para abrir las herramientas de desarrollador.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 3: Ir a la pestaña Console</h3>
+                    <p>Haz clic en la pestaña "Console" en las herramientas de desarrollador.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 4: Copiar y pegar el script</h3>
+                    <p>Ve a la pestaña "Script" de esta herramienta, copia todo el código y pégalo en la consola del navegador.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 5: Presionar Enter</h3>
+                    <p>Presiona Enter para ejecutar el script. El diagnóstico se ejecutará automáticamente.</p>
+                </div>
+                
+                <div class="success">
+                    <h3>✅ Qué esperar</h3>
+                    <ul>
+                        <li>El script verificará automáticamente los IDs de rutina</li>
+                        <li>Interceptará las llamadas a la API para ver los datos</li>
+                        <li>Simulará un clic en "Ver Detalles" para probar el modal</li>
+                        <li>Detectará errores en la consola</li>
+                        <li>Proporcionará información detallada sobre el problema</li>
+                    </ul>
+                </div>
+                
+                <div class="warning">
+                    <h3>⚠️ Funciones adicionales</h3>
+                    <p>Después de ejecutar el script, tendrás acceso a:</p>
+                    <div class="code-block">debugRoutine("ID_DE_RUTINA")</div>
+                    <p>Esta función te permite verificar una rutina específica por su ID.</p>
+                </div>
+            </div>
+            
+            <div id="features" class="tab-content">
+                <h2>✨ Características del Script de Diagnóstico</h2>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h3>🔍 Verificación de Estado</h3>
+                        <p>Analiza el estado de React para encontrar datos de rutinas y detectar problemas en el componente.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>🌐 Interceptor de API</h3>
+                        <p>Intercepta todas las llamadas a la API de rutinas para verificar qué datos se están recibiendo.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>🖱️ Simulación de Clics</h3>
+                        <p>Simula automáticamente clics en los botones "Ver Detalles" para probar la funcionalidad del modal.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>📊 Análisis del DOM</h3>
+                        <p>Examina el DOM en busca de elementos relacionados con rutinas y botones de acción.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>❌ Detección de Errores</h3>
+                        <p>Intercepta y registra todos los errores de JavaScript que puedan estar causando el problema.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>🛠️ Herramientas de Debug</h3>
+                        <p>Proporciona funciones adicionales para verificar rutinas específicas manualmente.</p>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>📈 Interpretación de Resultados</h3>
+                    <ul>
+                        <li><strong>✅ Verde:</strong> Funcionamiento correcto</li>
+                        <li><strong>⚠️ Amarillo:</strong> Advertencias o datos faltantes</li>
+                        <li><strong>❌ Rojo:</strong> Errores que requieren atención</li>
+                        <li><strong>🔍 Azul:</strong> Información de diagnóstico</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="script" class="tab-content">
+                <h2>💻 Script de Verificación de IDs de Rutina</h2>
+                
+                <div class="warning">
+                    <p><strong>⚠️ Importante:</strong> Copia todo el código de abajo y pégalo en la consola del navegador mientras estás en la página del cliente.</p>
+                </div>
+                
+                <div class="code-block" id="scriptCode">// Script para verificar IDs de rutina y validar datos
+// Ejecutar en la consola del navegador en la página TrainerClientProgressPage
+
+(function() {
+  console.log('🔍 === INICIANDO VERIFICACIÓN DE IDs DE RUTINA ===');
+  
+  // Función para obtener el clientId de la URL
+  function getClientIdFromUrl() {
+    const path = window.location.pathname;
+    const match = path.match(/\/trainer\/clients\/([^/]+)\/progress/);
+    return match ? match[1] : null;
+  }
+  
+  // Función para verificar si hay rutinas en el estado de React
+  function checkReactState() {
+    console.log('🔍 Verificando estado de React...');
+    
+    // Buscar el componente React en el DOM
+    const reactRoot = document.querySelector('#root');
+    if (!reactRoot) {
+      console.error('❌ No se encontró el elemento root de React');
+      return null;
+    }
+    
+    // Intentar acceder al estado a través de React DevTools
+    const reactFiber = reactRoot._reactInternalFiber || reactRoot._reactInternalInstance;
+    if (reactFiber) {
+      console.log('✅ Componente React encontrado');
+      return reactFiber;
+    }
+    
+    console.log('⚠️ No se pudo acceder al estado de React directamente');
+    return null;
+  }
+  
+  // Función para verificar rutinas en el DOM
+  function checkRoutinesInDOM() {
+    console.log('🔍 Verificando rutinas en el DOM...');
+    
+    const routineButtons = document.querySelectorAll('button:contains("Ver Detalles")');
+    console.log(`📊 Botones "Ver Detalles" encontrados: ${routineButtons.length}`);
+    
+    // Buscar tarjetas de rutina
+    const routineCards = document.querySelectorAll('[class*="routine"], [class*="Routine"]');
+    console.log(`📊 Tarjetas de rutina encontradas: ${routineCards.length}`);
+    
+    // Buscar texto que contenga "Rutina"
+    const routineTexts = document.querySelectorAll('*');
+    let routineCount = 0;
+    routineTexts.forEach(el => {
+      if (el.textContent && el.textContent.includes('Rutina') && el.children.length === 0) {
+        console.log(`📝 Texto de rutina: ${el.textContent.trim()}`);
+        routineCount++;
+      }
+    });
+    
+    return { routineButtons: routineButtons.length, routineCards: routineCards.length, routineTexts: routineCount };
+  }
+  
+  // Función para interceptar llamadas a la API
+  function interceptAPICall() {
+    console.log('🔍 Configurando interceptor de API...');
+    
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      if (typeof url === 'string' && url.includes('/routines')) {
+        console.log('🌐 Interceptada llamada a API de rutinas:', url);
+        
+        return originalFetch.apply(this, args)
+          .then(response => {
+            console.log('📡 Respuesta de API de rutinas:', response.status, response.statusText);
+            
+            // Clonar la respuesta para poder leerla
+            const clonedResponse = response.clone();
+            clonedResponse.json().then(data => {
+              console.log('📊 Datos de rutinas recibidos:', data);
+              
+              if (data && Array.isArray(data)) {
+                console.log(`✅ ${data.length} rutinas encontradas`);
+                data.forEach((routine, index) => {
+                  console.log(`📋 Rutina ${index + 1}:`, {
+                    id: routine.id,
+                    name: routine.name,
+                    clientId: routine.clientId,
+                    exercises: routine.exercises ? routine.exercises.length : 'N/A'
+                  });
+                });
+              } else if (data && data.data && Array.isArray(data.data)) {
+                console.log(`✅ ${data.data.length} rutinas encontradas en data.data`);
+                data.data.forEach((routine, index) => {
+                  console.log(`📋 Rutina ${index + 1}:`, {
+                    id: routine.id,
+                    name: routine.name,
+                    clientId: routine.clientId,
+                    exercises: routine.exercises ? routine.exercises.length : 'N/A'
+                  });
+                });
+              } else {
+                console.log('⚠️ Formato de datos inesperado:', data);
+              }
+            }).catch(err => {
+              console.error('❌ Error al parsear respuesta JSON:', err);
+            });
+            
+            return response;
+          })
+          .catch(error => {
+            console.error('❌ Error en llamada a API de rutinas:', error);
+            throw error;
+          });
+      }
+      
+      return originalFetch.apply(this, args);
+    };
+    
+    console.log('✅ Interceptor de API configurado');
+  }
+  
+  // Función para simular clic en botón "Ver Detalles"
+  function simulateButtonClick() {
+    console.log('🔍 Buscando botones "Ver Detalles"...');
+    
+    // Buscar todos los botones que contengan "Ver Detalles"
+    const buttons = Array.from(document.querySelectorAll('button')).filter(btn => 
+      btn.textContent && btn.textContent.trim().includes('Ver Detalles')
+    );
+    
+    console.log(`📊 Botones "Ver Detalles" encontrados: ${buttons.length}`);
+    
+    if (buttons.length > 0) {
+      console.log('🖱️ Simulando clic en el primer botón "Ver Detalles"...');
+      
+      // Agregar listener para detectar cambios en el DOM
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList') {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === 1) { // Element node
+                if (node.classList && (node.classList.contains('modal') || 
+                    node.querySelector && node.querySelector('.modal'))) {
+                  console.log('✅ Modal detectado en el DOM:', node);
+                  
+                  // Verificar contenido del modal
+                  const modalContent = node.textContent || '';
+                  console.log('📝 Contenido del modal:', modalContent.substring(0, 200) + '...');
+                  
+                  observer.disconnect();
+                }
+              }
+            });
+          }
+        });
+      });
+      
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+      
+      // Hacer clic en el botón
+      buttons[0].click();
+      
+      // Desconectar observer después de 5 segundos
+      setTimeout(() => {
+        observer.disconnect();
+        console.log('⏰ Observer desconectado después de 5 segundos');
+      }, 5000);
+      
+    } else {
+      console.log('❌ No se encontraron botones "Ver Detalles"');
+    }
+  }
+  
+  // Función para verificar errores en consola
+  function checkConsoleErrors() {
+    console.log('🔍 Verificando errores en consola...');
+    
+    // Interceptar console.error
+    const originalError = console.error;
+    const errors = [];
+    
+    console.error = function(...args) {
+      errors.push(args);
+      originalError.apply(console, args);
+    };
+    
+    // Restaurar después de 10 segundos
+    setTimeout(() => {
+      console.error = originalError;
+      if (errors.length > 0) {
+        console.log('❌ Errores detectados:', errors);
+      } else {
+        console.log('✅ No se detectaron errores en consola');
+      }
+    }, 10000);
+  }
+  
+  // Función principal
+  function runDiagnostic() {
+    const clientId = getClientIdFromUrl();
+    console.log('🆔 Client ID desde URL:', clientId);
+    
+    if (!clientId) {
+      console.error('❌ No se pudo obtener el Client ID de la URL');
+      return;
+    }
+    
+    // Verificar estado de React
+    checkReactState();
+    
+    // Verificar rutinas en DOM
+    const domCheck = checkRoutinesInDOM();
+    console.log('📊 Resumen DOM:', domCheck);
+    
+    // Configurar interceptor de API
+    interceptAPICall();
+    
+    // Verificar errores en consola
+    checkConsoleErrors();
+    
+    // Simular clic después de 2 segundos
+    setTimeout(() => {
+      simulateButtonClick();
+    }, 2000);
+    
+    console.log('✅ Diagnóstico iniciado. Revisa los logs en los próximos segundos...');
+  }
+  
+  // Ejecutar diagnóstico
+  runDiagnostic();
+  
+  // Función para verificar manualmente una rutina específica
+  window.debugRoutine = function(routineId) {
+    console.log(`🔍 Verificando rutina específica: ${routineId}`);
+    
+    // Hacer llamada directa a la API
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('❌ No se encontró token de autenticación');
+      return;
+    }
+    
+    fetch(`/api/trainer/routines/${routineId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log('📡 Respuesta para rutina específica:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('📊 Datos de rutina específica:', data);
+    })
+    .catch(error => {
+      console.error('❌ Error al obtener rutina específica:', error);
+    });
+  };
+  
+  console.log('🛠️ Función debugRoutine() disponible globalmente');
+  console.log('💡 Uso: debugRoutine("ID_DE_RUTINA")');
+  
+})();
+
+console.log('🔍 === VERIFICACIÓN DE IDs DE RUTINA COMPLETADA ===');
+console.log('📋 Revisa los logs anteriores para identificar problemas con los IDs de rutina');
+console.log('🛠️ Si encuentras IDs de rutina, puedes usar debugRoutine("ID") para verificar individualmente');</div>
+                
+                <button class="copy-btn" onclick="copyScript()">📋 Copiar Script</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Ocultar todos los contenidos de pestañas
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Desactivar todas las pestañas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Mostrar el contenido seleccionado
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activar la pestaña seleccionada
+            event.target.classList.add('active');
+        }
+        
+        function copyScript() {
+            const scriptCode = document.getElementById('scriptCode').textContent;
+            navigator.clipboard.writeText(scriptCode).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ ¡Copiado!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#667eea';
+                }, 2000);
+            }).catch(err => {
+                alert('Error al copiar: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>

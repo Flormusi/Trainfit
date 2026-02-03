@@ -1,0 +1,100 @@
+name: Manual Approval Token Rotation
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: "Entorno a rotar (development/staging)"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - development
+          - staging
+      length:
+        description: "Bytes del token (recomendado 24-64)"
+        required: false
+        default: "32"
+        type: string
+      encoding:
+        description: "Codificación del token"
+        required: false
+        default: "base64url"
+        type: choice
+        options:
+          - base64url
+          - hex
+      dry_run:
+        description: "Ejecutar en modo simulación (no escribe)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  rotate-token:
+    name: Rotate APPROVAL_TOKEN
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Read current token from env file
+        id: read_token
+        run: |
+          ENV_FILE="backend/.env.${{ github.event.inputs.target_env }}"
+          if [ ! -f "$ENV_FILE" ]; then
+            echo "❌ No existe archivo $ENV_FILE" >&2
+            exit 1
+          fi
+          CURRENT_TOKEN=$(grep -E '^APPROVAL_TOKEN=' "$ENV_FILE" | head -n1 | cut -d'=' -f2-)
+          if [ -z "$CURRENT_TOKEN" ]; then
+            echo "❌ APPROVAL_TOKEN no encontrado en $ENV_FILE" >&2
+            exit 1
+          fi
+          echo "token=$CURRENT_TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Rotate token (dry-run)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        env:
+          NODE_ENV: ${{ github.event.inputs.target_env }}
+          CONFIRM_TOKEN_ROTATION: YES
+        run: |
+          node backend/ops/rotate_approval_token.js \
+            --approve \
+            --token="${{ steps.read_token.outputs.token }}" \
+            --length=${{ github.event.inputs.length }} \
+            --encoding=${{ github.event.inputs.encoding }} \
+            --dry-run
+
+      - name: Rotate token (apply)
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          NODE_ENV: ${{ github.event.inputs.target_env }}
+          CONFIRM_TOKEN_ROTATION: YES
+        run: |
+          node backend/ops/rotate_approval_token.js \
+            --approve \
+            --token="${{ steps.read_token.outputs.token }}" \
+            --length=${{ github.event.inputs.length }} \
+            --encoding=${{ github.event.inputs.encoding }}
+
+      - name: Commit changes
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add backend/.env.${{ github.event.inputs.target_env }} backend/ops/logs/token_rotation.log
+          git commit -m "chore(security): rotate APPROVAL_TOKEN for ${{ github.event.inputs.target_env }}"
+          git push

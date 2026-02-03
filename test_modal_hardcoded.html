@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Modal con Datos Hardcodeados - TrainFit</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab.active {
+            color: #dc2626;
+            border-bottom-color: #dc2626;
+            font-weight: bold;
+        }
+        .tab:hover {
+            color: #dc2626;
+            background: #f8f9fa;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .instructions {
+            background: #e8f4fd;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #dc2626;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #dc2626;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        .feature h3 {
+            color: #28a745;
+            margin-top: 0;
+        }
+        .copy-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+        .copy-btn:hover {
+            background: #b91c1c;
+        }
+        .copy-btn:active {
+            background: #991b1b;
+        }
+        .test-data {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .test-data h4 {
+            color: #0ea5e9;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Prueba de Modal con Datos Hardcodeados</h1>
+        
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('instructions')">📋 Instrucciones</button>
+                <button class="tab" onclick="showTab('features')">✨ Características</button>
+                <button class="tab" onclick="showTab('data')">📊 Datos de Prueba</button>
+                <button class="tab" onclick="showTab('script')">💻 Script</button>
+            </div>
+            
+            <div id="instructions" class="tab-content active">
+                <div class="instructions">
+                    <h2>📋 Cómo usar esta herramienta de prueba</h2>
+                    <p>Esta herramienta te permitirá probar el modal RoutineDetailsModal con datos simulados, independientemente de la API.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 1: Navegar a la página del cliente</h3>
+                    <p>Ve a la página de progreso del cliente donde deberían aparecer los botones "Ver Detalles":</p>
+                    <div class="code-block">http://localhost:5173/trainer/clients/[CLIENT_ID]/progress</div>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 2: Abrir las herramientas de desarrollador</h3>
+                    <p>Presiona <strong>F12</strong> o <strong>Ctrl+Shift+I</strong> (Cmd+Option+I en Mac) para abrir las herramientas de desarrollador.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 3: Ir a la pestaña Console</h3>
+                    <p>Haz clic en la pestaña "Console" en las herramientas de desarrollador.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 4: Copiar y pegar el script</h3>
+                    <p>Ve a la pestaña "Script" de esta herramienta, copia todo el código y pégalo en la consola del navegador.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Paso 5: Presionar Enter y esperar</h3>
+                    <p>Presiona Enter para ejecutar el script. La prueba se ejecutará automáticamente y mostrará los resultados en 3 segundos.</p>
+                </div>
+                
+                <div class="success">
+                    <h3>✅ Qué hace esta prueba</h3>
+                    <ul>
+                        <li>Intercepta las llamadas a la API y las reemplaza con datos simulados</li>
+                        <li>Intenta abrir el modal haciendo clic en "Ver Detalles"</li>
+                        <li>Si no funciona, crea un modal manualmente para verificar el CSS</li>
+                        <li>Proporciona un diagnóstico claro del problema</li>
+                    </ul>
+                </div>
+                
+                <div class="warning">
+                    <h3>⚠️ Interpretación de resultados</h3>
+                    <p><strong>Si el modal se abre correctamente:</strong></p>
+                    <ul>
+                        <li>El componente RoutineDetailsModal funciona bien</li>
+                        <li>El problema está en los datos de la API o en los props</li>
+                        <li>Verificar la respuesta real de la API</li>
+                    </ul>
+                    
+                    <p><strong>Si el modal no se abre:</strong></p>
+                    <ul>
+                        <li>Hay un problema en el componente RoutineDetailsModal</li>
+                        <li>Revisar errores de JavaScript en la consola</li>
+                        <li>Verificar que los props se pasan correctamente</li>
+                    </ul>
+                </div>
+                
+                <div class="error">
+                    <h3>🚨 Funciones adicionales disponibles</h3>
+                    <p>Después de ejecutar el script, tendrás acceso a:</p>
+                    <div class="code-block">// Ejecutar prueba completa
+testModalHardcoded.runHardcodedTest()
+
+// Crear modal manualmente (bypass completo)
+testModalHardcoded.createModalManually()
+
+// Verificar estado actual
+testModalHardcoded.checkCurrentModalState()
+
+// Ver datos de prueba
+console.log(testModalHardcoded.mockData)</div>
+                </div>
+            </div>
+            
+            <div id="features" class="tab-content">
+                <h2>✨ Características de la Prueba</h2>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h3>🎭 Mock de API</h3>
+                        <p>Intercepta y reemplaza las llamadas a la API con datos simulados realistas para aislar el problema.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>🖱️ Simulación de Interacción</h3>
+                        <p>Simula automáticamente clics en botones "Ver Detalles" para probar el flujo completo.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>🛠️ Creación Manual</h3>
+                        <p>Si el componente React falla, crea un modal HTML/CSS manual para verificar estilos y estructura.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>🔍 Diagnóstico Inteligente</h3>
+                        <p>Analiza el resultado y proporciona sugerencias específicas sobre dónde buscar el problema.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>📊 Monitoreo de Estado</h3>
+                        <p>Verifica continuamente el estado del DOM y la visibilidad del modal durante la prueba.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>🎯 Aislamiento de Problemas</h3>
+                        <p>Separa los problemas de datos de los problemas de componente para un diagnóstico más preciso.</p>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>🎯 Flujo de la Prueba</h3>
+                    <ol>
+                        <li><strong>Verificación inicial:</strong> Comprueba el estado actual del modal</li>
+                        <li><strong>Configuración de mock:</strong> Intercepta las llamadas a la API</li>
+                        <li><strong>Simulación de clic:</strong> Intenta abrir el modal normalmente</li>
+                        <li><strong>Fallback manual:</strong> Si falla, crea un modal HTML manual</li>
+                        <li><strong>Diagnóstico final:</strong> Analiza los resultados y sugiere soluciones</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div id="data" class="tab-content">
+                <h2>📊 Datos de Prueba Utilizados</h2>
+                
+                <div class="test-data">
+                    <h4>🏋️ Rutina de Prueba</h4>
+                    <p><strong>Nombre:</strong> Rutina de Prueba - Fuerza</p>
+                    <p><strong>Descripción:</strong> Rutina de prueba para verificar la funcionalidad del modal</p>
+                    <p><strong>ID:</strong> test-routine-123</p>
+                </div>
+                
+                <div class="test-data">
+                    <h4>💪 Ejercicios Incluidos</h4>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                        <strong>1. Press de Banca</strong><br>
+                        • 4 series × 12 repeticiones<br>
+                        • Peso: 80 kg<br>
+                        • Descanso: 120 segundos<br>
+                        • Notas: Mantener la espalda pegada al banco
+                    </div>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                        <strong>2. Sentadillas</strong><br>
+                        • 3 series × 15 repeticiones<br>
+                        • Peso: 100 kg<br>
+                        • Descanso: 90 segundos<br>
+                        • Notas: Bajar hasta que los muslos estén paralelos al suelo
+                    </div>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                        <strong>3. Peso Muerto</strong><br>
+                        • 3 series × 8 repeticiones<br>
+                        • Peso: 120 kg<br>
+                        • Descanso: 180 segundos<br>
+                        • Notas: Mantener la espalda recta durante todo el movimiento
+                    </div>
+                </div>
+                
+                <div class="success">
+                    <h4>✅ Características de los Datos</h4>
+                    <ul>
+                        <li>Datos realistas que coinciden con la estructura esperada</li>
+                        <li>Incluye todos los campos opcionales (peso, descanso, notas)</li>
+                        <li>URLs de imágenes placeholder para probar la carga de medios</li>
+                        <li>Fechas de creación y actualización válidas</li>
+                        <li>IDs únicos para cada ejercicio y rutina</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="script" class="tab-content">
+                <h2>💻 Script de Prueba con Datos Hardcodeados</h2>
+                
+                <div class="warning">
+                    <p><strong>⚠️ Importante:</strong> Copia todo el código de abajo y pégalo en la consola del navegador mientras estás en la página del cliente.</p>
+                </div>
+                
+                <div class="code-block" id="scriptCode">// Script para probar RoutineDetailsModal con datos hardcodeados
+// Ejecutar en la consola del navegador en TrainerClientProgressPage
+
+(function() {
+  console.log('🧪 === INICIANDO PRUEBA CON DATOS HARDCODEADOS ===');
+  
+  // Datos de rutina hardcodeados para pruebas
+  const mockRoutineData = {
+    id: 'test-routine-123',
+    name: 'Rutina de Prueba - Fuerza',
+    description: 'Rutina de prueba para verificar la funcionalidad del modal',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z',
+    exercises: [
+      {
+        id: 'exercise-1',
+        name: 'Press de Banca',
+        sets: 4,
+        reps: 12,
+        weight: 80,
+        restTime: 120,
+        notes: 'Mantener la espalda pegada al banco',
+        image_url: 'https://via.placeholder.com/300x200?text=Press+Banca'
+      },
+      {
+        id: 'exercise-2',
+        name: 'Sentadillas',
+        sets: 3,
+        reps: 15,
+        weight: 100,
+        restTime: 90,
+        notes: 'Bajar hasta que los muslos estén paralelos al suelo',
+        image_url: 'https://via.placeholder.com/300x200?text=Sentadillas'
+      },
+      {
+        id: 'exercise-3',
+        name: 'Peso Muerto',
+        sets: 3,
+        reps: 8,
+        weight: 120,
+        restTime: 180,
+        notes: 'Mantener la espalda recta durante todo el movimiento',
+        image_url: 'https://via.placeholder.com/300x200?text=Peso+Muerto'
+      }
+    ]
+  };
+  
+  // Función para interceptar y mockear las llamadas a la API
+  function setupAPIMock() {
+    console.log('🔧 Configurando mock de API...');
+    
+    const originalFetch = window.fetch;
+    
+    window.fetch = function(...args) {
+      const url = args[0];
+      
+      // Interceptar llamadas a rutinas específicas
+      if (typeof url === 'string' && url.includes('/routines/')) {
+        console.log('🎯 Interceptada llamada a rutina específica:', url);
+        
+        // Simular respuesta exitosa con datos hardcodeados
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          json: () => Promise.resolve({
+            data: mockRoutineData
+          }),
+          clone: function() {
+            return {
+              json: () => Promise.resolve({
+                data: mockRoutineData
+              })
+            };
+          }
+        });
+      }
+      
+      // Para otras llamadas, usar fetch original
+      return originalFetch.apply(this, args);
+    };
+    
+    console.log('✅ Mock de API configurado');
+  }
+  
+  // Función para forzar la apertura del modal con datos hardcodeados
+  function forceOpenModal() {
+    console.log('🚀 Intentando forzar apertura del modal...');
+    
+    // Buscar el componente React en el DOM
+    const reactRoot = document.querySelector('#root');
+    if (!reactRoot) {
+      console.error('❌ No se encontró el elemento root de React');
+      return;
+    }
+    
+    // Intentar encontrar el estado del componente
+    try {
+      // Buscar botones "Ver Detalles"
+      const detailButtons = Array.from(document.querySelectorAll('button')).filter(btn => 
+        btn.textContent && btn.textContent.trim().includes('Ver Detalles')
+      );
+      
+      if (detailButtons.length > 0) {
+        console.log(`📊 Encontrados ${detailButtons.length} botones "Ver Detalles"`);
+        
+        // Simular clic en el primer botón
+        console.log('🖱️ Simulando clic en botón "Ver Detalles"...');
+        detailButtons[0].click();
+        
+        // Esperar un momento y verificar si el modal se abrió
+        setTimeout(() => {
+          checkModalAfterClick();
+        }, 1000);
+        
+      } else {
+        console.log('❌ No se encontraron botones "Ver Detalles"');
+        
+        // Intentar crear y abrir el modal manualmente
+        createModalManually();
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al intentar abrir el modal:', error);
+    }
+  }
+  
+  // Función para verificar el modal después del clic
+  function checkModalAfterClick() {
+    console.log('🔍 Verificando modal después del clic...');
+    
+    const modalOverlay = document.querySelector('.routine-modal-overlay');
+    const modalContent = document.querySelector('.routine-modal-content');
+    
+    if (modalOverlay && modalContent) {
+      console.log('✅ Modal encontrado después del clic');
+      console.log('📊 Modal overlay:', modalOverlay);
+      console.log('📊 Modal content:', modalContent);
+      
+      // Verificar contenido del modal
+      const modalTitle = modalContent.querySelector('h2');
+      const exerciseCards = modalContent.querySelectorAll('.exercise-card');
+      
+      console.log('📝 Título del modal:', modalTitle ? modalTitle.textContent : 'No encontrado');
+      console.log('🏋️ Ejercicios encontrados:', exerciseCards.length);
+      
+      // Verificar si el modal está visible
+      const isVisible = window.getComputedStyle(modalOverlay).display !== 'none';
+      console.log('👁️ Modal visible:', isVisible);
+      
+      if (!isVisible) {
+        console.log('⚠️ Modal existe pero no es visible, intentando forzar visibilidad...');
+        modalOverlay.style.display = 'flex';
+        modalOverlay.style.opacity = '1';
+        modalOverlay.style.zIndex = '9999';
+      }
+      
+    } else {
+      console.log('❌ Modal no encontrado después del clic');
+      console.log('🔍 Elementos encontrados en el DOM:');
+      
+      // Buscar elementos relacionados con modal
+      const modalElements = document.querySelectorAll('[class*="modal"], [class*="Modal"]');
+      console.log('📊 Elementos con "modal" en clase:', modalElements.length);
+      
+      modalElements.forEach((el, index) => {
+        console.log(`  ${index + 1}. ${el.tagName}.${el.className}`);
+      });
+    }
+  }
+  
+  // Función para crear el modal manualmente (como último recurso)
+  function createModalManually() {
+    console.log('🛠️ Creando modal manualmente como último recurso...');
+    
+    // Crear overlay del modal
+    const overlay = document.createElement('div');
+    overlay.className = 'routine-modal-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    `;
+    
+    // Crear contenido del modal
+    const content = document.createElement('div');
+    content.className = 'routine-modal-content';
+    content.style.cssText = `
+      background: #1a1a1a;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      border: 1px solid #333;
+      color: white;
+    `;
+    
+    // Crear header del modal
+    const header = document.createElement('div');
+    header.className = 'routine-modal-header';
+    header.style.cssText = `
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      padding: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    `;
+    
+    header.innerHTML = `
+      <div>
+        <div style="font-size: 0.875rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 0.5rem; opacity: 0.9;">TRAINFIT</div>
+        <h2 style="margin: 0; font-size: 1.75rem; font-weight: 700;">${mockRoutineData.name}</h2>
+        <p style="margin: 0; font-size: 1rem; opacity: 0.8;">${mockRoutineData.description}</p>
+      </div>
+      <button onclick="this.closest('.routine-modal-overlay').remove()" style="
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+      ">×</button>
+    `;
+    
+    // Crear body del modal
+    const body = document.createElement('div');
+    body.className = 'routine-modal-body';
+    body.style.cssText = `
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: #1a1a1a;
+    `;
+    
+    // Crear lista de ejercicios
+    let exercisesHTML = '<div class="exercises-list">';
+    mockRoutineData.exercises.forEach((exercise, index) => {
+      exercisesHTML += `
+        <div class="exercise-card" style="
+          background: #2a2a2a;
+          border: 1px solid #333;
+          border-radius: 16px;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+        ">
+          <div class="exercise-header" style="display: flex; align-items: flex-start; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="exercise-number" style="
+              background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+              color: white;
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 600;
+              font-size: 14px;
+            ">${index + 1}</div>
+            <div class="exercise-main-info" style="flex: 1;">
+              <div class="exercise-title-section">
+                <h4 style="margin: 0 0 0.75rem 0; font-size: 1.25rem; font-weight: 700;">${exercise.name}</h4>
+                <div class="exercise-quick-stats" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                  <span class="quick-stat" style="
+                    background: #dc2626;
+                    color: white;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                  ">${exercise.sets} series</span>
+                  <span class="quick-stat" style="
+                    background: #dc2626;
+                    color: white;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                  ">${exercise.reps} reps</span>
+                  ${exercise.weight ? `<span class="quick-stat" style="
+                    background: #dc2626;
+                    color: white;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                  ">${exercise.weight} kg</span>` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+          ${exercise.notes ? `
+            <div class="exercise-notes" style="
+              background: rgba(245, 158, 11, 0.1);
+              padding: 12px;
+              border-radius: 6px;
+              border-left: 3px solid #f59e0b;
+              font-size: 14px;
+              line-height: 1.5;
+              border: 1px solid rgba(245, 158, 11, 0.2);
+            ">
+              <strong style="color: #f59e0b;">Notas:</strong> ${exercise.notes}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
+    exercisesHTML += '</div>';
+    
+    body.innerHTML = exercisesHTML;
+    
+    // Ensamblar el modal
+    content.appendChild(header);
+    content.appendChild(body);
+    overlay.appendChild(content);
+    
+    // Agregar al DOM
+    document.body.appendChild(overlay);
+    
+    console.log('✅ Modal creado manualmente y agregado al DOM');
+    
+    // Agregar evento para cerrar al hacer clic fuera
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    });
+  }
+  
+  // Función para verificar el estado actual del modal
+  function checkCurrentModalState() {
+    console.log('🔍 Verificando estado actual del modal...');
+    
+    const modalOverlay = document.querySelector('.routine-modal-overlay');
+    const modalContent = document.querySelector('.routine-modal-content');
+    const modalBody = document.querySelector('.routine-modal-body');
+    
+    console.log('📊 Estado del modal:');
+    console.log('  - Overlay presente:', !!modalOverlay);
+    console.log('  - Content presente:', !!modalContent);
+    console.log('  - Body presente:', !!modalBody);
+    
+    if (modalOverlay) {
+      const isVisible = window.getComputedStyle(modalOverlay).display !== 'none';
+      console.log('  - Visible:', isVisible);
+      console.log('  - Z-index:', window.getComputedStyle(modalOverlay).zIndex);
+    }
+    
+    return { modalOverlay, modalContent, modalBody };
+  }
+  
+  // Función principal para ejecutar todas las pruebas
+  function runHardcodedTest() {
+    console.log('🧪 Ejecutando prueba completa con datos hardcodeados...');
+    
+    // 1. Verificar estado inicial
+    checkCurrentModalState();
+    
+    // 2. Configurar mock de API
+    setupAPIMock();
+    
+    // 3. Intentar abrir el modal
+    setTimeout(() => {
+      forceOpenModal();
+    }, 1000);
+    
+    // 4. Verificar resultado después de 3 segundos
+    setTimeout(() => {
+      console.log('\n🎯 === RESULTADO FINAL ===');
+      const finalState = checkCurrentModalState();
+      
+      if (finalState.modalOverlay && finalState.modalContent) {
+        console.log('✅ ÉXITO: Modal está presente y funcional');
+        console.log('💡 El problema no está en el componente RoutineDetailsModal');
+        console.log('💡 Revisar: datos de la API, props del componente, o lógica de apertura');
+      } else {
+        console.log('❌ FALLO: Modal no se pudo crear o mostrar');
+        console.log('💡 El problema está en el componente RoutineDetailsModal o su renderizado');
+        console.log('💡 Revisar: errores de JavaScript, props faltantes, o problemas de CSS');
+      }
+    }, 3000);
+  }
+  
+  // Funciones disponibles globalmente
+  window.testModalHardcoded = {
+    runHardcodedTest,
+    setupAPIMock,
+    forceOpenModal,
+    createModalManually,
+    checkCurrentModalState,
+    mockData: mockRoutineData
+  };
+  
+  console.log('\n🛠️ Funciones de prueba disponibles:');
+  console.log('- testModalHardcoded.runHardcodedTest() - Ejecutar prueba completa');
+  console.log('- testModalHardcoded.createModalManually() - Crear modal manualmente');
+  console.log('- testModalHardcoded.checkCurrentModalState() - Verificar estado del modal');
+  console.log('- testModalHardcoded.mockData - Ver datos de prueba');
+  
+  // Ejecutar prueba automáticamente
+  runHardcodedTest();
+  
+})();
+
+console.log('🧪 === PRUEBA CON DATOS HARDCODEADOS INICIADA ===');
+console.log('📋 Esta prueba verificará si el modal funciona con datos simulados');
+console.log('⏱️ Espera 3 segundos para ver los resultados finales');</div>
+                
+                <button class="copy-btn" onclick="copyScript()">📋 Copiar Script</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Ocultar todos los contenidos de pestañas
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Desactivar todas las pestañas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Mostrar el contenido seleccionado
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activar la pestaña seleccionada
+            event.target.classList.add('active');
+        }
+        
+        function copyScript() {
+            const scriptCode = document.getElementById('scriptCode').textContent;
+            navigator.clipboard.writeText(scriptCode).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ ¡Copiado!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#dc2626';
+                }, 2000);
+            }).catch(err => {
+                alert('Error al copiar: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>

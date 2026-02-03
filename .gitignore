@@ -1,0 +1,44 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.vite/
+**/.vite/
+*.log
+# OS
+.DS_Store
+
+# ENV
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+.vite/
+**/.vite/
+
+# Logs
+*.log
+
+# Debug / local scripts
+debug_*.js
+test_*.js
+*_debug*.js
+cookies.txt
+
+
+# Backups / dumps
+*.sql
+*.sqlite
+*.db

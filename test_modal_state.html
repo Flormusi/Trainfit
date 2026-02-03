@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación del Estado del Modal - TrainFit</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: #ff6b6b;
+            border-bottom-color: #ff6b6b;
+        }
+        
+        .tab:hover {
+            color: #ff6b6b;
+            background: #f8f9fa;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
+        }
+        
+        .alert-warning {
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #ef6c00;
+        }
+        
+        .alert-success {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .feature-list li:before {
+            content: '✅';
+            margin-right: 10px;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .instructions h3 {
+            color: #ff6b6b;
+            margin-top: 0;
+        }
+        
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Verificación del Estado del Modal</h1>
+            <p>Herramienta de diagnóstico para el estado isRoutineModalOpen en TrainFit</p>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('instructions')">📋 Instrucciones</button>
+                <button class="tab" onclick="showTab('features')">⚡ Características</button>
+                <button class="tab" onclick="showTab('usage')">🚀 Uso</button>
+                <button class="tab" onclick="showTab('code')">💻 Código</button>
+            </div>
+            
+            <div id="instructions" class="tab-content active">
+                <div class="alert alert-info">
+                    <strong>🎯 Objetivo:</strong> Esta herramienta verifica que el estado <code>isRoutineModalOpen</code> se actualiza correctamente cuando se hace clic en "Ver Detalles".
+                </div>
+                
+                <div class="instructions">
+                    <h3>📝 Instrucciones de Uso</h3>
+                    
+                    <div class="step">
+                        <strong>1. Preparación:</strong>
+                        <ul>
+                            <li>Abre la aplicación TrainFit en otra pestaña</li>
+                            <li>Navega a la página de progreso de un cliente</li>
+                            <li>Asegúrate de que haya rutinas asignadas visibles</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="step">
+                        <strong>2. Cargar el Script:</strong>
+                        <ul>
+                            <li>Abre las herramientas de desarrollador (F12)</li>
+                            <li>Ve a la pestaña "Console"</li>
+                            <li>Copia y pega el script de la pestaña "Código"</li>
+                            <li>Presiona Enter para ejecutar</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="step">
+                        <strong>3. Ejecutar Diagnóstico:</strong>
+                        <ul>
+                            <li>Ejecuta: <code>runModalStateDiagnosis()</code></li>
+                            <li>Haz clic en cualquier botón "Ver Detalles"</li>
+                            <li>Observa los mensajes en la consola</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="step">
+                        <strong>4. Análisis de Resultados:</strong>
+                        <ul>
+                            <li>Verifica que aparezcan mensajes de estado ANTES y DESPUÉS del clic</li>
+                            <li>Confirma que el modal se abre correctamente</li>
+                            <li>Revisa si hay errores o warnings</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ Importante:</strong> Este script debe ejecutarse en la página de TrainFit, no en esta página de instrucciones.
+                </div>
+            </div>
+            
+            <div id="features" class="tab-content">
+                <h2>⚡ Características del Script</h2>
+                
+                <ul class="feature-list">
+                    <li><strong>Monitoreo de Estado:</strong> Verifica el estado de React y los componentes</li>
+                    <li><strong>Interceptación de Clics:</strong> Captura clics en botones "Ver Detalles"</li>
+                    <li><strong>Observación del DOM:</strong> Monitorea cambios en elementos del modal</li>
+                    <li><strong>Verificación de Visibilidad:</strong> Comprueba si el modal es visible</li>
+                    <li><strong>Detección de Errores:</strong> Intercepta errores y warnings</li>
+                    <li><strong>Análisis Temporal:</strong> Verifica estado antes, durante y después</li>
+                    <li><strong>Diagnóstico Completo:</strong> Proporciona información detallada</li>
+                </ul>
+                
+                <div class="alert alert-success">
+                    <strong>✅ Funciones Disponibles:</strong>
+                    <ul>
+                        <li><code>runModalStateDiagnosis()</code> - Diagnóstico completo</li>
+                        <li><code>testModalBehavior()</code> - Prueba de comportamiento</li>
+                        <li><code>checkCurrentModalState()</code> - Estado actual</li>
+                        <li><code>monitorModalState()</code> - Monitoreo de React</li>
+                        <li><code>stopModalDiagnosis()</code> - Detener diagnóstico</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="usage" class="tab-content">
+                <h2>🚀 Guía de Uso Rápido</h2>
+                
+                <div class="alert alert-info">
+                    <strong>🎯 Casos de Uso:</strong>
+                </div>
+                
+                <div class="step">
+                    <strong>Diagnóstico Básico:</strong>
+                    <div class="code-block">
+// Ejecutar diagnóstico completo
+runModalStateDiagnosis();
+
+// Hacer clic en "Ver Detalles" y observar la consola
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <strong>Verificación Manual:</strong>
+                    <div class="code-block">
+// Verificar estado actual
+checkCurrentModalState();
+
+// Probar comportamiento específico
+testModalBehavior();
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <strong>Monitoreo Continuo:</strong>
+                    <div class="code-block">
+// Iniciar monitoreo
+const diagnosis = runModalStateDiagnosis();
+
+// Detener cuando termines
+stopModalDiagnosis();
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>🔍 Qué Buscar en los Resultados:</strong>
+                    <ul>
+                        <li>✅ "Modal se abrió correctamente" - Estado funciona bien</li>
+                        <li>❌ "Modal NO se abrió" - Problema con el estado</li>
+                        <li>🚨 "ERROR DETECTADO" - Error en JavaScript</li>
+                        <li>📊 Cambios en "Estado ANTES/DESPUÉS" - Verificar diferencias</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="code" class="tab-content">
+                <h2>💻 Código del Script</h2>
+                
+                <div class="alert alert-info">
+                    <strong>📋 Instrucciones:</strong> Copia todo el código de abajo y pégalo en la consola de la página de TrainFit.
+                </div>
+                
+                <button class="btn" onclick="copyCode()">📋 Copiar Código</button>
+                <button class="btn btn-secondary" onclick="downloadScript()">💾 Descargar Script</button>
+                
+                <div class="code-block" id="scriptCode">
+// === SCRIPT DE VERIFICACIÓN DEL ESTADO isRoutineModalOpen ===
+console.log('🔍 Iniciando verificación del estado isRoutineModalOpen...');
+
+// [El código completo del script se cargará aquí]
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Función para cambiar pestañas
+        function showTab(tabName) {
+            // Ocultar todas las pestañas
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remover clase active de todos los botones
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Mostrar la pestaña seleccionada
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+        
+        // Función para copiar código
+        function copyCode() {
+            fetch('./debug_modal_state.js')
+                .then(response => response.text())
+                .then(code => {
+                    navigator.clipboard.writeText(code).then(() => {
+                        alert('✅ Código copiado al portapapeles');
+                    }).catch(() => {
+                        // Fallback para navegadores que no soportan clipboard API
+                        const textArea = document.createElement('textarea');
+                        textArea.value = code;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        alert('✅ Código copiado al portapapeles');
+                    });
+                })
+                .catch(() => {
+                    alert('❌ Error al cargar el código. Asegúrate de que debug_modal_state.js esté en la misma carpeta.');
+                });
+        }
+        
+        // Función para descargar script
+        function downloadScript() {
+            fetch('./debug_modal_state.js')
+                .then(response => response.text())
+                .then(code => {
+                    const blob = new Blob([code], { type: 'text/javascript' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'debug_modal_state.js';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                })
+                .catch(() => {
+                    alert('❌ Error al descargar el archivo.');
+                });
+        }
+        
+        // Cargar el código en la pestaña de código
+        fetch('./debug_modal_state.js')
+            .then(response => response.text())
+            .then(code => {
+                document.getElementById('scriptCode').textContent = code;
+            })
+            .catch(() => {
+                document.getElementById('scriptCode').innerHTML = 
+                    '<div class="alert alert-warning">❌ No se pudo cargar el código. Asegúrate de que debug_modal_state.js esté en la misma carpeta.</div>';
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+# Render Blueprint: TrainFit Backend
+# Usa este archivo para crear el servicio Web en Render desde este repo.
+# Seleccioná la rama deploy-socketio-cors y el directorio backend.
+
+services:
+  - type: web
+    name: trainfit-backend
+    env: node
+    rootDir: backend
+    branch: deploy-socketio-cors
+    autoDeploy: true
+    plan: free
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Configurá tu DATABASE_URL de Neon en el dashboard de Render (no se versiona aquí)
+      - key: DATABASE_URL
+        value: ""
+      # Render puede generar un secreto automáticamente
+      - key: JWT_SECRET
+        generateValue: true
+      # Actualizá este valor cuando tengas tu dominio de Vercel (puede ser múltiple, separado por comas)
+      - key: ALLOWED_ORIGINS
+        value: "https://tu-dominio.vercel.app"

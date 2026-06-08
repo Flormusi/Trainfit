@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Views, dateFnsLocalizer, View } from 'react-big-calendar';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import startOfWeek from 'date-fns/startOfWeek';
-import endOfWeek from 'date-fns/endOfWeek';
-import startOfMonth from 'date-fns/startOfMonth';
-import endOfMonth from 'date-fns/endOfMonth';
-import getDay from 'date-fns/getDay';
-import isSameDay from 'date-fns/isSameDay';
+import { format, parse, startOfWeek, endOfWeek, startOfMonth, endOfMonth, getDay, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar as CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Edit, Trash2, Check, X, User, Dumbbell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

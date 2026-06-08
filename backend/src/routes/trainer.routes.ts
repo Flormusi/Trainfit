@@ -5,8 +5,9 @@ import {
   getExercises,
   createExercise,
   getTrainerClients,
-  getAnalytics
-} from '../controllers/trainer.controller.improved';
+  getAnalytics,
+  getChartsData
+} from '../controllers/trainerController';
 
 // Importar el resto de funciones del controlador original
 import {
@@ -89,6 +90,7 @@ router.get('/profile', protect, requestMiddleware, authorize([Role.TRAINER]), ge
 router.put('/profile', protect, requestMiddleware, authorize([Role.TRAINER]), updateProfile);
 
 router.get('/analytics', protect, requestMiddleware, authorize([Role.TRAINER]), getAnalytics);
+router.get('/analytics/charts', protect, requestMiddleware, authorize([Role.TRAINER]), getChartsData);
 
 // Obtener notificaciones del cliente
 router.get('/notifications', protect, requestMiddleware, authorize([Role.TRAINER]), getClientNotifications);

@@ -71,26 +71,9 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
       const confirmed = window.confirm('¿Seguro que querés eliminar todas las notificaciones?');
       if (!confirmed) return;
 
-      const response = await axios.delete(`/notifications/clear`);
-      console.log('Respuesta clear (primario /notifications/clear):', response.data, 'Status:', response.status, 'Antes length:', notifications.length);
-      if (response.status >= 200 && response.status < 300) {
-        setNotifications(() => []);
-        console.log('Estado de notificaciones vaciado en frontend (primario)');
-        toast.success('Todas las notificaciones eliminadas');
-      } else if (response.status === 404) {
-        console.warn('Endpoint /notifications/clear devolvió 404. Probando respaldo /payment-reminders/notifications/clear');
-        const fallbackRes = await axios.delete(`/payment-reminders/notifications/clear`);
-        console.log('Respuesta clear (respaldo /payment-reminders/notifications/clear):', fallbackRes.data, 'Status:', fallbackRes.status);
-        if (fallbackRes.status >= 200 && fallbackRes.status < 300) {
-          setNotifications(() => []);
-          console.log('Estado de notificaciones vaciado en frontend (respaldo)');
-          toast.success('Todas las notificaciones eliminadas');
-        } else {
-          toast.error('Error al eliminar todas las notificaciones (respaldo)');
-        }
-      } else {
-        toast.error('Error al eliminar todas las notificaciones');
-      }
+      await axios.delete(`/clients/notifications/clear`);
+      setNotifications([]);
+      toast.success('Todas las notificaciones eliminadas');
     } catch (error) {
       console.error('Error en clearAllNotifications:', error);
       toast.error('Error al eliminar todas las notificaciones');
@@ -101,15 +84,9 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
   const deleteNotification = async (notificationId: string) => {
     try {
       console.log('Eliminando notificación', notificationId);
-      const response = await axios.delete(`/notifications/${notificationId}`);
-
-      if (response.status >= 200 && response.status < 300) {
-        setNotifications(prev => prev.filter(n => String(n._id || n.id) !== String(notificationId)));
-        toast.success('Notificación eliminada');
-      } else {
-        console.error('Eliminar notificación - respuesta no OK:', response.status, response.data);
-        toast.error('No se pudo eliminar la notificación');
-      }
+      await axios.delete(`/clients/notifications/${notificationId}`);
+      setNotifications(prev => prev.filter(n => String(n._id || n.id) !== String(notificationId)));
+      toast.success('Notificación eliminada');
     } catch (error) {
       console.error('Error al eliminar notificación:', error);
       toast.error('Error al eliminar notificación');

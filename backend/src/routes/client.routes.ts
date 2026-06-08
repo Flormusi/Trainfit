@@ -38,6 +38,29 @@ router.get('/:userId/notifications/unread-count', protect, authorize([Role.CLIEN
 router.put('/notifications/:notificationId/read', protect, authorize([Role.CLIENT]), markNotificationAsRead);
 router.put('/:userId/notifications/mark-all-read', protect, authorize([Role.CLIENT]), markAllNotificationsAsRead);
 
+// DELETE de notificaciones
+import { PrismaClient } from '@prisma/client';
+const prismaForNotif = new PrismaClient();
+router.delete('/notifications/clear', protect, authorize([Role.CLIENT]), async (req: Request, res: Response) => {
+  const user = (req as any).user;
+  try {
+    await prismaForNotif.notification.deleteMany({ where: { userId: user.id } });
+    res.json({ success: true, message: 'Notificaciones eliminadas' });
+  } catch (e: any) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+router.delete('/notifications/:notificationId', protect, authorize([Role.CLIENT]), async (req: Request, res: Response) => {
+  const user = (req as any).user;
+  const { notificationId } = req.params;
+  try {
+    await prismaForNotif.notification.deleteMany({ where: { id: notificationId, userId: user.id } });
+    res.json({ success: true, message: 'Notificación eliminada' });
+  } catch (e: any) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 // Rutas adicionales para el dashboard del cliente
 router.get('/:userId/assigned-routines', protect, authorize([Role.CLIENT]), getAssignedRoutines);
 router.get('/routines/:id/details', protect, authorize([Role.CLIENT]), getRoutineDetails);

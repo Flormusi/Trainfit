@@ -540,7 +540,7 @@
 .client-dashboard-page .messages-card .messages-preview-content { color: #ddd; margin-bottom: 4px; }
 .client-dashboard-page .messages-card .messages-preview-time { color: #9aa5b1; font-size: 0.9rem; }
 .client-dashboard-page .messages-card .open-messaging-btn {
-  background-image: linear-gradient(90deg, #E74C3C, #F39C12);
+  background-image: linear-gradient(90deg, #dc2626, #b91c1c);
   color: #fff;
   font-weight: 600;
   border: none;

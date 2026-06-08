@@ -410,9 +410,9 @@ const ClientList: React.FC = () => {
               }}
             >
               <option value="all">Todos los planes</option>
-              <option value="basic">Básico</option>
-              <option value="premium">Premium</option>
-              <option value="pro">Pro</option>
+              <option value="semipersonalizado">Entrenamiento semipersonalizado (Gym GEVD)</option>
+              <option value="grupal">Entrenamiento grupal (Plaza Arenales)</option>
+              <option value="distancia">Entrenamiento a distancia</option>
             </select>
           </div>
         </div>
@@ -523,7 +523,7 @@ const ClientList: React.FC = () => {
             border: 'none',
             outline: 'none',
             boxShadow: 'none'
-          }}>{clients.filter(c => c.membership_tier === 'premium').length}</h3>
+          }}>{clients.filter(c => c.membership_tier === 'distancia').length}</h3>
           <p style={{
             margin: '0',
             color: '#b0b0b0',
@@ -532,7 +532,7 @@ const ClientList: React.FC = () => {
             border: 'none',
             outline: 'none',
             boxShadow: 'none'
-          }}>Premium</p>
+          }}>A distancia</p>
         </div>
       </div>
 
@@ -778,9 +778,18 @@ const ClientList: React.FC = () => {
                 fontSize: '1.5rem',
                 fontWeight: '700',
                 margin: '0 auto',
-                boxShadow: '0 0 8px rgba(214, 40, 40, 0.35)'
+                boxShadow: '0 0 8px rgba(214, 40, 40, 0.35)',
+                overflow: 'hidden'
               }}>
-                {client.name.charAt(0).toUpperCase()}
+                {(client as any).clientProfile?.profileImage ? (
+                  <img
+                    src={(client as any).clientProfile.profileImage}
+                    alt={client.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  client.name.charAt(0).toUpperCase()
+                )}
               </div>
               
               <div style={{
@@ -790,7 +799,7 @@ const ClientList: React.FC = () => {
                 boxShadow: 'none'
               }}>
                 <h3 style={{
-                  margin: '0 0 8px 0',
+                  margin: '0 0 4px 0',
                   color: '#ffffff',
                   fontSize: '1.25rem',
                   fontWeight: '600',
@@ -798,6 +807,15 @@ const ClientList: React.FC = () => {
                   outline: 'none',
                   boxShadow: 'none'
                 }}>{client.name}</h3>
+                {(client as any).clientProfile?.nickname && (
+                  <p style={{
+                    margin: '0 0 6px 0',
+                    color: '#dc2626',
+                    fontSize: '0.8rem',
+                    fontStyle: 'italic',
+                    fontWeight: '500'
+                  }}>"{(client as any).clientProfile.nickname}"</p>
+                )}
                 <p style={{
                   margin: '0 0 4px 0',
                   color: '#b0b0b0',
@@ -821,24 +839,30 @@ const ClientList: React.FC = () => {
                     display: 'inline-block',
                     padding: '4px 12px',
                     borderRadius: '20px',
-                    fontSize: '0.8rem',
+                    fontSize: '0.75rem',
                     fontWeight: '600',
-                    textTransform: 'uppercase',
-                    background: client.membership_tier === 'premium' 
-                      ? 'rgba(220, 38, 38, 0.2)' 
-                      : client.membership_tier === 'pro'
+                    background: client.membership_tier === 'semipersonalizado'
+                      ? 'rgba(220, 38, 38, 0.2)'
+                      : client.membership_tier === 'grupal'
                       ? 'rgba(245, 158, 11, 0.2)'
+                      : client.membership_tier === 'distancia'
+                      ? 'rgba(59, 130, 246, 0.2)'
                       : 'rgba(156, 163, 175, 0.2)',
-                    color: client.membership_tier === 'premium' 
-                      ? '#ef4444' 
-                      : client.membership_tier === 'pro'
+                    color: client.membership_tier === 'semipersonalizado'
+                      ? '#ef4444'
+                      : client.membership_tier === 'grupal'
                       ? '#f59e0b'
+                      : client.membership_tier === 'distancia'
+                      ? '#60a5fa'
                       : '#9ca3af',
                     border: 'none',
                     outline: 'none',
                     boxShadow: 'none'
                   }}>
-                    {client.membership_tier.charAt(0).toUpperCase() + client.membership_tier.slice(1)}
+                    {client.membership_tier === 'semipersonalizado' ? 'Semipersonalizado'
+                      : client.membership_tier === 'grupal' ? 'Grupal'
+                      : client.membership_tier === 'distancia' ? 'A distancia'
+                      : client.membership_tier}
                   </span>
                 )}
               </div>

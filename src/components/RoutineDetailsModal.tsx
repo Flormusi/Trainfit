@@ -132,350 +132,237 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     return s.includes('-') ? s.split('-').map(v => v.trim()).join(' · ') : s;
   };
 
+  // Helper: get series/reps/peso from new weeks structure or legacy fields
+  const getExerciseField = (ex: any, field: 'series' | 'reps' | 'peso') => {
+    // Try new weeks structure first (use week1 as reference for PDF)
+    if (ex.weeks?.week1) {
+      const val = ex.weeks.week1[field];
+      if (val && String(val).trim()) return String(val).trim();
+    }
+    // Legacy fallback
+    if (field === 'series') return String(ex.sets ?? ex.series ?? '').trim() || '-';
+    if (field === 'reps') return String(ex.reps ?? '').trim() || '-';
+    if (field === 'peso') {
+      const w = ex.weight ?? (Array.isArray(ex.weightsPerSeries) ? ex.weightsPerSeries[0] : undefined);
+      return w !== undefined && w !== null && String(w).trim() ? `${String(w).replace(/kg/gi,'').trim()} kg` : '-';
+    }
+    return '-';
+  };
+
   const downloadPDF = async () => {
     try {
       if (!routine) return;
-      
-      const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape para formato profesional
+
+      const pdf = new jsPDF('p', 'mm', 'a4'); // Portrait A4
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      let yPosition = 15;
+      let yPosition = 0;
 
-      // Paleta de colores Trainfit
+      // Colores
       const trainfitRed = [220, 38, 38] as [number, number, number];
       const trainfitBlack = [10, 10, 10] as [number, number, number];
-      const trainfitDarkGray = [26, 26, 26] as [number, number, number];
       const trainfitLightGray = [156, 163, 175] as [number, number, number];
       const trainfitWhite = [255, 255, 255] as [number, number, number];
 
-      // Header con diseño Trainfit profesional (banner negro)
+      // ── HEADER ──────────────────────────────────────────────
+      const headerH = 28;
       pdf.setFillColor(...trainfitBlack);
-      pdf.rect(0, 0, pageWidth, 35, 'F');
-      
-      // Logo TRAINFIT (carga desde /public/images)
-      try {
-        const logoResp = await fetch('/images/logo-trainfit.png');
-        const logoBlob = await logoResp.blob();
-        const logoBase64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(logoBlob);
-        });
-        const imgEl = new Image();
-        imgEl.src = logoBase64;
-        await new Promise((resolve) => { imgEl.onload = resolve; });
-        const naturalW = (imgEl.naturalWidth || 0);
-        const naturalH = (imgEl.naturalHeight || 0);
-        const targetH = 16;
-        const targetW = naturalW && naturalH ? (targetH * (naturalW / naturalH)) : 24;
-        pdf.addImage(imgEl, 'PNG', 12, 9, targetW, targetH);
-      } catch (error) {
-        // Fallback al texto si falla la carga del logo
-        pdf.setTextColor(...trainfitWhite);
-        pdf.setFontSize(18);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('TRAINFIT', 15, 15);
-      }
-      
-      // Subtítulo junto al logo
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(...trainfitWhite);
-      pdf.text('FITNESS & TRAINING', 15, 25);
+      pdf.rect(0, 0, pageWidth, headerH, 'F');
 
-      // Título grande: Plan de Entrenamiento - Día X (centrado)
+      // Logo texto (izquierda)
+      pdf.setTextColor(...trainfitRed);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
+      pdf.text('TRAINFIT', 12, 12);
+      pdf.setFontSize(7);
+      pdf.setTextColor(...trainfitLightGray);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('FITNESS & TRAINING', 12, 18);
+
+      // Título rutina (derecha del logo, centrado verticalmente)
       const dayTitle = routine.name || 'Rutina';
       pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(26);
-      pdf.text(`Plan de Entrenamiento - ${dayTitle}`, pageWidth / 2, 22, { align: 'center' });
+      pdf.setFontSize(13);
+      pdf.setTextColor(...trainfitWhite);
+      pdf.text(dayTitle, pageWidth / 2 + 15, 13, { align: 'center' });
 
-      // Subtítulo con cliente, fecha y progreso
+      // Subtítulo cliente + fecha
       const storedUserStr = localStorage.getItem('user');
       let currentClientName = 'N/A';
-      try {
-        currentClientName = storedUserStr ? (JSON.parse(storedUserStr)?.name || 'N/A') : 'N/A';
-      } catch {
-        currentClientName = 'N/A';
-      }
+      try { currentClientName = storedUserStr ? (JSON.parse(storedUserStr)?.name || 'N/A') : 'N/A'; } catch { currentClientName = 'N/A'; }
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.text(`Cliente: ${currentClientName} • Fecha: ${new Date().toLocaleDateString('es-ES')} • Progreso: 0%`, pageWidth / 2, 30, { align: 'center' });
-
-      // Separador decorativo bajo el header
-      pdf.setDrawColor(230, 230, 230);
-      pdf.setLineWidth(0.5);
-      pdf.line(15, 35, pageWidth - 15, 35);
-      
-      yPosition = 45;
-      pdf.setTextColor(...trainfitBlack);
-
-      // Información general
-      pdf.setFillColor(...trainfitDarkGray);
-      pdf.rect(15, yPosition, pageWidth - 30, 25, 'F');
-      pdf.setDrawColor(...trainfitLightGray);
-      pdf.setLineWidth(0.25);
-      pdf.rect(15, yPosition, pageWidth - 30, 25);
-      
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...trainfitWhite);
-      pdf.text('INFORMACIÓN GENERAL', 20, yPosition + 10);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
+      pdf.setFontSize(8);
       pdf.setTextColor(...trainfitLightGray);
-      const infoY = yPosition + 16;
-      pdf.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 20, infoY);
-      pdf.text(`Ejercicios: ${routine.exercises.length}`, pageWidth / 2 - 30, infoY);
-      // Series Totales: soporte para sets o series (string/number) y evitar NaN
-      const totalSeries = routine.exercises.reduce((total, ex: any) => {
-        const raw = ex.sets ?? ex.series;
-        const parsed = typeof raw === 'string' ? parseInt(raw, 10) : Number(raw);
-        return total + (Number.isFinite(parsed) ? parsed : 0);
-      }, 0);
-      pdf.text(`Series Totales: ${totalSeries}`, pageWidth - 80, infoY);
-      if (routine.description) {
-        pdf.text(`Descripción: ${routine.description.substring(0, 50)}...`, 20, infoY + 6);
-      }
+      pdf.text(`${currentClientName} · ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2 + 15, 21, { align: 'center' });
 
-      yPosition += 35;
+      yPosition = headerH + 8;
 
       // Precargar imágenes
-       toast.loading('Generando PDF con imágenes...');
-       const exercisesWithImages = await Promise.allSettled(
-         routine.exercises.map(async (exercise) => {
-           let imageBase64 = null;
-           if (exercise.image_url) {
-             try {
-               imageBase64 = await getImageAsBase64(exercise.image_url);
-             } catch (error: unknown) {
-               const msg = error instanceof Error ? error.message : String(error);
-               console.warn(`Error cargando imagen para ${exercise.name}:`, msg);
-             }
-           }
-           return { ...exercise, imageBase64 };
-         })
-       ).then(results => 
-         results.map((result, index) => 
-           result.status === 'fulfilled' ? result.value : { 
-             ...routine.exercises[index] || routine.exercises[0], 
-             name: 'Ejercicio sin datos', 
-             imageBase64: null 
-           }
-         )
-       );
+      toast.loading('Generando PDF...');
+      const exercisesWithImages = await Promise.allSettled(
+        routine.exercises.map(async (exercise) => {
+          let imageBase64 = null;
+          if (exercise.image_url) {
+            try { imageBase64 = await getImageAsBase64(exercise.image_url); } catch { /* sin imagen */ }
+          }
+          return { ...exercise, imageBase64 };
+        })
+      ).then(results =>
+        results.map((result, index) =>
+          result.status === 'fulfilled' ? result.value : {
+            ...routine.exercises[index] || routine.exercises[0],
+            name: 'Ejercicio sin datos',
+            imageBase64: null,
+          }
+        )
+      );
+
 
       // Tabla de ejercicios
       // Usamos márgenes fijos de 15mm y ajustamos columnas para que el ancho total
       // sea exactamente pageWidth - 30mm, evitando recortes y desbordes.
-      const tableHeaders = ['#', 'Imagen', 'Ejercicio', 'Series', 'Reps', 'Peso', 'Descanso'];
-      const tableStartX = 15;
-      const tableWidth = pageWidth - 30; // respetar márgenes
-      const colWidths = [12, 46, 80, 22, 34, 34, 39]; // suma = 267mm = tableWidth
-      let xPosition = tableStartX;
+      // ── TABLA DE EJERCICIOS ─────────────────────────────────
+      // Columnas: # | Imagen | Ejercicio+Notas | Series | Reps | Peso
+      const tableStartX = 10;
+      const tableWidth = pageWidth - 20;
+      // Anchos columnas en portrait A4 (210mm ancho - 20mm márgenes = 190mm)
+      const colW = [8, 28, 90, 16, 20, 28] as const; // suma = 190
+      const tableHeaders = ['#', 'Img', 'Ejercicio', 'Series', 'Reps', 'Peso'];
+      const rowH = 22; // compacto: ~8 ejercicios por página
+      const headerH2 = 9;
 
-      // Encabezados de tabla
-      // Evitamos símbolos especiales en headers para asegurar tipografía consistente
-      pdf.setFillColor(...trainfitRed);
-      pdf.rect(tableStartX, yPosition, tableWidth, 14, 'F');
-      pdf.setTextColor(...trainfitWhite);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(11);
-
-      tableHeaders.forEach((header, index) => {
-        pdf.text(header, xPosition + colWidths[index]/2, yPosition + 9, { align: 'center' });
-        xPosition += colWidths[index];
-      });
-
-      yPosition += 14;
-      pdf.setTextColor(...trainfitBlack);
-      pdf.setFont('helvetica', 'normal');
-
-      // Filas de ejercicios
-      for (let index = 0; index < exercisesWithImages.length; index++) {
-        const exercise = exercisesWithImages[index];
-        // Si hay notas, damos un poco más de altura a la fila
-        const hasNotes = !!(exercise as any).notes && String((exercise as any).notes).trim() !== '';
-        const rowHeight = hasNotes ? 54 : 50;
-
-        if (yPosition + rowHeight > pageHeight - 25) {
-          pdf.addPage();
-          yPosition = 20;
-          
-          // Repetir encabezados
-          pdf.setFillColor(...trainfitRed);
-          pdf.rect(tableStartX, yPosition, tableWidth, 14, 'F');
-          pdf.setTextColor(...trainfitWhite);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(11);
-          
-          xPosition = tableStartX;
-          tableHeaders.forEach((header, headerIndex) => {
-            pdf.text(header, xPosition + colWidths[headerIndex]/2, yPosition + 9, { align: 'center' });
-            xPosition += colWidths[headerIndex];
-          });
-          
-          yPosition += 14;
-          pdf.setTextColor(...trainfitBlack);
-          pdf.setFont('helvetica', 'normal');
-        }
-
-        // Alternar color de fila
-        if (index % 2 === 0) {
-          pdf.setFillColor(245, 245, 245);
-          pdf.rect(tableStartX, yPosition, tableWidth, rowHeight, 'F');
-        }
-
-        // Bordes de celda
-        pdf.setDrawColor(...trainfitLightGray);
-        pdf.setLineWidth(0.25);
-        xPosition = tableStartX;
-        
-        colWidths.forEach((width) => {
-          pdf.rect(xPosition, yPosition, width, rowHeight);
-          xPosition += width;
-        });
-
-        // Contenido de las celdas
-        xPosition = tableStartX;
-        
-        // Número de ejercicio con círculo rojo (radio ajustado para no tocar bordes)
+      const drawTableHeader = () => {
         pdf.setFillColor(...trainfitRed);
-        const circleX = xPosition + colWidths[0]/2;
-        const circleY = yPosition + rowHeight/2;
-        pdf.circle(circleX, circleY, 5, 'F');
+        pdf.rect(tableStartX, yPosition, tableWidth, headerH2, 'F');
         pdf.setTextColor(...trainfitWhite);
-        pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
-        pdf.text((index + 1).toString(), circleX, circleY + 2, { align: 'center' });
-        xPosition += colWidths[0];
+        pdf.setFontSize(8);
+        let x = tableStartX;
+        tableHeaders.forEach((h, i) => {
+          pdf.text(h, x + colW[i] / 2, yPosition + 6, { align: 'center' });
+          x += colW[i];
+        });
+        yPosition += headerH2;
+        pdf.setTextColor(...trainfitBlack);
+        pdf.setFont('helvetica', 'normal');
+      };
 
-        // Imagen del ejercicio (padding simétrico y proporción preservada)
+      drawTableHeader();
+
+      for (let index = 0; index < exercisesWithImages.length; index++) {
+        const exercise = exercisesWithImages[index] as any;
+        const hasNotes = !!exercise.notes && String(exercise.notes).trim() !== '';
+
+        // Nueva página si no cabe
+        if (yPosition + rowH > pageHeight - 18) {
+          pdf.addPage();
+          yPosition = 10;
+          drawTableHeader();
+        }
+
+        // Fondo alternado
+        if (index % 2 === 0) {
+          pdf.setFillColor(247, 247, 247);
+          pdf.rect(tableStartX, yPosition, tableWidth, rowH, 'F');
+        }
+
+        // Borde inferior de fila
+        pdf.setDrawColor(220, 220, 220);
+        pdf.setLineWidth(0.2);
+        pdf.line(tableStartX, yPosition + rowH, tableStartX + tableWidth, yPosition + rowH);
+
+        let x = tableStartX;
+        const midY = yPosition + rowH / 2;
+
+        // # con círculo rojo
+        pdf.setFillColor(...trainfitRed);
+        pdf.circle(x + colW[0] / 2, midY, 3.5, 'F');
+        pdf.setTextColor(...trainfitWhite);
+        pdf.setFontSize(7);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(String(index + 1), x + colW[0] / 2, midY + 1.5, { align: 'center' });
+        x += colW[0];
+
+        // Imagen
         pdf.setTextColor(...trainfitBlack);
         pdf.setFont('helvetica', 'normal');
         if (exercise.imageBase64) {
           try {
-            const boxPadding = 4;
-            const boxW = colWidths[1] - boxPadding * 2;
-            const boxH = rowHeight - 12; // aire vertical
+            const pad = 2;
+            const bW = colW[1] - pad * 2;
+            const bH = rowH - pad * 2;
             const imgEl = new Image();
             imgEl.src = exercise.imageBase64 as string;
-            await new Promise((resolve) => { imgEl.onload = resolve; });
-            const iW = imgEl.naturalWidth || 1;
-            const iH = imgEl.naturalHeight || 1;
-            const scale = Math.min(boxW / iW, boxH / iH);
-            const targetW = Math.max(1, Math.min(iW * scale, boxW));
-            const targetH = Math.max(1, Math.min(iH * scale, boxH));
-            const imgX = xPosition + boxPadding + (boxW - targetW) / 2;
-            const imgY = yPosition + (rowHeight - targetH) / 2;
-            pdf.addImage(imgEl, 'JPEG', imgX, imgY, targetW, targetH);
-          } catch (error) {
-            console.warn('Error adding image to PDF:', error);
-            pdf.setFontSize(8);
-            pdf.text('Sin imagen', xPosition + colWidths[1]/2, yPosition + rowHeight/2, { align: 'center' });
-          }
-        } else {
-          pdf.setFontSize(8);
-          pdf.text('Sin imagen', xPosition + colWidths[1]/2, yPosition + rowHeight/2, { align: 'center' });
+            await new Promise((res) => { imgEl.onload = res; });
+            const scale = Math.min(bW / (imgEl.naturalWidth || 1), bH / (imgEl.naturalHeight || 1));
+            const iW = Math.max(1, (imgEl.naturalWidth || 1) * scale);
+            const iH = Math.max(1, (imgEl.naturalHeight || 1) * scale);
+            pdf.addImage(imgEl, 'JPEG', x + pad + (bW - iW) / 2, yPosition + pad + (bH - iH) / 2, iW, iH);
+          } catch { /* sin imagen */ }
         }
-        xPosition += colWidths[1];
+        x += colW[1];
 
-        // Nombre del ejercicio + notas del entrenador (si existen)
-        pdf.setFontSize(10);
-        pdf.setTextColor(...trainfitBlack);
-        const nameY = yPosition + (hasNotes ? rowHeight/2 - 4 : rowHeight/2);
-        pdf.text(exercise.name, xPosition + 3, nameY, { maxWidth: colWidths[2] - 6 });
-
-        // Notas por ejercicio: segunda línea en cursiva y gris
+        // Nombre + notas
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(20, 20, 20);
+        const nameLines = pdf.splitTextToSize(exercise.name, colW[2] - 4);
+        const visibleName = Array.isArray(nameLines) ? nameLines.slice(0, hasNotes ? 1 : 2) : [nameLines];
+        const nameStartY = hasNotes ? yPosition + 5 : midY - (visibleName.length - 1) * 2;
+        visibleName.forEach((line: string, li: number) => pdf.text(line, x + 2, nameStartY + li * 4));
         if (hasNotes) {
-          const rawNotes = String((exercise as any).notes);
-          const notesLines = pdf.splitTextToSize(rawNotes, colWidths[2] - 6);
-          const limitedLines = Array.isArray(notesLines) ? notesLines.slice(0, 2) : [notesLines];
           pdf.setFont('helvetica', 'italic');
-          pdf.setTextColor(110, 110, 110);
-          const notesStartY = nameY + 8;
-          limitedLines.forEach((line: string, i: number) => {
-            pdf.text(line, xPosition + 3, notesStartY + i * 4);
-          });
+          pdf.setFontSize(7);
+          pdf.setTextColor(120, 120, 120);
+          const notesLines = pdf.splitTextToSize(String(exercise.notes), colW[2] - 4);
+          const visibleNotes = Array.isArray(notesLines) ? notesLines.slice(0, 2) : [notesLines];
+          visibleNotes.forEach((line: string, li: number) => pdf.text(line, x + 2, nameStartY + 5 + li * 3.5));
           pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(...trainfitBlack);
+          pdf.setTextColor(20, 20, 20);
         }
-        xPosition += colWidths[2];
-        
-        // Series (fallback a 'series' si 'sets' no está)
-        {
-          const seriesRaw = (editedExercises[exercise.id]?.sets ?? exercise.sets ?? (exercise as any).series);
-          const seriesText = (seriesRaw !== undefined && seriesRaw !== null && String(seriesRaw).trim() !== '')
-            ? String(seriesRaw)
-            : '-';
-          pdf.text(seriesText, xPosition + colWidths[3]/2, yPosition + rowHeight/2, { align: 'center' });
-        }
-        xPosition += colWidths[3];
-        
-        // Reps (envolver para que no se desborde)
-        {
-          const repsText = formatDelimited((getDisplayValue(exercise, 'reps') || 0).toString());
-          const maxWidth = colWidths[4] - 6; // padding lateral
-          const lines = pdf.splitTextToSize(repsText, maxWidth);
-          const visible = Array.isArray(lines) ? lines.slice(0, 2) : [lines];
-          const lineHeight = 4;
-          const centerY = yPosition + rowHeight/2;
-          const startY = centerY - ((visible.length - 1) * lineHeight) / 2;
-          visible.forEach((line: string, i: number) => {
-            pdf.text(line, xPosition + colWidths[4]/2, startY + i * lineHeight, { align: 'center' });
-          });
-        }
-        xPosition += colWidths[4];
-        
-        // Peso: usar weightsPerSeries si existe, si no weight básico
-        const rawWeights = (exercise as any).weightsPerSeries;
-        const joinedWeights = Array.isArray(rawWeights) && rawWeights.length > 0
-          ? rawWeights.map((w: any) => String(w).replace(/kg/gi, '').trim()).join('-')
-          : (editedExercises[exercise.id]?.weight ?? exercise.weight);
-        const weightText = (joinedWeights !== undefined && joinedWeights !== null && String(joinedWeights).trim() !== '')
-          ? `${formatDelimited(String(joinedWeights).replace(/kg/gi, '').trim())} kg`
-          : '-';
-        // Peso (envolver si es necesario)
-        {
-          const maxWidthW = colWidths[5] - 6;
-          const wLines = pdf.splitTextToSize(weightText, maxWidthW);
-          const wVisible = Array.isArray(wLines) ? wLines.slice(0, 2) : [wLines];
-          const lineHeight = 4;
-          const centerY = yPosition + rowHeight/2;
-          const startY = centerY - ((wVisible.length - 1) * lineHeight) / 2;
-          wVisible.forEach((line: string, i: number) => {
-            pdf.text(line, xPosition + colWidths[5]/2, startY + i * lineHeight, { align: 'center' });
-          });
-        }
-        xPosition += colWidths[5];
-        
-        // Descanso
-        pdf.text((exercise.restTime !== undefined && exercise.restTime !== null) ? `${exercise.restTime}s` : '-', xPosition + colWidths[6]/2, yPosition + rowHeight/2, { align: 'center' });
-        
-        yPosition += rowHeight;
+        x += colW[2];
+
+        // Series / Reps / Peso — leer del nuevo formato weeks o fallback legacy
+        const seriesVal = getExerciseField(exercise, 'series');
+        const repsVal = getExerciseField(exercise, 'reps');
+        const pesoVal = getExerciseField(exercise, 'peso');
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(20, 20, 20);
+
+        pdf.text(seriesVal, x + colW[3] / 2, midY + 1, { align: 'center' });
+        x += colW[3];
+
+        // Reps: si es piramidal mostrar en naranja
+        if (exercise.pyramidal) pdf.setTextColor(180, 100, 0);
+        pdf.text(repsVal, x + colW[4] / 2, midY + 1, { align: 'center' });
+        pdf.setTextColor(20, 20, 20);
+        x += colW[4];
+
+        pdf.text(pesoVal, x + colW[5] / 2, midY + 1, { align: 'center' });
+
+        yPosition += rowH;
       }
-      
-      // Footer con branding y número de página (igual que el PDF del entrenador)
-      const footerHeight = 22;
-      const footerY = pageHeight - footerHeight;
+
+      // ── FOOTER ──────────────────────────────────────────────
+      const footerH = 12;
       const totalPages = pdf.getNumberOfPages();
       for (let p = 1; p <= totalPages; p++) {
         pdf.setPage(p);
+        const footerY = pageHeight - footerH;
         pdf.setFillColor(...trainfitBlack);
-        pdf.rect(0, footerY, pageWidth, footerHeight, 'F');
+        pdf.rect(0, footerY, pageWidth, footerH, 'F');
         pdf.setTextColor(...trainfitWhite);
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        pdf.text('Trainfit - Tu entrenamiento a medida', pageWidth / 2, footerY + 14, { align: 'center' });
-        pdf.setFontSize(8);
-        pdf.text(`Página ${p} de ${totalPages}`, pageWidth - 20, footerY + 14, { align: 'right' });
+        pdf.setFontSize(7);
+        pdf.text('Trainfit · Tu entrenamiento a medida', pageWidth / 2, footerY + 8, { align: 'center' });
+        pdf.text(`${p} / ${totalPages}`, pageWidth - 12, footerY + 8, { align: 'right' });
       }
 
-      // Descargar el PDF
       const fileName = `rutina-${routine.name.replace(/\s+/g, '-').toLowerCase()}.pdf`;
       pdf.save(fileName);
-      
-      toast.success('Rutina descargada exitosamente en PDF');
+      toast.success('PDF descargado');
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('Error downloading PDF:', msg);
@@ -520,190 +407,314 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     return r ?? '';
   };
 
+  // Helper: extract week data from new structure or fallback to legacy fields
+  const getWeekData = (exercise: any, weekKey: string) => {
+    if (exercise.weeks && exercise.weeks[weekKey]) {
+      return exercise.weeks[weekKey] as { series: string; reps: string; peso: string };
+    }
+    // Legacy fallback: use top-level sets/reps/weight for week1
+    if (weekKey === 'week1') {
+      return {
+        series: String(exercise.sets ?? exercise.series ?? ''),
+        reps: String(exercise.reps ?? ''),
+        peso: String(exercise.weight ?? ''),
+      };
+    }
+    return null;
+  };
+
+  const hasWeeksData = (exercise: any) =>
+    exercise.weeks && (exercise.weeks.week1 || exercise.weeks.week2 || exercise.weeks.week3 || exercise.weeks.week4);
+
+  const getRpeLabel = (rpe: string) => {
+    const n = parseInt(rpe);
+    if (!n) return null;
+    if (n <= 4) return { label: `RPE ${n} · Suave`, color: '#16a34a' };
+    if (n <= 6) return { label: `RPE ${n} · Moderado`, color: '#ca8a04' };
+    if (n <= 8) return { label: `RPE ${n} · Alto`, color: '#ea580c' };
+    return { label: `RPE ${n} · Máximo`, color: '#dc2626' };
+  };
+
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
       <motion.div
-        className="routine-modal-overlay"
+        style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+          padding: '16px',
+          overflowY: 'auto',
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       >
         <motion.div
-          className="routine-modal-content"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
+          style={{
+            background: '#1a1a1a',
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '560px',
+            marginTop: '16px',
+            marginBottom: '16px',
+            overflow: 'hidden',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
+          }}
+          initial={{ scale: 0.92, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.92, opacity: 0, y: 20 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="routine-modal-header tf-header-gradient">
-            <div className="header-content">
-              <div className="header-info">
-                <div className="trainfit-logo">TRAINFIT</div>
-                <h2>{routine?.name || 'Cargando...'}</h2>
+          {/* Header */}
+          <div style={{
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #2a1a1a 100%)',
+            borderBottom: '1px solid #333',
+            padding: '20px 20px 16px',
+            position: 'sticky', top: 0, zIndex: 10,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#dc2626', letterSpacing: 2, textTransform: 'uppercase' }}>TRAINFIT</span>
+                <h2 style={{ color: '#fff', fontSize: 20, fontWeight: 700, margin: '4px 0 0', lineHeight: 1.2 }}>
+                  {routine?.name || 'Cargando...'}
+                </h2>
                 {routine?.description && (
-                  <p className="routine-subtitle">{routine.description}</p>
+                  <p style={{ color: '#9ca3af', fontSize: 13, margin: '4px 0 0' }}>{routine.description}</p>
                 )}
               </div>
-              <div className="routine-modal-actions">
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                 <button
-                  className="btn-download modern-button"
                   onClick={downloadPDF}
                   disabled={!routine}
+                  style={{
+                    background: '#dc2626', color: '#fff', border: 'none', borderRadius: 8,
+                    padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                    opacity: routine ? 1 : 0.5,
+                  }}
                 >
-                  📄 Descargar PDF
+                  📄 PDF
                 </button>
-                <button className="btn-close button-neutral" onClick={onClose}>
+                <button
+                  onClick={onClose}
+                  style={{
+                    background: '#333', color: '#fff', border: 'none', borderRadius: 8,
+                    width: 36, height: 36, fontSize: 16, cursor: 'pointer', flexShrink: 0,
+                  }}
+                >
                   ✕
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="routine-modal-body">
+          {/* Body */}
+          <div style={{ padding: '16px', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
             {loading ? (
-              <div className="loading-state">
-                <div className="spinner"></div>
+              <div style={{ textAlign: 'center', padding: '48px 0', color: '#9ca3af' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
                 <p>Cargando rutina...</p>
               </div>
             ) : routine ? (
-              <>
-                <div className="routine-stats">
-                  <div className="stat-card">
-                    <div className="stat-number">{routine.exercises.length}</div>
-                    <div className="stat-label">Ejercicios</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-number">{
-                      routine.exercises.reduce((total, ex: any) => {
-                        const raw = ex.sets ?? ex.series;
-                        const parsed = typeof raw === 'string' ? parseInt(String(raw).replace(/[^0-9]/g, ''), 10) : Number(raw);
-                        return total + (Number.isFinite(parsed) ? parsed : 0);
-                      }, 0)
-                    }</div>
-                    <div className="stat-label">Series Totales</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-number">{Math.round(routine.exercises.reduce((total, ex) => total + (ex.restTime || 60), 0) / 60)}</div>
-                    <div className="stat-label">Min. Descanso</div>
-                  </div>
-                </div>
-                
-                <div className="exercises-list">
-                  <div className="exercises-header">
-                    <h3>Plan de Entrenamiento</h3>
-                    <div className="exercises-count">{routine.exercises.length} ejercicios</div>
-                  </div>
-                  {routine.exercises.map((exercise, index) => (
-                    <div key={exercise.id} className="exercise-card">
-                      <div className="exercise-header">
-                        <div className="exercise-number">{index + 1}</div>
-                        <div className="exercise-main-info">
-                          <div className="exercise-title-section">
-                            <h4>{exercise.name}</h4>
-                            <div className="exercise-quick-stats">
-                              <span className="quick-stat">{(exercise.sets ?? exercise.series) ? `${String(exercise.sets ?? exercise.series).toString()} series` : 'SERIES'}</span>
-                              <span className="quick-stat">{exercise.reps ? `${String(exercise.reps)} reps` : 'REPS'}</span>
-                              {(exercise.weight ?? (exercise.weightsPerSeries && exercise.weightsPerSeries[0] !== undefined)) && (
-                                <span className="quick-stat">{
-                                  `${String(
-                                    exercise.weight ?? (Array.isArray(exercise.weightsPerSeries) ? exercise.weightsPerSeries[0] : '')
-                                  ).replace(/kg/gi, '').trim()} kg`
-                                }</span>
-                              )}
-                            </div>
-                          </div>
-                          {exercise.image_url && (
-                            <div className="exercise-image-container">
-                              <img 
-                                src={exercise.image_url} 
-                                alt={exercise.name}
-                                className="exercise-image"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="exercise-params">
-                        <div className="param-group">
-                          <label>Series:</label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={getDisplayValue(exercise, 'sets')}
-                            onChange={(e) => handleExerciseEdit(exercise.id, 'sets', parseInt(e.target.value))}
-                            className="param-input"
-                          />
-                        </div>
-                        
-                        <div className="param-group">
-                          <label>Repeticiones:</label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="50"
-                            value={getDisplayValue(exercise, 'reps')}
-                            onChange={(e) => handleExerciseEdit(exercise.id, 'reps', parseInt(e.target.value))}
-                            className="param-input"
-                          />
-                        </div>
-                        
-                        <div className="param-group">
-                          <label>Peso (kg):</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.5"
-                            value={getDisplayValue(exercise, 'weight') || ''}
-                            onChange={(e) => handleExerciseEdit(exercise.id, 'weight', parseFloat(e.target.value))}
-                            className="param-input"
-                            placeholder="Opcional"
-                          />
-                        </div>
-                        
-                        {exercise.restTime && (
-                          <div className="param-group readonly">
-                            <label>Descanso:</label>
-                            <span>{exercise.restTime} seg</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {exercise.notes && (
-                        <div className="exercise-notes">
-                          <strong>Notas:</strong> {exercise.notes}
-                        </div>
-                      )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {/* Summary row */}
+                <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                  {[
+                    { n: routine.exercises.length, label: 'Ejercicios' },
+                    { n: 4, label: 'Semanas' },
+                  ].map(({ n, label }) => (
+                    <div key={label} style={{
+                      flex: 1, background: '#111', borderRadius: 10, padding: '10px 12px',
+                      textAlign: 'center', border: '1px solid #2a2a2a',
+                    }}>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: '#dc2626' }}>{n}</div>
+                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{label}</div>
                     </div>
                   ))}
                 </div>
-              </>
+
+                {/* Exercise cards */}
+                {routine.exercises.map((exercise: any, index: number) => {
+                  const weeks = ['week1', 'week2', 'week3', 'week4'];
+                  const weeksWithData = weeks.map(w => ({ key: w, data: getWeekData(exercise, w) })).filter(w => w.data && (w.data.series || w.data.reps || w.data.peso));
+                  const rpeInfo = exercise.rpe ? getRpeLabel(exercise.rpe) : null;
+                  const myWeight = editedExercises[exercise.id]?.weight;
+
+                  return (
+                    <div key={exercise.id} style={{
+                      background: '#111',
+                      borderRadius: 12,
+                      border: '1px solid #2a2a2a',
+                      overflow: 'hidden',
+                    }}>
+                      {/* Exercise top row */}
+                      <div style={{ display: 'flex', gap: 12, padding: 14, alignItems: 'flex-start' }}>
+                        {/* Number */}
+                        <div style={{
+                          width: 28, height: 28, borderRadius: '50%',
+                          background: '#dc2626', color: '#fff',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 13, fontWeight: 700, flexShrink: 0,
+                        }}>
+                          {index + 1}
+                        </div>
+
+                        {/* Image + info */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                            {exercise.image_url && (
+                              <img
+                                src={exercise.image_url}
+                                alt={exercise.name}
+                                style={{
+                                  width: 56, height: 56, borderRadius: 8, objectFit: 'cover',
+                                  border: '1px solid #333', flexShrink: 0,
+                                }}
+                              />
+                            )}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <h4 style={{ color: '#fff', fontSize: 15, fontWeight: 600, margin: 0, lineHeight: 1.3 }}>
+                                {exercise.name}
+                              </h4>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                                {rpeInfo && (
+                                  <span style={{
+                                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                                    background: rpeInfo.color + '22', color: rpeInfo.color, border: `1px solid ${rpeInfo.color}44`,
+                                  }}>
+                                    {rpeInfo.label}
+                                  </span>
+                                )}
+                                {exercise.pyramidal && (
+                                  <span style={{
+                                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                                    background: '#92400e22', color: '#f59e0b', border: '1px solid #92400e44',
+                                  }}>
+                                    🔺 Piramidal
+                                  </span>
+                                )}
+                                {exercise.video_url && (
+                                  <a href={exercise.video_url} target="_blank" rel="noopener noreferrer" style={{
+                                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                                    background: '#1e3a5f', color: '#60a5fa', border: '1px solid #1e40af',
+                                    textDecoration: 'none',
+                                  }}>
+                                    ▶ Video
+                                  </a>
+                                )}
+                              </div>
+                              {exercise.notes && (
+                                <p style={{ color: '#9ca3af', fontSize: 12, margin: '6px 0 0', fontStyle: 'italic' }}>
+                                  📝 {exercise.notes}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Weeks table */}
+                      {weeksWithData.length > 0 && (
+                        <div style={{ borderTop: '1px solid #222', overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                            <thead>
+                              <tr style={{ background: '#1e1e1e' }}>
+                                <th style={{ padding: '8px 10px', textAlign: 'left', color: '#6b7280', fontWeight: 600, fontSize: 11, width: '30%' }}>Semana</th>
+                                <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Series</th>
+                                <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Reps</th>
+                                <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Peso obj.</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {weeksWithData.map(({ key, data }, wi) => (
+                                <tr key={key} style={{ borderTop: '1px solid #222', background: wi % 2 === 0 ? 'transparent' : '#0d0d0d' }}>
+                                  <td style={{ padding: '8px 10px', color: '#e5e7eb', fontWeight: 600, fontSize: 12 }}>
+                                    Semana {wi + 1}
+                                  </td>
+                                  <td style={{ padding: '8px 6px', textAlign: 'center', color: '#d1d5db' }}>{data?.series || '-'}</td>
+                                  <td style={{ padding: '8px 6px', textAlign: 'center', color: exercise.pyramidal ? '#f59e0b' : '#d1d5db' }}>
+                                    {data?.reps || '-'}
+                                  </td>
+                                  <td style={{ padding: '8px 6px', textAlign: 'center', color: '#d1d5db' }}>
+                                    {data?.peso ? `${data.peso} kg` : '-'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* Client weight input */}
+                      <div style={{
+                        borderTop: '1px solid #222',
+                        padding: '12px 14px',
+                        background: '#0d1117',
+                        display: 'flex', alignItems: 'center', gap: 10,
+                      }}>
+                        <span style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                          💪 Mi peso:
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.5"
+                          value={myWeight !== undefined ? myWeight : ''}
+                          onChange={(e) => handleExerciseEdit(exercise.id, 'weight', parseFloat(e.target.value))}
+                          placeholder="ej: 20"
+                          style={{
+                            flex: 1, background: '#1a1a1a', border: '1px solid #dc262650',
+                            borderRadius: 8, color: '#fff', padding: '8px 12px', fontSize: 14,
+                            outline: 'none', maxWidth: 100,
+                          }}
+                        />
+                        <span style={{ color: '#6b7280', fontSize: 13 }}>kg</span>
+                        {myWeight !== undefined && (
+                          <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>✓ Guardado</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
-              <div className="error-state">
+              <div style={{ textAlign: 'center', padding: '48px 0', color: '#9ca3af' }}>
                 <p>Error al cargar la rutina</p>
               </div>
             )}
           </div>
 
+          {/* Footer - save button */}
           {routine && Object.keys(editedExercises).length > 0 && (
-            <div className="routine-modal-footer">
+            <div style={{
+              padding: '14px 16px',
+              borderTop: '1px solid #2a2a2a',
+              display: 'flex', gap: 8,
+              position: 'sticky', bottom: 0,
+              background: '#1a1a1a',
+            }}>
               <button
-                className="btn-save"
                 onClick={saveChanges}
                 disabled={isSaving}
+                style={{
+                  flex: 1, background: '#dc2626', color: '#fff', border: 'none',
+                  borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
+                  cursor: isSaving ? 'not-allowed' : 'pointer', opacity: isSaving ? 0.7 : 1,
+                }}
               >
-                {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+                {isSaving ? 'Guardando...' : '💾 Guardar mis pesos'}
               </button>
               <button
-                className="btn-cancel"
                 onClick={() => setEditedExercises({})}
                 disabled={isSaving}
+                style={{
+                  background: '#333', color: '#9ca3af', border: 'none',
+                  borderRadius: 10, padding: '12px 16px', fontSize: 14, cursor: 'pointer',
+                }}
               >
-                Cancelar Cambios
+                Cancelar
               </button>
             </div>
           )}

@@ -15,7 +15,9 @@ const AddClientPage: React.FC = () => {
         trainingDaysPerWeek: '',
         medicalConditions: '',
         medications: '',
-        injuries: ''
+        injuries: '',
+        membershipTier: '',
+        nickname: ''
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -201,6 +203,21 @@ const AddClientPage: React.FC = () => {
                             </div>
 
                             <div>
+                                <label htmlFor="nickname" className="block text-sm font-semibold text-white/80 mb-2">
+                                    Apodo
+                                </label>
+                                <input
+                                    type="text"
+                                    id="nickname"
+                                    name="nickname"
+                                    value={formData.nickname}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all duration-300 backdrop-blur-sm"
+                                    placeholder="Ej: Flor, Pepe, Gonza..."
+                                />
+                            </div>
+
+                            <div>
                                 <label htmlFor="weight" className="block text-sm font-semibold text-white/80 mb-2">
                                     Peso (kg)
                                 </label>
@@ -236,6 +253,24 @@ const AddClientPage: React.FC = () => {
                                     <option value="5" className="bg-gray-800">5 días</option>
                                     <option value="6" className="bg-gray-800">6 días</option>
                                     <option value="7" className="bg-gray-800">7 días</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label htmlFor="membershipTier" className="block text-sm font-semibold text-white/80 mb-2">
+                                    Plan de Entrenamiento
+                                </label>
+                                <select
+                                    id="membershipTier"
+                                    name="membershipTier"
+                                    value={formData.membershipTier}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all duration-300 backdrop-blur-sm"
+                                >
+                                    <option value="" className="bg-gray-800">Sin asignar (editable luego)</option>
+                                    <option value="semipersonalizado" className="bg-gray-800">Entrenamiento semipersonalizado (Gym GEVD)</option>
+                                    <option value="grupal" className="bg-gray-800">Entrenamiento grupal (Plaza Arenales)</option>
+                                    <option value="distancia" className="bg-gray-800">Entrenamiento a distancia</option>
                                 </select>
                             </div>
                         </div>

@@ -6,7 +6,6 @@ import ExerciseImage from '../../components/ExerciseImage';
 import { useAuth } from '../../contexts/AuthContext';
 const { trainerApi }: { trainerApi: typeof apiService.trainerApi } = apiService;
 
-// Importar todos los ejercicios
 import {
   bicepsExercises,
   cardioExercises,
@@ -26,36 +25,74 @@ import {
 } from '../../data/exercisesIndex';
 
 export interface Client {
-  id: string; 
+  id: string;
   name: string;
 }
 
-export interface ExerciseData {
-  id: string; 
-  exerciseId: string; 
-  name: string; 
+interface WeekData {
   series: string;
   reps: string;
-  weight?: string;
+  peso: string;
+}
+
+export interface ExerciseData {
+  id: string;
+  exerciseId: string;
+  name: string;
   notes?: string;
   image_url?: string;
-  weightsPerSeries?: number[];
+  video_url?: string;
+  rpe?: string;
+  pyramidal?: boolean;
+  weeks: {
+    week1: WeekData;
+    week2: WeekData;
+    week3: WeekData;
+    week4: WeekData;
+  };
+  // campos legacy para compatibilidad con el backend
+  series?: string;
+  reps?: string;
+  weight?: string;
 }
 
 export interface RoutineData {
   name: string;
   clientId: string;
-  duration: string; 
+  duration: string;
   notes?: string;
   exercises: ExerciseData[];
   trainingObjective: string;
   totalWeeks?: number;
 }
 
+const emptyWeek = (): WeekData => ({ series: '', reps: '', peso: '' });
+
+const emptyExercise = (): ExerciseData => ({
+  id: Date.now().toString() + Math.random(),
+  exerciseId: '',
+  name: '',
+  notes: '',
+  image_url: '',
+  video_url: '',
+  rpe: '',
+  pyramidal: false,
+  weeks: {
+    week1: emptyWeek(),
+    week2: emptyWeek(),
+    week3: emptyWeek(),
+    week4: emptyWeek(),
+  },
+});
+
+const WEEK_LABELS = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'];
+const WEEK_KEYS = ['week1', 'week2', 'week3', 'week4'] as const;
+
 const CreateRoutinePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+
   const [clients, setClients] = useState<Client[]>([]);
   const [routineData, setRoutineData] = useState<RoutineData>({
     name: '',
@@ -66,126 +103,47 @@ const CreateRoutinePage: React.FC = () => {
     trainingObjective: '',
     totalWeeks: 4,
   });
-  const [availableExercises, setAvailableExercises] = useState<any[]>([]); 
-  const [filteredExercises, setFilteredExercises] = useState<any[]>([]);
+
+  const [availableExercises, setAvailableExercises] = useState<any[]>([]);
+  const [customExercises, setCustomExercises] = useState<any[]>([]);
   const [searchTerms, setSearchTerms] = useState<string[]>([]);
   const [showDropdowns, setShowDropdowns] = useState<boolean[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const dropdownRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [pyramidalEnabled, setPyramidalEnabled] = useState<boolean[]>([]);
-  const [originalReps, setOriginalReps] = useState<string[]>([]);
-  const PYRAMIDAL_SEQUENCE = ['12', '10', '8', '8', '6'];
-  const [weightsPerSeries, setWeightsPerSeries] = useState<string[][]>([]);
-  const [percentPerExercise, setPercentPerExercise] = useState<number[]>([]);
-  const [defaultPercent, setDefaultPercent] = useState<number>(7.5);
 
-  // Cargar porcentaje por defecto desde localStorage al montar (por entrenador)
+  // Cargar clientes y ejercicios
   useEffect(() => {
-    const trainerKey = user?.id ? `defaultPercentIncrement:${user.id}` : 'defaultPercentIncrement';
-    try {
-      const saved = localStorage.getItem(trainerKey);
-      if (saved !== null) {
-        const val = parseFloat(saved);
-        setDefaultPercent(isNaN(val) ? 7.5 : val);
-      } else {
-        // Fallback/migración: si no existe la clave por entrenador, intentar leer la global
-        const legacy = localStorage.getItem('defaultPercentIncrement');
-        if (legacy !== null) {
-          const legacyVal = parseFloat(legacy);
-          setDefaultPercent(isNaN(legacyVal) ? 7.5 : legacyVal);
-        }
-      }
-    } catch (e) {
-      console.warn('No se pudo leer el porcentaje por defecto desde localStorage:', e);
-    }
-  }, [user?.id]);
-
-  // Guardar porcentaje por defecto en localStorage cuando cambie (por entrenador)
-  useEffect(() => {
-    const trainerKey = user?.id ? `defaultPercentIncrement:${user.id}` : 'defaultPercentIncrement';
-    try {
-      localStorage.setItem(trainerKey, defaultPercent.toString());
-    } catch (e) {
-      console.warn('No se pudo persistir el porcentaje por defecto en localStorage:', e);
-    }
-  }, [defaultPercent, user?.id]);
-
-  // Sincronizar porcentaje por defecto con backend (leer y escribir)
-  useEffect(() => {
-    const syncWithBackend = async () => {
-      if (!user?.id) return;
-      try {
-        const profile = await trainerApi.getProfile();
-        const backendPercent = profile?.trainerProfile?.defaultPercentIncrement as number | string | undefined;
-        const trainerKey = user.id ? `defaultPercentIncrement:${user.id}` : 'defaultPercentIncrement';
-
-        if (backendPercent !== undefined && backendPercent !== null) {
-          const val = typeof backendPercent === 'string' ? parseFloat(backendPercent) : backendPercent;
-          if (!isNaN(val as number)) {
-            setDefaultPercent(val as number);
-            try { localStorage.setItem(trainerKey, String(val)); } catch {}
-          }
-        } else {
-          // Si no hay valor en backend, persistir el local actual
-          await trainerApi.updateProfile({ defaultPercentIncrement: defaultPercent });
-        }
-      } catch (e) {
-        console.warn('No se pudo sincronizar el porcentaje por defecto con el backend:', e);
-      }
-    };
-    syncWithBackend();
-  }, [user?.id]);
-
-  // Actualizar backend cuando cambie el porcentaje por defecto
-  useEffect(() => {
-    const persistBackend = async () => {
-      if (!user?.id) return;
-      try {
-        await trainerApi.updateProfile({ defaultPercentIncrement: defaultPercent });
-      } catch (e) {
-        console.warn('No se pudo actualizar el porcentaje por defecto en el backend:', e);
-      }
-    };
-    persistBackend();
-  }, [defaultPercent, user?.id]);
-  useEffect(() => {
-    const fetchClientsAndExercises = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token from localStorage:', token);
-        if (!token) {
-          setError('Usuario no autenticado. Por favor, inicia sesión.');
-          return;
-        }
-
-        console.log('Verificando trainerApi:', trainerApi); // Nuevo log
-        console.log('Verificando trainerApi.getClients:', trainerApi ? trainerApi.getClients : 'trainerApi no definido'); // Nuevo log
+        if (!token) { setError('Usuario no autenticado.'); return; }
 
         if (!trainerApi || typeof trainerApi.getClients !== 'function') {
-          setError('Error crítico: trainerApi.getClients no está disponible. Revisa la importación y el archivo api.ts.');
-          console.error('trainerApi o trainerApi.getClients no es una función', trainerApi);
-          setClients([]);
+          setError('Error crítico: trainerApi.getClients no disponible.');
           return;
         }
 
         const response = await trainerApi.getClients();
-        console.log('Response from getClients (API call):', response);
         const clientsData = response.data || [];
-
         if (Array.isArray(clientsData)) {
-          const formattedClients = clientsData.map(client => ({
-            id: client.id,
-            name: client.name || client.email
-          }));
-          setClients(formattedClients);
-        } else {
-          console.error('La respuesta de getClients no es un array válido:', clientsData);
-          setError('Error al cargar los clientes: formato de respuesta inesperado.');
-          setClients([]);
+          setClients(clientsData.map((c: any) => ({ id: c.id, name: c.name || c.email })));
         }
-        
-        // Combinar todos los ejercicios y asignarles IDs únicos
+
+        // Cargar ejercicios personalizados de la trainer
+        try {
+          const customRes = await trainerApi.getExercises();
+          const customData: any = customRes.data;
+          const custom = (customData?.data || customData || []).map((ex: any) => ({
+            ...ex,
+            id: `custom_${ex.id}`,
+            isCustom: true,
+          }));
+          setCustomExercises(custom);
+        } catch {
+          // Si falla, continúa sin ejercicios custom
+        }
+
         const allExercises = [
           ...bicepsExercises.map((ex, i) => ({ ...ex, id: `biceps_${i}` })),
           ...cardioExercises.map((ex, i) => ({ ...ex, id: `cardio_${i}` })),
@@ -201,59 +159,41 @@ const CreateRoutinePage: React.FC = () => {
           ...pectoralesExercises.map((ex, i) => ({ ...ex, id: `pectorales_${i}` })),
           ...piernasExercises.map((ex, i) => ({ ...ex, id: `piernas_${i}` })),
           ...potenciaExercises.map((ex, i) => ({ ...ex, id: `potencia_${i}` })),
-          ...tricepsExercises.map((ex, i) => ({ ...ex, id: `triceps_${i}` }))
+          ...tricepsExercises.map((ex, i) => ({ ...ex, id: `triceps_${i}` })),
         ];
-
         setAvailableExercises(allExercises);
-        setFilteredExercises(allExercises);
-
       } catch (err: any) {
-        // El error 'trainerApi.getClients is not a function' se captura aquí
-        console.error('Error fetching clients or exercises:', err);
-        if (err.message && err.message.includes('is not a function')){
-            setError('Error de configuración: `trainerApi.getClients` no es una función. Verifica la importación del módulo api.');
-        } else if (err.response && err.response.headers && err.response.headers['content-type']?.includes('text/html')) {
-          setError('Error de autenticación o sesión expirada. Por favor, inicia sesión de nuevo.');
-        } else {
-          setError('Error al cargar datos iniciales. Intenta de nuevo más tarde.');
-        }
-        setClients([]); 
+        setError('Error al cargar datos. Intenta de nuevo.');
       }
     };
-
-    fetchClientsAndExercises();
+    fetchData();
   }, []);
 
-  // Initialize with preset routine data if available
+  // Preset desde biblioteca
   useEffect(() => {
     const presetRoutine = location.state?.presetRoutine;
     if (presetRoutine) {
-      console.log('Initializing with preset routine:', presetRoutine);
-      
-      // Convert preset exercises to the format expected by the form
-      const presetExercises = presetRoutine.exercises?.map((exercise: any, index: number) => ({
-        id: `preset_${index}`,
-        exerciseId: exercise.id || `preset_exercise_${index}`,
-        name: exercise.name || exercise.exercise || 'Ejercicio sin nombre',
-        series: exercise.sets?.toString() || exercise.series?.toString() || '3',
-        reps: exercise.reps?.toString() || exercise.repetitions?.toString() || '10',
-        weight: exercise.weight?.toString() || '',
-        notes: exercise.notes || '',
-        image_url: exercise.image_url || ''
-      })) || [];
-
+      const presetExercises: ExerciseData[] = (presetRoutine.exercises || []).map((ex: any, i: number) => ({
+        id: `preset_${i}`,
+        exerciseId: ex.id || `preset_exercise_${i}`,
+        name: ex.name || ex.exercise || 'Ejercicio sin nombre',
+        notes: ex.notes || '',
+        image_url: ex.image_url || '',
+        weeks: {
+          week1: { series: ex.sets?.toString() || ex.series?.toString() || '3', reps: ex.reps?.toString() || '10', peso: ex.weight?.toString() || '' },
+          week2: emptyWeek(),
+          week3: emptyWeek(),
+          week4: emptyWeek(),
+        },
+      }));
       setRoutineData(prev => ({
         ...prev,
         name: presetRoutine.name || 'Rutina Prediseñada',
         notes: presetRoutine.description || presetRoutine.notes || '',
-        exercises: presetExercises
+        exercises: presetExercises,
       }));
-
-      // Initialize search terms and dropdowns for preset exercises
-      setSearchTerms(presetExercises.map(() => ''));
+      setSearchTerms(presetExercises.map((ex) => ex.name));
       setShowDropdowns(presetExercises.map(() => false));
-      setPyramidalEnabled(presetExercises.map(() => false));
-      setOriginalReps(presetExercises.map((ex: any) => ex.reps?.toString() || ''));
     }
   }, [location.state]);
 
@@ -262,270 +202,90 @@ const CreateRoutinePage: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       dropdownRefs.current.forEach((ref, index) => {
         if (ref && !ref.contains(event.target as Node)) {
-          const newShowDropdowns = [...showDropdowns];
-          newShowDropdowns[index] = false;
-          setShowDropdowns(newShowDropdowns);
+          setShowDropdowns(prev => { const n = [...prev]; n[index] = false; return n; });
         }
       });
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showDropdowns]);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setRoutineData((prevData: RoutineData) => ({ 
-      ...prevData,
-      [name]: name === 'totalWeeks' ? Math.max(1, parseInt(value || '4', 10)) : value,
-    }));
+    setRoutineData(prev => ({ ...prev, [name]: name === 'totalWeeks' ? Math.max(1, parseInt(value || '4', 10)) : value }));
   };
 
-  const handleSearchChange = (index: number, value: string) => {
-    const newSearchTerms = [...searchTerms];
-    const newShowDropdowns = [...showDropdowns];
-    
-    newSearchTerms[index] = value;
-    newShowDropdowns[index] = value.length > 0;
-    
-    setSearchTerms(newSearchTerms);
-    setShowDropdowns(newShowDropdowns);
+  const getFilteredExercises = (index: number) => {
+    const term = (searchTerms[index] || '').toLowerCase();
+    const allExs = [
+      ...customExercises.map(e => ({ ...e, _group: '⭐ Mis ejercicios' })),
+      ...availableExercises.map(e => ({ ...e, _group: 'Biblioteca' })),
+    ];
+    if (!term) return allExs;
+    return allExs.filter(ex => (ex.name || '').toLowerCase().includes(term));
   };
 
-  const getFilteredExercisesForIndex = (index: number) => {
-    const term = searchTerms[index]?.toLowerCase() || '';
-    if (term === '') {
-      return availableExercises;
-    }
-    return availableExercises.filter(exercise => 
-      (exercise.name ? exercise.name.toLowerCase() : '').includes(term)
-    );
+  const selectExercise = (index: number, ex: any) => {
+    setSearchTerms(prev => { const n = [...prev]; n[index] = ex.name; return n; });
+    setShowDropdowns(prev => { const n = [...prev]; n[index] = false; return n; });
+    const imageUrl = ex.isCustom
+      ? (ex.imageUrl || '')
+      : getExerciseImageUrl(ex.name, 300, 200);
+    const videoUrl = ex.isCustom ? (ex.videoUrl || '') : '';
+    setRoutineData(prev => {
+      const exercises = [...prev.exercises];
+      exercises[index] = { ...exercises[index], name: ex.name, exerciseId: ex.name, image_url: imageUrl, video_url: videoUrl };
+      return { ...prev, exercises };
+    });
   };
 
-  const selectExercise = (index: number, exercise: any) => {
-    const newSearchTerms = [...searchTerms];
-    const newShowDropdowns = [...showDropdowns];
-    
-    newSearchTerms[index] = exercise.name;
-    newShowDropdowns[index] = false;
-    
-    setSearchTerms(newSearchTerms);
-    setShowDropdowns(newShowDropdowns);
-
-    // Simular el evento de cambio para actualizar el ejercicio
-    const fakeEvent = {
-      target: {
-        name: 'exerciseId',
-        value: exercise.name
-      }
-    } as ChangeEvent<HTMLSelectElement>;
-    
-    handleExerciseChange(index, fakeEvent);
-  };
-
-  // Modificar la sección de renderizado de ejercicios para incluir la visualización de imágenes
-  const handleExerciseChange = (index: number, e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    console.log('Evento de cambio:', { name, value });
-    
-    const updatedExercises = [...routineData.exercises];
-    if (updatedExercises[index]) {
-      console.log('Estado actual del ejercicio:', updatedExercises[index]);
-      
-      updatedExercises[index] = {
-        ...updatedExercises[index],
-        [name]: value,
+  const handleWeekChange = (exerciseIndex: number, week: typeof WEEK_KEYS[number], field: keyof WeekData, value: string) => {
+    setRoutineData(prev => {
+      const exercises = [...prev.exercises];
+      exercises[exerciseIndex] = {
+        ...exercises[exerciseIndex],
+        weeks: {
+          ...exercises[exerciseIndex].weeks,
+          [week]: { ...exercises[exerciseIndex].weeks[week], [field]: value },
+        },
       };
+      return { ...prev, exercises };
+    });
+  };
 
-      if (name === 'exerciseId') {
-        // Buscar el ejercicio seleccionado en todas las categorías de ejercicios
-        const categories = [
-          bicepsExercises,
-          cardioExercises,
-          circuitoExercises,
-          coreExercises,
-          dorsalesExercises,
-          espinalesExercises,
-          gemelosExercises,
-          gluteoExercises,
-          hombrosExercises,
-          isquiosExercises,
-          movilidadExercises,
-          pectoralesExercises,
-          piernasExercises,
-          potenciaExercises,
-          tricepsExercises
-        ];
-    
-        let foundExercise = null;
-        for (const category of categories) {
-          const selectedExercise = category.find(ex => ex.name === value);
-          if (selectedExercise) {
-            foundExercise = selectedExercise;
-            break;
-          }
-        }
-
-        if (foundExercise) {
-          console.log('Ejercicio encontrado:', foundExercise);
-          // Usar el servicio de Cloudinary para obtener la URL de la imagen
-          const imageUrl = getExerciseImageUrl(foundExercise.name, 300, 200);
-          updatedExercises[index] = {
-            ...updatedExercises[index],
-            name: foundExercise.name,
-            exerciseId: foundExercise.name,
-            image_url: imageUrl
-          };
-          console.log('Ejercicio actualizado con imagen de Cloudinary:', updatedExercises[index]);
-        } else {
-          console.log('No se encontró el ejercicio:', value);
-        }
-      }
-    }
-
-    setRoutineData((prevData: RoutineData) => {
-      const newData = { 
-        ...prevData,
-        exercises: updatedExercises,
-      };
-      console.log('Nuevo estado de rutina:', newData);
-      return newData;
+  const handleNoteChange = (exerciseIndex: number, value: string) => {
+    setRoutineData(prev => {
+      const exercises = [...prev.exercises];
+      exercises[exerciseIndex] = { ...exercises[exerciseIndex], notes: value };
+      return { ...prev, exercises };
     });
   };
 
   const addExercise = () => {
-    setRoutineData((prevData: RoutineData) => ({ 
-      ...prevData,
-      exercises: [
-        ...prevData.exercises,
-        { 
-          id: Date.now().toString(), 
-          exerciseId: '', 
-          name: '', 
-          series: '', 
-          reps: '', 
-          weight: '', 
-          notes: '',
-          image_url: ''
-        }, 
-      ],
-    }));
-    
-    // Agregar nuevos estados para el nuevo ejercicio
+    setRoutineData(prev => ({ ...prev, exercises: [...prev.exercises, emptyExercise()] }));
     setSearchTerms(prev => [...prev, '']);
     setShowDropdowns(prev => [...prev, false]);
-    setPyramidalEnabled(prev => [...prev, false]);
-    setOriginalReps(prev => [...prev, '']);
-    setWeightsPerSeries(prev => [...prev, []]);
-    // Al agregar ejercicio, heredar el porcentaje por defecto vigente
-    setPercentPerExercise(prev => [...prev, defaultPercent]);
   };
 
   const removeExercise = (index: number) => {
-    setRoutineData((prevData: RoutineData) => ({ 
-      ...prevData,
-      exercises: prevData.exercises.filter((_, i) => i !== index),
-    }));
-    
-    // Remover estados correspondientes
+    setRoutineData(prev => ({ ...prev, exercises: prev.exercises.filter((_, i) => i !== index) }));
     setSearchTerms(prev => prev.filter((_, i) => i !== index));
     setShowDropdowns(prev => prev.filter((_, i) => i !== index));
-    setPyramidalEnabled(prev => prev.filter((_, i) => i !== index));
-    setOriginalReps(prev => prev.filter((_, i) => i !== index));
-    setWeightsPerSeries(prev => prev.filter((_, i) => i !== index));
-    setPercentPerExercise(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const togglePyramidal = (index: number) => {
-    const enabling = !(pyramidalEnabled[index] || false);
-    setPyramidalEnabled(prev => {
-      const next = [...prev];
-      next[index] = enabling;
-      return next;
-    });
-
-    if (enabling) {
-      // Inicializar pesos por serie si no existen
-      setWeightsPerSeries(prev => {
-        const next = [...prev];
-        const length = PYRAMIDAL_SEQUENCE.length;
-        next[index] = next[index] && next[index].length === length ? next[index] : Array(length).fill('');
-        return next;
-      });
-    } else {
-      // No-op al desactivar; el campo de peso simple se mostrará y los pesos por serie quedarán en memoria por si se reactiva
-    }
-
-    setRoutineData(prevData => {
-      const exercises = [...prevData.exercises];
-      if (!exercises[index]) return prevData;
-      if (enabling) {
-        setOriginalReps(prev => {
-          const next = [...prev];
-          next[index] = exercises[index].reps || '';
-          return next;
-        });
-        exercises[index] = { ...exercises[index], reps: PYRAMIDAL_SEQUENCE.join('-') };
-      } else {
-        const restored = originalReps[index] || '';
-        exercises[index] = { ...exercises[index], reps: restored };
-      }
-      return { ...prevData, exercises };
-    });
-  };
-
-  // Manejar cambio de pesos por serie
-  const handleSeriesWeightChange = (exerciseIndex: number, seriesIndex: number, value: string) => {
-    setWeightsPerSeries(prev => {
-      const next = [...prev];
-      const arr = next[exerciseIndex] ? [...next[exerciseIndex]] : Array(PYRAMIDAL_SEQUENCE.length).fill('');
-      arr[seriesIndex] = value;
-      next[exerciseIndex] = arr;
-      return next;
-    });
-  };
-
-  const handlePercentChange = (exerciseIndex: number, value: string) => {
-    const parsed = parseFloat(value);
-    setPercentPerExercise(prev => {
-      const next = [...prev];
-      next[exerciseIndex] = isNaN(parsed) ? defaultPercent : parsed;
-      return next;
-    });
-  };
-
-  // Sugerir pesos automáticamente aumentando ~7.5% por serie
-  const suggestWeights = (exerciseIndex: number, percent: number = defaultPercent) => {
-    const baseStr = weightsPerSeries[exerciseIndex]?.[0] || '';
-    const base = parseFloat(String(baseStr).replace(',', '.'));
-    if (isNaN(base)) return; // Requiere base válida
-    setWeightsPerSeries(prev => {
-      const next = [...prev];
-      const arr = next[exerciseIndex] ? [...next[exerciseIndex]] : Array(PYRAMIDAL_SEQUENCE.length).fill('');
-      for (let i = 0; i < PYRAMIDAL_SEQUENCE.length; i++) {
-        const value = i === 0 ? base : base * Math.pow(1 + percent / 100, i);
-        arr[i] = String(Math.round(value * 10) / 10);
-      }
-      next[exerciseIndex] = arr;
-      return next;
-    });
+    dropdownRefs.current = dropdownRefs.current.filter((_, i) => i !== index);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
-    console.log('Submitting routine data:', routineData);
 
     if (!routineData.name || !routineData.clientId || !routineData.duration || !routineData.trainingObjective || routineData.exercises.length === 0) {
-      setError('Por favor, completa todos los campos obligatorios y añade al menos un ejercicio.');
+      setError('Por favor, completá todos los campos obligatorios y agregá al menos un ejercicio.');
       return;
     }
     for (const ex of routineData.exercises) {
-      if (!ex.exerciseId || !ex.series || !ex.reps) {
-        setError('Por favor, completa todos los campos para cada ejercicio (ejercicio, series, repeticiones).');
+      if (!ex.exerciseId) {
+        setError('Seleccioná un ejercicio para cada fila.');
         return;
       }
     }
@@ -534,75 +294,21 @@ const CreateRoutinePage: React.FC = () => {
       const payload = {
         ...routineData,
         totalWeeks: typeof routineData.totalWeeks === 'number' && !isNaN(routineData.totalWeeks) ? routineData.totalWeeks : 4,
-        exercises: routineData.exercises.map((ex, idx) => {
-          const isPyr = pyramidalEnabled[idx] && (weightsPerSeries[idx]?.length === PYRAMIDAL_SEQUENCE.length);
-          const weightsArray = isPyr
-            ? (weightsPerSeries[idx] || []).map(w => {
-                const n = parseFloat(String(w).replace(',', '.'));
-                return isNaN(n) ? 0 : Math.round(n * 10) / 10;
-              })
-            : undefined;
-          return {
-            ...ex,
-            // Mantener compatibilidad con el backend actual en 'weight' (string)
-            weight: isPyr && weightsArray ? weightsArray.map(n => String(n)).join('-') : (ex.weight || ''),
-            // Nuevo campo con mayor flexibilidad para visualizaciones y cálculos
-            weightsPerSeries: weightsArray
-          };
-        })
+        exercises: routineData.exercises.map(ex => ({
+          ...ex,
+          // compatibilidad legacy con el backend
+          series: ex.weeks.week1.series,
+          reps: ex.weeks.week1.reps,
+          weight: ex.weeks.week1.peso,
+        })),
       };
-      const response = await trainerApi.createRoutine(payload);
-      console.log('Routine created successfully:', response.data);
-      setSuccessMessage('Rutina creada exitosamente!');
-      try {
-        localStorage.setItem(
-          'trainfit_trainingObjective_lastSelection',
-          JSON.stringify({ value: routineData.trainingObjective, timestamp: Date.now() })
-        );
-      } catch (e) {
-        console.warn('No se pudo guardar el objetivo en localStorage:', e);
-      }
-      setRoutineData({
-        name: '',
-        clientId: '',
-        duration: '',
-        notes: '',
-        exercises: [],
-        trainingObjective: '',
-      });
-      setPyramidalEnabled([]);
-      setOriginalReps([]);
-      setWeightsPerSeries([]);
-      setPercentPerExercise([]);
+      await trainerApi.createRoutine(payload);
+      setSuccessMessage('¡Rutina creada exitosamente!');
+      setRoutineData({ name: '', clientId: '', duration: '', notes: '', exercises: [], trainingObjective: '', totalWeeks: 4 });
+      setSearchTerms([]);
+      setShowDropdowns([]);
     } catch (err: any) {
-      console.error('Error creating routine:', err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(`Error al crear la rutina: ${err.response.data.message}`);
-      } else if (err.response && err.response.headers && err.response.headers['content-type']?.includes('text/html')) {
-        setError('Error de autenticación al crear la rutina. Por favor, inicia sesión de nuevo.');
-      }else {
-        setError('Error al crear la rutina. Intenta de nuevo más tarde.');
-      }
-    }
-  };
-
-  const renderClientOptions = () => {
-    if (!Array.isArray(clients) || clients.length === 0) {
-      return <option value="">No hay clientes disponibles o cargando...</option>;
-    }
-    return clients.map((client) => (
-      <option key={client.id} value={client.id}>
-        {client.name}
-      </option>
-    ));
-  };
-
-  const handleDashboardClick = () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/trainer-dashboard');
-    } else {
-      navigate('/');
+      setError(err?.response?.data?.message ? `Error: ${err.response.data.message}` : 'Error al crear la rutina. Intenta de nuevo.');
     }
   };
 
@@ -610,22 +316,19 @@ const CreateRoutinePage: React.FC = () => {
     const state: any = location.state || {};
     if (state.fromLibrary) {
       navigate('/trainer/routines/library', { state: { folder: state.folder } });
-      return;
+    } else {
+      navigate('/trainer-dashboard');
     }
-    handleDashboardClick();
   };
 
-  // Actualizar la sección de renderizado para mostrar las imágenes
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-[#ff4444]">
-              Crear Nueva Rutina
-            </h1>
-            <p className="text-gray-400 mt-2">Diseña una rutina personalizada para tu cliente</p>
+            <h1 className="text-4xl font-bold text-[#ff4444]">Crear Nueva Rutina</h1>
+            <p className="text-gray-400 mt-2">Diseñá una rutina personalizada para tu cliente</p>
           </div>
           <button
             onClick={handleBackClick}
@@ -636,82 +339,71 @@ const CreateRoutinePage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="bg-[#dc3545]/10 border border-[#dc3545]/30 text-[#dc3545] px-6 py-4 rounded-lg mb-6">
-            <div className="flex items-center">
-              <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <div>
-                <strong className="font-semibold">Error: </strong>
-                <span>{error}</span>
-              </div>
-            </div>
+          <div className="bg-[#dc3545]/10 border border-[#dc3545]/30 text-[#dc3545] px-6 py-4 rounded-lg mb-6 flex items-center gap-3">
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
 
         {successMessage && (
-          <div className="bg-[#28a745]/10 border border-[#28a745]/30 text-[#28a745] px-6 py-4 rounded-lg mb-6">
-            <div className="flex items-center">
-              <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <div>
-                <strong className="font-semibold">¡Éxito! </strong>
-                <span>{successMessage}</span>
-              </div>
-            </div>
+          <div className="bg-[#28a745]/10 border border-[#28a745]/30 text-[#28a745] px-6 py-4 rounded-lg mb-6 flex items-center gap-3">
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span>{successMessage}</span>
           </div>
         )}
 
-        <div className="bg-[#2a2a2a] rounded-2xl shadow-2xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Datos generales */}
+          <div className="bg-[#2a2a2a] rounded-2xl p-8">
+            <h2 className="text-xl font-bold text-white mb-6">Datos generales</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2" htmlFor="name">
-                  Nombre de la Rutina <span className="text-red-400">*</span>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  Nombre de la rutina <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
-                  id="name"
                   name="name"
                   value={routineData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
-                  placeholder="Ej: Rutina de Fuerza - Semana 1"
+                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all"
+                  placeholder="Ej: Día 2 - Piernas"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2" htmlFor="clientId">
+                <label className="block text-sm font-semibold text-gray-300 mb-2">
                   Cliente <span className="text-red-400">*</span>
                 </label>
                 <select
-                  id="clientId"
                   name="clientId"
                   value={routineData.clientId}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
+                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white focus:ring-2 focus:ring-[#ff4444] transition-all"
                   required
                 >
-                  <option value="" className="bg-gray-700">Selecciona un cliente</option>
-                  {renderClientOptions()}
+                  <option value="">Seleccioná un cliente</option>
+                  {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2" htmlFor="trainingObjective">
-                  Objetivo de entrenamiento <span className="text-red-400">*</span>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  Objetivo <span className="text-red-400">*</span>
                 </label>
                 <select
-                  id="trainingObjective"
                   name="trainingObjective"
                   value={routineData.trainingObjective}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
+                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white focus:ring-2 focus:ring-[#ff4444] transition-all"
                   required
                 >
-                  <option value="">Selecciona un objetivo</option>
+                  <option value="">Seleccioná un objetivo</option>
                   <option value="Fuerza">Fuerza</option>
                   <option value="Hipertrofia">Hipertrofia</option>
                   <option value="Fuerza resistencia">Fuerza resistencia</option>
@@ -724,297 +416,326 @@ const CreateRoutinePage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2" htmlFor="duration">
+                <label className="block text-sm font-semibold text-gray-300 mb-2">
                   Duración <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
-                  id="duration"
                   name="duration"
                   value={routineData.duration}
                   onChange={handleChange}
-                  placeholder="Ej: 45 minutos"
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
+                  placeholder="Ej: 60 minutos"
+                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] transition-all"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2" htmlFor="totalWeeks">
-                  Total de semanas
-                </label>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Total de semanas</label>
                 <input
                   type="number"
-                  id="totalWeeks"
                   name="totalWeeks"
                   min={1}
-                  value={typeof routineData.totalWeeks === 'number' ? routineData.totalWeeks : 4}
+                  max={4}
+                  value={routineData.totalWeeks ?? 4}
                   onChange={handleChange}
-                  placeholder="Ej: 4"
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
+                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2" htmlFor="notes">
-                  Notas
-                </label>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Notas generales</label>
                 <textarea
-                  id="notes"
                   name="notes"
                   value={routineData.notes}
                   onChange={handleChange}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm resize-none"
-                  placeholder="Notas adicionales sobre la rutina..."
+                  rows={1}
+                  className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] transition-all resize-none"
+                  placeholder="Notas sobre la rutina..."
                 />
               </div>
             </div>
+          </div>
 
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">Ejercicios</h3>
-                <div className="flex items-center gap-3 text-sm text-gray-300">
-                  <span className="font-semibold">Porcentaje por defecto:</span>
-                  <select
-                    value={defaultPercent}
-                    onChange={(e) => setDefaultPercent(parseFloat(e.target.value))}
-                    className="px-3 py-2 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white"
-                  >
-                    <option value={5}>5%</option>
-                    <option value={7.5}>7.5%</option>
-                    <option value={10}>10%</option>
-                  </select>
-                  <span className="text-xs text-gray-400">Los nuevos ejercicios heredan este valor.</span>
-                </div>
+          {/* Tabla de ejercicios */}
+          <div className="bg-[#2a2a2a] rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Ejercicios</h2>
+              <button
+                type="button"
+                onClick={addExercise}
+                className="bg-[#ff4444] hover:bg-[#ff3333] text-white font-semibold py-2.5 px-5 rounded-lg transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Agregar ejercicio
+              </button>
+            </div>
+
+            {routineData.exercises.length === 0 ? (
+              <div className="text-center py-16 text-gray-500">
+                <svg className="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <p className="text-lg">Hacé clic en "Agregar ejercicio" para empezar</p>
               </div>
-
-              {routineData.exercises.map((exercise, index) => (
-                <div key={exercise.id} className="bg-[#1a1a1a] border border-[#555555] rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-lg font-semibold text-white flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
-                        {index + 1}
-                      </div>
-                      Ejercicio {index + 1}
-                    </h4>
-                    <button
-                      type="button"
-                      onClick={() => removeExercise(index)}
-                      className="bg-[#dc3545]/20 hover:bg-[#dc3545] text-[#dc3545] hover:text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 border border-[#dc3545]/30 hover:border-[#dc3545]"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                    <div className="relative" ref={(el) => dropdownRefs.current[index] = el}>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
-                        Ejercicio <span className="text-red-400">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={searchTerms[index] || ''}
-                        onChange={(e) => handleSearchChange(index, e.target.value)}
-                        onFocus={() => {
-                          const newShowDropdowns = [...showDropdowns];
-                          newShowDropdowns[index] = true;
-                          setShowDropdowns(newShowDropdowns);
-                        }}
-                        placeholder="Escribe para buscar ejercicios..."
-                        className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
-                        required
-                      />
-                  
-                      {showDropdowns[index] && (
-                        <div className="absolute z-10 w-full bg-[#2a2a2a] border border-[#555555] rounded-lg shadow-lg max-h-60 overflow-y-auto mt-1">
-                          {getFilteredExercisesForIndex(index).length > 0 ? (
-                            getFilteredExercisesForIndex(index).map((ex) => (
-                              <div
-                                key={ex.id}
-                                onClick={() => selectExercise(index, ex)}
-                                className="px-4 py-3 hover:bg-[#333333] cursor-pointer border-b border-[#555555] last:border-b-0 text-white hover:text-[#ff4444] transition-all duration-200"
-                              >
-                                {ex.name}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="px-4 py-3 text-gray-400 text-sm">
-                              No se encontraron ejercicios
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {exercise.name && (
-                      <div className="col-span-1 md:col-span-2 lg:col-span-1">
-                        <p className="text-sm font-semibold text-gray-300 mb-2">Imagen del ejercicio:</p>
-                        <ExerciseImage
-                          exerciseName={exercise.name}
-                          width={300}
-                          height={200}
-                          className="rounded-xl shadow-lg border border-gray-600/30"
-                          alt={exercise.name}
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
-                        Series <span className="text-red-400">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="series"
-                        value={exercise.series}
-                        onChange={(e) => handleExerciseChange(index, e)}
-                        className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
-                        placeholder="Ej: 3"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
-                        Repeticiones <span className="text-red-400">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="reps"
-                        value={exercise.reps}
-                        onChange={(e) => handleExerciseChange(index, e)}
-                        className="w-full px-4 py-3 bg-[#2a2a2a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
-                        placeholder="Ej: 12"
-                        required
-                        disabled={pyramidalEnabled[index]}
-                      />
-                    </div>
-
-                    {/* Toggle piramidal y visualización de secuencia */}
-                    <div className="col-span-full flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => togglePyramidal(index)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${pyramidalEnabled[index] ? 'bg-[#ff4444] text-white border-[#ff4444]' : 'bg-[#1a1a1a] text-gray-200 border-[#555555] hover:bg-[#333333]'} `}
-                        aria-pressed={pyramidalEnabled[index] ? 'true' : 'false'}
-                        title="Repeticiones piramidales"
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse" style={{ minWidth: '1100px' }}>
+                  <thead>
+                    <tr className="text-xs font-semibold text-gray-400 uppercase">
+                      <th className="text-left py-3 px-2 w-8">#</th>
+                      <th className="text-left py-3 px-2" style={{ minWidth: '200px' }}>Ejercicio</th>
+                      <th className="text-left py-3 px-2" style={{ minWidth: '120px' }}>Nota</th>
+                      <th className="text-center py-3 px-2 border-l border-[#444]" style={{ minWidth: '70px' }}>
+                        <span className="text-orange-400">RPE</span>
+                      </th>
+                      {WEEK_LABELS.map((label, wi) => (
+                        <th key={wi} colSpan={3} className="text-center py-3 px-2 border-l border-[#444]" style={{ minWidth: '180px' }}>
+                          <span className="text-[#ff4444]">{label}</span>
+                        </th>
+                      ))}
+                      <th className="w-8"></th>
+                    </tr>
+                    <tr className="text-xs text-gray-500 border-b border-[#444]">
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th className="py-2 px-1 font-normal text-center border-l border-[#444]">1-10</th>
+                      {WEEK_KEYS.map((_, wi) => (
+                        <React.Fragment key={wi}>
+                          <th className={`py-2 px-1 font-normal text-center ${wi > 0 ? 'border-l border-[#444]' : ''}`}>Serie</th>
+                          <th className="py-2 px-1 font-normal text-center">Reps</th>
+                          <th className="py-2 px-1 font-normal text-center">Peso/Int</th>
+                        </React.Fragment>
+                      ))}
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {routineData.exercises.map((exercise, index) => (
+                      <tr
+                        key={exercise.id}
+                        className="border-b border-[#333] hover:bg-[#2f2f2f] transition-colors"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16M4 6h16M4 18h16" />
-                        </svg>
-                        Repeticiones piramidales {pyramidalEnabled[index] ? 'activadas' : 'desactivadas'}
-                      </button>
-                      {pyramidalEnabled[index] && (
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                          <span className="font-semibold">Secuencia:</span>
-                          {PYRAMIDAL_SEQUENCE.map((rep, i) => (
-                            <span key={`${index}-seq-${i}`} className="px-2 py-1 rounded bg-[#2a2a2a] border border-[#555555]">{rep}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                        {/* Número */}
+                        <td className="py-3 px-2 text-center">
+                          <span className="w-7 h-7 rounded-full bg-[#ff4444]/20 text-[#ff4444] text-xs font-bold flex items-center justify-center">
+                            {index + 1}
+                          </span>
+                        </td>
 
-                    <div className="col-span-full">
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
-                        {pyramidalEnabled[index] ? 'Peso por serie' : 'Peso'}
-                      </label>
-                      {pyramidalEnabled[index] ? (
-                        <div>
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
-                            {PYRAMIDAL_SEQUENCE.map((rep, i) => (
-                              <div key={`${index}-w-${i}`} className="flex flex-col">
-                                <span className="text-xs text-gray-400 mb-1">Serie {i + 1} ({rep} reps)</span>
-                                <input
-                                  type="text"
-                                  value={weightsPerSeries[index]?.[i] || ''}
-                                  onChange={(e) => handleSeriesWeightChange(index, i, e.target.value)}
-                                  className="w-full px-4 py-2.5 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
-                                  placeholder="Ej: 20"
-                                />
+                        {/* Ejercicio con buscador */}
+                        <td className="py-3 px-2">
+                          <div className="relative" ref={(el) => dropdownRefs.current[index] = el}>
+                            <input
+                              type="text"
+                              value={searchTerms[index] || ''}
+                              onChange={(e) => {
+                                setSearchTerms(prev => { const n = [...prev]; n[index] = e.target.value; return n; });
+                                setShowDropdowns(prev => { const n = [...prev]; n[index] = true; return n; });
+                              }}
+                              onFocus={() => setShowDropdowns(prev => { const n = [...prev]; n[index] = true; return n; })}
+                              placeholder="Buscar ejercicio..."
+                              className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#555] rounded-lg text-white text-sm placeholder-gray-500 focus:ring-1 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all"
+                            />
+                            {showDropdowns[index] && (
+                              <div className="absolute z-20 w-full bg-[#2a2a2a] border border-[#555] rounded-lg shadow-2xl max-h-48 overflow-y-auto mt-1">
+                                {getFilteredExercises(index).length > 0 ? (
+                                  getFilteredExercises(index).slice(0, 10).map((ex) => (
+                                    <div
+                                      key={ex.id}
+                                      onClick={() => selectExercise(index, ex)}
+                                      className="px-3 py-2 hover:bg-[#333] cursor-pointer border-b border-[#444] last:border-b-0 text-sm text-white hover:text-[#ff4444] transition-all flex items-center gap-2"
+                                    >
+                                      {ex.isCustom && <span className="text-yellow-400 text-xs">⭐</span>}
+                                      {ex.name}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="px-3 py-2 text-gray-400 text-sm">Sin resultados</div>
+                                )}
                               </div>
-                            ))}
+                            )}
                           </div>
-                          {(weightsPerSeries[index]?.[0] ?? '').toString().trim() !== '' && (
-                            <div className="flex items-center gap-3 mt-2">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-300">Incremento:</span>
-                                <select
-                                  value={percentPerExercise[index] ?? defaultPercent}
-                                  onChange={(e) => handlePercentChange(index, e.target.value)}
-                                  className="px-3 py-2 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white"
-                                >
-                                  <option value={5}>5%</option>
-                                  <option value={7.5}>7.5%</option>
-                                  <option value={10}>10%</option>
-                                </select>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => suggestWeights(index, percentPerExercise[index] ?? defaultPercent)}
-                                className="bg-[#1a1a1a] hover:bg-[#333333] text-gray-200 font-medium py-2 px-4 rounded-lg transition-all duration-300 border border-[#555555]"
-                                title={`Sugerir pesos por serie (+${percentPerExercise[index] ?? defaultPercent}% por serie)`}
-                              >
-                                Sugerir pesos
-                              </button>
+                          {/* Imagen pequeña si hay ejercicio seleccionado */}
+                          {exercise.name && (
+                            <div className="mt-2">
+                              {exercise.image_url && !exercise.image_url.includes('placeholder') ? (
+                                <img src={exercise.image_url} alt={exercise.name} className="rounded-md border border-[#444] opacity-80" style={{width:80,height:55,objectFit:'cover'}} />
+                              ) : (
+                                <ExerciseImage exerciseName={exercise.name} width={80} height={55} className="rounded-md border border-[#444] opacity-80" alt={exercise.name} />
+                              )}
                             </div>
                           )}
-                        </div>
-                      ) : (
-                        <input
-                          type="text"
-                          name="weight"
-                          value={exercise.weight || ''}
-                          onChange={(e) => handleExerciseChange(index, e)}
-                          className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
-                          placeholder="Ej: 20kg"
-                        />
-                      )}
-                    </div>
+                          {/* Link de video */}
+                          {exercise.video_url && (
+                            <a href={exercise.video_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-xs text-[#ff4444] hover:underline">
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              Ver video
+                            </a>
+                          )}
+                          {/* Campo para pegar video manualmente */}
+                          <input
+                            type="url"
+                            value={exercise.video_url || ''}
+                            onChange={(e) => {
+                              setRoutineData(prev => {
+                                const exercises = [...prev.exercises];
+                                exercises[index] = { ...exercises[index], video_url: e.target.value };
+                                return { ...prev, exercises };
+                              });
+                            }}
+                            placeholder="Link video (opcional)"
+                            className="mt-1 w-full px-2 py-1 bg-[#1a1a1a] border border-[#333] rounded text-xs text-gray-300 placeholder-gray-600 focus:ring-1 focus:ring-[#ff4444] transition-all"
+                          />
+                        </td>
 
-                    <div className="col-span-full">
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
-                        Notas del ejercicio
-                      </label>
-                      <textarea
-                        name="notes"
-                        value={exercise.notes || ''}
-                        onChange={(e) => handleExerciseChange(index, e)}
-                        rows={3}
-                        className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300 resize-none"
-                        placeholder="Notas adicionales sobre este ejercicio..."
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              <div className="flex justify-center">
+                        {/* Nota */}
+                        <td className="py-3 px-2">
+                          <textarea
+                            value={exercise.notes || ''}
+                            onChange={(e) => handleNoteChange(index, e.target.value)}
+                            placeholder="Nota..."
+                            rows={2}
+                            className="w-full px-2 py-1.5 bg-[#1a1a1a] border border-[#555] rounded-lg text-white text-xs placeholder-gray-500 focus:ring-1 focus:ring-[#ff4444] transition-all resize-none"
+                          />
+                          {/* Toggle piramidal */}
+                          <button
+                            type="button"
+                            onClick={() => setRoutineData(prev => {
+                              const exercises = [...prev.exercises];
+                              exercises[index] = { ...exercises[index], pyramidal: !exercises[index].pyramidal };
+                              return { ...prev, exercises };
+                            })}
+                            className={`mt-1 w-full text-xs py-1 px-2 rounded border transition-all ${
+                              exercise.pyramidal
+                                ? 'bg-orange-500/20 border-orange-500/50 text-orange-400'
+                                : 'bg-[#1a1a1a] border-[#444] text-gray-500 hover:text-gray-300'
+                            }`}
+                            title="Activar repeticiones piramidales"
+                          >
+                            {exercise.pyramidal ? '▲ Piramidal ON' : '▲ Piramidal'}
+                          </button>
+                        </td>
+
+                        {/* RPE */}
+                        <td className="py-3 px-1 border-l border-[#444] text-center">
+                          <select
+                            value={exercise.rpe || ''}
+                            onChange={(e) => setRoutineData(prev => {
+                              const exercises = [...prev.exercises];
+                              exercises[index] = { ...exercises[index], rpe: e.target.value };
+                              return { ...prev, exercises };
+                            })}
+                            className="w-full px-1 py-1.5 bg-[#1a1a1a] border border-[#444] rounded-md text-white text-center text-sm focus:ring-1 focus:ring-orange-400 transition-all"
+                          >
+                            <option value="">–</option>
+                            {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </select>
+                          {exercise.rpe && (
+                            <div className={`mt-1 text-xs font-semibold ${
+                              Number(exercise.rpe) >= 9 ? 'text-red-400' :
+                              Number(exercise.rpe) >= 7 ? 'text-orange-400' :
+                              Number(exercise.rpe) >= 5 ? 'text-yellow-400' : 'text-green-400'
+                            }`}>
+                              {Number(exercise.rpe) >= 9 ? 'Máximo' :
+                               Number(exercise.rpe) >= 7 ? 'Alto' :
+                               Number(exercise.rpe) >= 5 ? 'Moderado' : 'Suave'}
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Semanas */}
+                        {WEEK_KEYS.map((week, wi) => (
+                          <React.Fragment key={week}>
+                            <td className={`py-3 px-1 ${wi > 0 ? 'border-l border-[#444]' : ''}`}>
+                              <input
+                                type="text"
+                                value={exercise.weeks[week].series}
+                                onChange={(e) => handleWeekChange(index, week, 'series', e.target.value)}
+                                placeholder="–"
+                                className="w-full px-2 py-1.5 bg-[#1a1a1a] border border-[#444] rounded-md text-white text-center text-sm placeholder-gray-600 focus:ring-1 focus:ring-[#ff4444] transition-all"
+                              />
+                            </td>
+                            <td className="py-3 px-1">
+                              <input
+                                type="text"
+                                value={exercise.weeks[week].reps}
+                                onChange={(e) => handleWeekChange(index, week, 'reps', e.target.value)}
+                                placeholder={exercise.pyramidal ? 'ej: 12-10-8' : '–'}
+                                className={`w-full px-2 py-1.5 border rounded-md text-center text-sm transition-all focus:ring-1 ${
+                                  exercise.pyramidal
+                                    ? 'bg-orange-500/10 border-orange-500/40 text-orange-200 placeholder-orange-400/50 focus:ring-orange-400'
+                                    : 'bg-[#1a1a1a] border-[#444] text-white placeholder-gray-600 focus:ring-[#ff4444]'
+                                }`}
+                              />
+                            </td>
+                            <td className="py-3 px-1">
+                              <input
+                                type="text"
+                                value={exercise.weeks[week].peso}
+                                onChange={(e) => handleWeekChange(index, week, 'peso', e.target.value)}
+                                placeholder="–"
+                                className="w-full px-2 py-1.5 bg-[#1a1a1a] border border-[#444] rounded-md text-white text-center text-sm placeholder-gray-600 focus:ring-1 focus:ring-[#ff4444] transition-all"
+                              />
+                            </td>
+                          </React.Fragment>
+                        ))}
+
+                        {/* Eliminar */}
+                        <td className="py-3 px-2">
+                          <button
+                            type="button"
+                            onClick={() => removeExercise(index)}
+                            className="text-gray-500 hover:text-[#ff4444] transition-colors p-1 rounded"
+                            title="Eliminar ejercicio"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Botón agregar al pie de la tabla */}
+            {routineData.exercises.length > 0 && (
+              <div className="mt-4 flex justify-center">
                 <button
                   type="button"
                   onClick={addExercise}
-                  className="bg-[#ff4444] hover:bg-[#ff3333] text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-300 flex items-center gap-2"
+                  className="text-gray-400 hover:text-[#ff4444] text-sm flex items-center gap-2 py-2 px-4 border border-dashed border-[#444] hover:border-[#ff4444] rounded-lg transition-all"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  Agregar Ejercicio
+                  Agregar otro ejercicio
                 </button>
               </div>
-            </div>
+            )}
+          </div>
 
-            <div className="flex justify-end pt-6">
-              <button
-                type="submit"
-                className="bg-[#ff4444] hover:bg-[#ff3333] text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Crear Rutina
-              </button>
-            </div>
-          </form>
-        </div>
+          {/* Guardar */}
+          <div className="flex justify-end pb-8">
+            <button
+              type="submit"
+              className="bg-[#ff4444] hover:bg-[#ff3333] text-white font-bold py-4 px-10 rounded-lg transition-all flex items-center gap-2 text-lg"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Crear Rutina
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

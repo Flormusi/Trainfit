@@ -54,13 +54,16 @@ const AllRoutines = () => {
       setError('');
       
       const response = await trainerApi.getRoutines();
-      console.log('[AllRoutines] Rutinas recibidas:', response.data);
-      
-      if (!response.data || !Array.isArray(response.data)) {
+      console.log('[AllRoutines] Rutinas recibidas:', response);
+
+      // El backend puede devolver el array directo o { data: [...] }
+      const data = Array.isArray(response) ? response : response?.data;
+
+      if (!data || !Array.isArray(data)) {
         throw new Error('Formato de datos inválido recibido del servidor');
       }
 
-      setRoutines(response.data);
+      setRoutines(data);
       toast.success('Rutinas cargadas exitosamente');
     } catch (err: unknown) {
       console.error('[AllRoutines] Error al cargar las rutinas:', err);
@@ -146,11 +149,11 @@ const AllRoutines = () => {
       <header className="page-header">
         <div className="header-left">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/trainer/routines/library')}
             className="back-btn"
           >
             <ArrowLeftIcon className="btn-icon" />
-            Volver al dashboard
+            Volver a Biblioteca
           </button>
           <div className="page-title-section">
             <h1 className="page-title">

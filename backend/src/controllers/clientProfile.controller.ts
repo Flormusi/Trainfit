@@ -92,42 +92,44 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 // ✅ Crear o actualizar perfil del cliente
 export const createOrUpdateProfile = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, phone, goals, weight, medicalConditions, medications, injuries } = req.body;
-    
+    const { name, phone, goals, weight, medicalConditions, medications, injuries, initialObjective, trainingDaysPerWeek } = req.body;
+
     if (!req.user?.id) {
       res.status(401).json({ success: false, message: 'Usuario no autenticado' });
       return;
     }
 
-    if (!name) {
-      res.status(400).json({ success: false, message: 'El nombre es obligatorio' });
-      return;
-    }
-
-    console.log('🧾 Datos recibidos para guardar perfil:', {
-      name, phone, goals, weight, medicalConditions, medications, injuries
+    // Obtener el perfil existente para usar el nombre guardado si no viene en el body
+    const existingProfile = await prisma.clientProfile.findUnique({
+      where: { userId: req.user.id }
     });
+
+    const profileName = name || existingProfile?.name || req.user?.name || 'Sin nombre';
 
     const updatedProfile = await prisma.clientProfile.upsert({
       where: { userId: req.user.id },
       update: {
-        name,
-        phone,
-        goals,
-        weight: weight ? parseFloat(weight.toString()) : null,
-        medicalConditions,
-        medications,
-        injuries
+        name: profileName,
+        ...(phone !== undefined && { phone }),
+        ...(goals !== undefined && { goals }),
+        ...(weight !== undefined && { weight: weight ? parseFloat(weight.toString()) : null }),
+        ...(medicalConditions !== undefined && { medicalConditions }),
+        ...(medications !== undefined && { medications }),
+        ...(injuries !== undefined && { injuries }),
+        ...(initialObjective !== undefined && { initialObjective }),
+        ...(trainingDaysPerWeek !== undefined && { trainingDaysPerWeek: parseInt(trainingDaysPerWeek.toString()) }),
       },
       create: {
         userId: req.user.id,
-        name,
+        name: profileName,
         phone,
-        goals,
+        goals: goals || [],
         weight: weight ? parseFloat(weight.toString()) : null,
         medicalConditions,
         medications,
-        injuries
+        injuries,
+        initialObjective: initialObjective || 'Sin definir',
+        trainingDaysPerWeek: trainingDaysPerWeek ? parseInt(trainingDaysPerWeek.toString()) : 3,
       }
     });
 

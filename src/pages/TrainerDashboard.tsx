@@ -31,6 +31,9 @@ interface DashboardData {
   clientCount: number;
   routineCount: number;
   exerciseCount: number;
+  sessionsToday?: number;
+  overdueCount?: number;
+  averageProgress?: number;
 }
 
 interface Client {
@@ -38,6 +41,13 @@ interface Client {
   name: string;
   email: string;
   status?: "active" | "overdue";
+  clientProfile?: {
+    profileImage?: string;
+    initialObjective?: string;
+    goals?: string[];
+  };
+  assignedRoutines?: { id: string; name: string }[];
+  paymentStatus?: string;
 }
 
 const TrainerDashboard: React.FC = () => {
@@ -45,7 +55,8 @@ const TrainerDashboard: React.FC = () => {
   // Colocar en `true` para reactivar el botón en el dashboard.
   const SHOW_SECURITY = false;
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const trainerName = user?.name?.split(' ')[0] || 'Entrenador';
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     clientCount: 0,
     routineCount: 0,
@@ -57,6 +68,7 @@ const TrainerDashboard: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("week");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showRoutineManagement, setShowRoutineManagement] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,7 +98,7 @@ const TrainerDashboard: React.FC = () => {
 
       } catch (error) {
         console.error('Error fetching data:', error);
-        
+
         // Si hay error de autenticación, redirigir al login
         if ((error as any)?.response?.status === 401) {
           navigate('/login');
@@ -96,7 +108,17 @@ const TrainerDashboard: React.FC = () => {
       }
     };
 
+    const fetchUnreadMessages = async () => {
+      try {
+        const res = await api.get('/messages/unread-count');
+        setUnreadMessages(res.data?.unreadCount || 0);
+      } catch {
+        setUnreadMessages(0);
+      }
+    };
+
     fetchData();
+    fetchUnreadMessages();
   }, [navigate, selectedPeriod]);
 
   // Cálculos de métricas
@@ -133,7 +155,7 @@ const TrainerDashboard: React.FC = () => {
             TRAINFIT <Dumbbell className="logo-icon" />
           </h1>
           <div className="greeting">
-            <h2>¡Hola, Maga!</h2>
+            <h2>¡Hola, {trainerName}!</h2>
             <p>Aquí tienes un resumen de tu actividad</p>
           </div>
         </div>
@@ -164,15 +186,15 @@ const TrainerDashboard: React.FC = () => {
             <div className="card-content">
               <h3>Alumnos Activos</h3>
               <p className="card-number">{activeClients}</p>
-              <span className="variation positive">+5% esta semana</span>
+              <span className="info-text">{activeClients === 1 ? '1 alumno' : `${activeClients} alumnos`}</span>
             </div>
           </div>
           <div className="summary-card">
             <FireIcon className="card-icon" />
             <div className="card-content">
-              <h3>Sesiones Activas Hoy</h3>
-              <p className="card-number">{Math.floor(activeClients * 0.7)}</p>
-              <span className="info-text">Última: hace 2h</span>
+              <h3>Sesiones Hoy</h3>
+              <p className="card-number">{dashboardData?.sessionsToday ?? 0}</p>
+              <span className="info-text">{dashboardData?.sessionsToday ? 'Programadas hoy' : 'Sin sesiones hoy'}</span>
             </div>
           </div>
           <div className="summary-card">
@@ -181,7 +203,7 @@ const TrainerDashboard: React.FC = () => {
               <h3>Progreso Promedio</h3>
               <div className="progress-container">
                 <div className="progress-circle">
-                  <span className="progress-percentage">{activeClients > 0 ? 78 : 0}%</span>
+                  <span className="progress-percentage">{dashboardData?.averageProgress ?? 0}%</span>
                 </div>
               </div>
             </div>
@@ -190,8 +212,10 @@ const TrainerDashboard: React.FC = () => {
             <CreditCardIcon className="card-icon" />
             <div className="card-content">
               <h3>Cuotas Vencidas</h3>
-              <p className="card-number">{overduePayments}</p>
-              <span className="variation neutral">Todo al día</span>
+              <p className="card-number">{dashboardData?.overdueCount ?? overduePayments}</p>
+              <span className={dashboardData?.overdueCount ? 'variation negative' : 'variation neutral'}>
+                {dashboardData?.overdueCount ? `${dashboardData.overdueCount} vencida${dashboardData.overdueCount > 1 ? 's' : ''}` : 'Todo al día'}
+              </span>
             </div>
           </div>
           <div className="summary-card">
@@ -230,13 +254,29 @@ const TrainerDashboard: React.FC = () => {
             <BookOpenIcon className="action-icon" />
             Biblioteca de rutinas
           </button>
+          <button onClick={() => navigate('/trainer/exercises')} className="action-btn">
+            <BookOpenIcon className="action-icon" />
+            Mis ejercicios
+          </button>
           <button onClick={handleCalendarClick} className="action-btn">
             <CalendarIcon className="action-icon" />
             Calendario
           </button>
-          <button onClick={handleMessagesClick} className="action-btn">
+          <button onClick={handleMessagesClick} className="action-btn" style={{ position: 'relative' }}>
             <ChatBubbleLeftRightIcon className="action-icon" />
             Mensajes
+            {unreadMessages > 0 && (
+              <span style={{
+                position: 'absolute', top: 6, right: 6,
+                background: '#ef4444', color: '#fff',
+                borderRadius: '50%', width: 18, height: 18,
+                fontSize: 11, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                lineHeight: 1
+              }}>
+                {unreadMessages > 9 ? '9+' : unreadMessages}
+              </span>
+            )}
           </button>
           {/* Oculto intencionalmente: botón "Seguridad" desactivado en la UI.
               La ruta /trainer/security y su funcionalidad siguen activas.
@@ -248,6 +288,92 @@ const TrainerDashboard: React.FC = () => {
             </button>
           )}
         </div>
+      </section>
+
+      {/* Mis Alumnos */}
+      <section className="summary-section">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h2 className="section-title" style={{ margin: 0 }}>
+            <UsersIcon className="section-icon" />
+            Mis Alumnos
+          </h2>
+          <button
+            onClick={handleViewClientsClick}
+            style={{ background: 'none', border: '1px solid #444', color: '#aaa', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontSize: 13 }}
+          >
+            Ver todos →
+          </button>
+        </div>
+        {clients.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '32px 0', color: '#666' }}>
+            <p>No tenés alumnos aún.</p>
+            <button onClick={handleAddClientClick} className="action-btn primary" style={{ marginTop: 12, display: 'inline-flex' }}>
+              <PlusIcon className="action-icon" /> Agregar alumno
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+            {clients.map((client) => {
+              const hasRoutine = client.assignedRoutines && client.assignedRoutines.length > 0;
+              const objective = client.clientProfile?.initialObjective || (client.clientProfile?.goals?.[0]) || null;
+              const isOverdue = client.status === 'overdue';
+              const initials = (client.name || client.email || '?').split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
+              return (
+                <div
+                  key={client.id}
+                  onClick={() => navigate(`/trainer/clients/${client.id}`)}
+                  style={{
+                    background: '#1a1a2e', borderRadius: 14, padding: '18px 16px',
+                    cursor: 'pointer', border: '1px solid #2a2a3e',
+                    transition: 'border-color 0.2s',
+                    display: 'flex', flexDirection: 'column', gap: 10
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = '#dc2626')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#2a2a3e')}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {client.clientProfile?.profileImage ? (
+                      <img
+                        src={client.clientProfile.profileImage}
+                        alt={client.name}
+                        style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 44, height: 44, borderRadius: '50%', background: '#dc2626',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 700, fontSize: 16, color: '#fff', flexShrink: 0
+                      }}>
+                        {initials}
+                      </div>
+                    )}
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={{ fontWeight: 700, fontSize: 15, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {client.name || client.email}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {client.email}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {objective && (
+                      <div style={{ fontSize: 12, color: '#bbb' }}>
+                        🎯 <span>{objective}</span>
+                      </div>
+                    )}
+                    <div style={{ fontSize: 12, color: hasRoutine ? '#4ade80' : '#888' }}>
+                      {hasRoutine ? `📋 ${client.assignedRoutines![0].name}` : '📋 Sin rutina asignada'}
+                    </div>
+                    <div style={{ fontSize: 12, color: isOverdue ? '#ef4444' : '#4ade80' }}>
+                      {isOverdue ? '⚠️ Cuota vencida' : '✓ Pago al día'}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Gráficos */}
@@ -273,7 +399,7 @@ const TrainerDashboard: React.FC = () => {
               <p className="card-number">
                 {analyticsData?.routinesCreated || 0}
               </p>
-              <span className="variation positive">+12% vs periodo anterior</span>
+              {analyticsData?.routinesCreated ? <span className="variation positive">Este período</span> : <span className="info-text">Sin datos previos</span>}
             </div>
           </div>
           <div className="summary-card">
@@ -281,7 +407,7 @@ const TrainerDashboard: React.FC = () => {
             <div className="card-content">
               <h3>Nuevos Clientes</h3>
               <p className="card-number">{analyticsData?.newClients || 0}</p>
-              <span className="variation positive">+15% vs periodo anterior</span>
+              {analyticsData?.newClients ? <span className="variation positive">Este período</span> : <span className="info-text">Sin datos previos</span>}
             </div>
           </div>
           <div className="summary-card">
@@ -291,7 +417,7 @@ const TrainerDashboard: React.FC = () => {
               <p className="card-number">
                 {analyticsData?.progressUpdates || 0}
               </p>
-              <span className="variation positive">+8% actualizaciones</span>
+              {analyticsData?.progressUpdates ? <span className="variation positive">Este período</span> : <span className="info-text">Sin datos previos</span>}
             </div>
           </div>
         </div>

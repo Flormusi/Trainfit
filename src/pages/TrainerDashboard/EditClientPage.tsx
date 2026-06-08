@@ -18,7 +18,9 @@ const EditClientPage: React.FC = () => {
         trainingDaysPerWeek: '',
         medicalConditions: '',
         medications: '',
-        injuries: ''
+        injuries: '',
+        membershipTier: '',
+        nickname: ''
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -58,7 +60,9 @@ const EditClientPage: React.FC = () => {
                     trainingDaysPerWeek: (profile.trainingDaysPerWeek || clientData.trainingDaysPerWeek) ? (profile.trainingDaysPerWeek || clientData.trainingDaysPerWeek).toString() : '',
                     medicalConditions: profile.medicalConditions || clientData.medicalConditions || '',
                     medications: profile.medications || clientData.medications || '',
-                    injuries: profile.injuries || clientData.injuries || ''
+                    injuries: profile.injuries || clientData.injuries || '',
+                    membershipTier: profile.membershipTier || clientData.membershipTier || '',
+                    nickname: profile.nickname || clientData.nickname || ''
                 });
             } catch (err: any) {
                 console.error('Error loading client data:', err);
@@ -121,7 +125,9 @@ const EditClientPage: React.FC = () => {
                 trainingDaysPerWeek: formData.trainingDaysPerWeek ? parseInt(formData.trainingDaysPerWeek) : undefined,
                 medicalConditions: formData.medicalConditions,
                 medications: formData.medications,
-                injuries: formData.injuries
+                injuries: formData.injuries,
+                membershipTier: formData.membershipTier,
+                nickname: formData.nickname
             };
 
             console.log('📤 Datos a enviar:', clientData);
@@ -264,6 +270,21 @@ const EditClientPage: React.FC = () => {
                             </div>
 
                             <div>
+                                <label htmlFor="nickname" className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Apodo
+                                </label>
+                                <input
+                                    type="text"
+                                    id="nickname"
+                                    name="nickname"
+                                    value={formData.nickname}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#dc2626] focus:border-[#dc2626] transition-all duration-300"
+                                    placeholder="Ej: Flor, Pepe, Gonza..."
+                                />
+                            </div>
+
+                            <div>
                                 <label htmlFor="age" className="block text-sm font-semibold text-gray-300 mb-2">
                                     Edad
                                 </label>
@@ -361,6 +382,24 @@ const EditClientPage: React.FC = () => {
                                     className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#dc2626] focus:border-[#dc2626] transition-all duration-300"
                                     placeholder="1-7 días"
                                 />
+                            </div>
+
+                            <div>
+                                <label htmlFor="membershipTier" className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Plan de Entrenamiento
+                                </label>
+                                <select
+                                    id="membershipTier"
+                                    name="membershipTier"
+                                    value={formData.membershipTier}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555555] rounded-lg text-white focus:ring-2 focus:ring-[#dc2626] focus:border-[#dc2626] transition-all duration-300"
+                                >
+                                    <option value="">Sin asignar</option>
+                                    <option value="semipersonalizado">Entrenamiento semipersonalizado (Gym GEVD)</option>
+                                    <option value="grupal">Entrenamiento grupal (Plaza Arenales)</option>
+                                    <option value="distancia">Entrenamiento a distancia</option>
+                                </select>
                             </div>
                         </div>
 

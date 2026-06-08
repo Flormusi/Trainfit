@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGoogleCalendar } from '../../hooks/useGoogleCalendar';
 import './GoogleCalendarIntegration.css';
 
@@ -6,6 +6,8 @@ interface GoogleCalendarIntegrationProps {
   trainingSchedule?: any[];
   onSyncComplete?: () => void;
 }
+
+const SYNC_KEY = 'trainfit_synced_event_ids';
 
 const GoogleCalendarIntegration: React.FC<GoogleCalendarIntegrationProps> = ({
   trainingSchedule = [],
@@ -21,13 +23,46 @@ const GoogleCalendarIntegration: React.FC<GoogleCalendarIntegrationProps> = ({
     disconnect
   } = useGoogleCalendar();
 
+  const [syncedIds, setSyncedIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem(SYNC_KEY);
+      return saved ? new Set<string>(JSON.parse(saved) as string[]) : new Set<string>();
+    } catch { return new Set<string>(); }
+  });
+
+  // Calcular cuántos eventos todavía no fueron sincronizados
+  const pendingEvents = trainingSchedule.filter(ev => {
+    const key = ev.id ? String(ev.id) : String(ev.date);
+    return !syncedIds.has(key);
+  });
+
+  // Si cambia el trainingSchedule (ej: serverEvents se cargaron), limpiar IDs viejos que ya no existen
+  useEffect(() => {
+    const validKeys = new Set(trainingSchedule.map(ev => ev.id ? String(ev.id) : String(ev.date)));
+    setSyncedIds(prev => {
+      const filtered = new Set<string>(Array.from(prev).filter(id => validKeys.has(id)));
+      localStorage.setItem(SYNC_KEY, JSON.stringify(Array.from(filtered)));
+      return filtered;
+    });
+  }, [trainingSchedule.length]);
+
   const handleSync = async () => {
-    if (trainingSchedule.length === 0) {
-      alert('No hay entrenamientos programados para sincronizar');
+    if (pendingEvents.length === 0) {
+      alert('No hay entrenamientos nuevos para sincronizar');
       return;
     }
 
-    await syncTrainings(trainingSchedule);
+    await syncTrainings(pendingEvents);
+
+    // Marcar como sincronizados
+    const newSynced = new Set(syncedIds);
+    pendingEvents.forEach(ev => {
+      const key = ev.id ? String(ev.id) : String(ev.date);
+      newSynced.add(key);
+    });
+    setSyncedIds(newSynced);
+    localStorage.setItem(SYNC_KEY, JSON.stringify(Array.from(newSynced)));
+
     onSyncComplete?.();
   };
 
@@ -100,7 +135,9 @@ const GoogleCalendarIntegration: React.FC<GoogleCalendarIntegrationProps> = ({
               </p>
               {trainingSchedule.length > 0 && (
                 <p className="training-count">
-                  {trainingSchedule.length} entrenamientos listos para sincronizar
+                  {pendingEvents.length > 0
+                    ? `${pendingEvents.length} entrenamientos listos para sincronizar`
+                    : '✓ Todos los entrenamientos ya están sincronizados'}
                 </p>
               )}
             </div>
@@ -109,7 +146,7 @@ const GoogleCalendarIntegration: React.FC<GoogleCalendarIntegrationProps> = ({
               <button 
                 className="btn-sync"
                 onClick={handleSync}
-                disabled={isSyncing || trainingSchedule.length === 0}
+                disabled={isSyncing || pendingEvents.length === 0}
               >
                 {isSyncing ? (
                   <>

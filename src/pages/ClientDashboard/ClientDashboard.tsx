@@ -267,6 +267,11 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
     clientId?: string;
   }
   const [serverEvents, setServerEvents] = useState<CalendarEvent[]>([]);
+  const [gcalOpen, setGcalOpen] = useState(false);
+  const [requestChangeOpen, setRequestChangeOpen] = useState(false);
+  const [requestChangeMsg, setRequestChangeMsg] = useState('');
+  const [requestChangeSending, setRequestChangeSending] = useState(false);
+  const [trainerIdForMsg, setTrainerIdForMsg] = useState<string | null>(null);
   
   
   // Cargar eventos de Google Calendar cuando el usuario esté autenticado
@@ -541,6 +546,10 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           return;
         }
 
+        // Guardar el ID del entrenador para mensajes de solicitud de cambio
+        const firstTrainer = items.find((item: any) => item.userId);
+        if (firstTrainer?.userId) setTrainerIdForMsg(firstTrainer.userId);
+
         const mapped = items
           .map((item: any) => {
             const u = item.user || {};
@@ -792,7 +801,43 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
 
   // Función para solicitar cambio en el calendario
   const handleRequestChange = () => {
-    toast.info('Solicitud de cambio enviada al entrenador');
+    setRequestChangeMsg('');
+    setRequestChangeOpen(true);
+  };
+
+  const handleSendRequestChange = async () => {
+    if (!requestChangeMsg.trim()) {
+      toast.error('Escribí tu mensaje antes de enviar');
+      return;
+    }
+    setRequestChangeSending(true);
+    try {
+      let receiverId = trainerIdForMsg;
+      // Si no tenemos el ID del entrenador, intentar obtenerlo de conversaciones
+      if (!receiverId) {
+        const convRes = await axios.get('/messages/conversations');
+        const convItems: any[] = Array.isArray(convRes.data) ? convRes.data : (convRes.data?.data ?? []);
+        const firstTrainer = convItems.find((item: any) => item.userId);
+        if (firstTrainer?.userId) {
+          receiverId = firstTrainer.userId;
+          setTrainerIdForMsg(firstTrainer.userId);
+        }
+      }
+      if (!receiverId) {
+        toast.error('No se encontró el entrenador. Asegurate de tener conversaciones previas.');
+        setRequestChangeSending(false);
+        return;
+      }
+      const fullMsg = `📅 Solicitud de cambio de horario:\n${requestChangeMsg.trim()}`;
+      await axios.post('/messages/send', { receiverId, content: fullMsg });
+      toast.success('Solicitud enviada al entrenador ✓');
+      setRequestChangeOpen(false);
+      setRequestChangeMsg('');
+    } catch (e: any) {
+      toast.error('Error al enviar la solicitud');
+    } finally {
+      setRequestChangeSending(false);
+    }
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1038,14 +1083,12 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           {/* Rutina del Mes */}
           <div className="dashboard-section routine-overview">
             <div className="card main-routine-card bg-[#1e1e1e] rounded-xl p-6 shadow-md">
-              <h2>💪 TU RUTINA DEL MES</h2>
-              {!isLoadingRoutines && assignedRoutines.length > 0 ? (
-                <div className="routine-content">
-                  <div className="routine-name">{assignedRoutines[0]?.name}</div>
-                  <div className="routine-objective text-gray-400">🎯 Objetivo: {assignedRoutines[0]?.description || 'Objetivo no especificado'}</div>
-                  <div className="routine-week-progress text-gray-400">📅 Rutina activa</div>
-                  <button 
-                    className="routine-details-btn bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg" 
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <h2 style={{ margin: 0 }}>💪 TU RUTINA</h2>
+                {!isLoadingRoutines && assignedRoutines.length > 0 && (
+                  <button
+                    className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-4 py-2 rounded-lg"
+                    style={{ fontSize: 13 }}
                     onClick={() => {
                       setSelectedRoutine(assignedRoutines[0]);
                       setShowRoutineModal(true);
@@ -1053,20 +1096,71 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                   >
                     Ver detalles
                   </button>
-                  </div>
-                ) : isLoadingRoutines ? (
-                  <div className="routine-content">
-                    <div className="routine-name">Cargando rutina...</div>
-                    <div className="routine-objective text-gray-400">⏳ Obteniendo información</div>
-                  </div>
-                ) : (
-                  <div className="routine-content">
-                    <div className="routine-name">No hay rutinas asignadas</div>
-                    <div className="routine-objective text-gray-400">📞 Contacta a tu entrenador para que te asigne una rutina</div>
-                  </div>
                 )}
               </div>
+
+              {isLoadingRoutines ? (
+                <div className="routine-content">
+                  <div className="routine-name">Cargando rutina...</div>
+                </div>
+              ) : assignedRoutines.length > 0 ? (
+                <div>
+                  {/* Nombre de rutina */}
+                  <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
+                    {assignedRoutines[0]?.name}
+                  </div>
+                  {/* Objetivo solo si está definido */}
+                  {assignedRoutines[0]?.description && (
+                    <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 12 }}>
+                      🎯 {assignedRoutines[0].description}
+                    </div>
+                  )}
+
+                  {/* Preview de ejercicios */}
+                  {(() => {
+                    const exercises: any[] = assignedRoutines[0]?.exercises || [];
+                    const preview = exercises.slice(0, 5);
+                    if (preview.length === 0) return null;
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {preview.map((ex: any, i: number) => {
+                          const week1 = ex.weeks?.week1;
+                          const series = week1?.series || ex.series || ex.sets || '';
+                          const reps = week1?.reps || ex.reps || '';
+                          return (
+                            <div key={i} style={{
+                              display: 'flex', alignItems: 'center', gap: 10,
+                              background: '#111', borderRadius: 8, padding: '7px 10px',
+                            }}>
+                              {ex.image_url && (
+                                <img src={ex.image_url} alt={ex.name} style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }} />
+                              )}
+                              <span style={{ flex: 1, fontSize: 13, color: '#e5e7eb', fontWeight: 500 }}>{ex.name}</span>
+                              {(series || reps) && (
+                                <span style={{ fontSize: 12, color: '#6b7280', flexShrink: 0 }}>
+                                  {series && `${series}×`}{reps}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {exercises.length > 5 && (
+                          <div style={{ fontSize: 12, color: '#6b7280', textAlign: 'center', paddingTop: 2 }}>
+                            +{exercises.length - 5} ejercicios más
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              ) : (
+                <div className="routine-content">
+                  <div className="routine-name" style={{ color: '#9ca3af' }}>No hay rutinas asignadas</div>
+                  <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Contactá a tu entrenador para que te asigne una rutina</div>
+                </div>
+              )}
             </div>
+          </div>
 
           {/* Calendario de Entrenamientos */}
           <div className="dashboard-section training-calendar">
@@ -1229,13 +1323,38 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
             </div>
           </div>
 
-          {/* Integración Google Calendar */}
-          <GoogleCalendarIntegration 
-            trainingSchedule={mockTrainingSchedule}
-            onSyncComplete={() => {
-              toast.success('Entrenamientos sincronizados con Google Calendar');
-            }}
-          />
+          {/* Integración Google Calendar — colapsada */}
+          <div style={{ marginTop: 8 }}>
+            <button
+              onClick={() => setGcalOpen(o => !o)}
+              style={{
+                width: '100%', background: '#1e1e1e', border: '1px solid #2a2a2a',
+                borderRadius: 10, padding: '10px 16px', color: '#9ca3af',
+                fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}
+            >
+              <span>📆 Integración Google Calendar</span>
+              <span>{gcalOpen ? '▲' : '▼'}</span>
+            </button>
+            {gcalOpen && (
+              <div style={{ marginTop: 4 }}>
+                <GoogleCalendarIntegration
+                  trainingSchedule={serverEvents.map((ev, i) => ({
+                    id: i + 1,
+                    date: ev.start,
+                    type: ev.title || (ev.type === 'session' ? 'Sesión' : ev.type === 'consultation' ? 'Consulta' : 'Entrenamiento'),
+                    hour: ev.start.getHours(),
+                    minute: ev.start.getMinutes(),
+                    duration: Math.max(1, (ev.end.getTime() - ev.start.getTime()) / 3600000),
+                    exercises: [],
+                    location: 'Gimnasio TrainFit'
+                  }))}
+                  onSyncComplete={() => toast.success('Entrenamientos sincronizados con Google Calendar')}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="dashboard-right-column">
@@ -1564,6 +1683,68 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           onClose={() => setShowPaymentHistoryModal(false)}
           paymentHistory={paymentHistory}
         />
+      )}
+
+      {/* Modal de Solicitud de Cambio de Horario */}
+      {requestChangeOpen && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(0,0,0,0.55)', display: 'flex',
+            alignItems: 'center', justifyContent: 'center'
+          }}
+          onClick={() => setRequestChangeOpen(false)}
+        >
+          <div
+            style={{
+              background: '#fff', borderRadius: 16, padding: '28px 28px 24px',
+              maxWidth: 440, width: '90%', boxShadow: '0 8px 40px rgba(0,0,0,0.18)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ margin: '0 0 6px', fontSize: 18, fontWeight: 700, color: '#1a1a2e' }}>
+              📅 Solicitar cambio de horario
+            </h3>
+            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#666' }}>
+              Contale a tu entrenador qué necesitás cambiar: si no podés ir, necesitás otro horario, día u otra aclaración.
+            </p>
+            <textarea
+              value={requestChangeMsg}
+              onChange={(e) => setRequestChangeMsg(e.target.value)}
+              placeholder="Ej: No puedo ir el martes, ¿podemos cambiar al miércoles a las 18hs?"
+              style={{
+                width: '100%', minHeight: 110, border: '1.5px solid #ddd',
+                borderRadius: 10, padding: '10px 12px', fontSize: 14,
+                resize: 'vertical', outline: 'none', fontFamily: 'inherit',
+                boxSizing: 'border-box'
+              }}
+              autoFocus
+            />
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+              <button
+                onClick={() => setRequestChangeOpen(false)}
+                style={{
+                  padding: '9px 20px', borderRadius: 8, border: '1.5px solid #ddd',
+                  background: '#f5f5f5', cursor: 'pointer', fontSize: 14, fontWeight: 600
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSendRequestChange}
+                disabled={requestChangeSending}
+                style={{
+                  padding: '9px 22px', borderRadius: 8, border: 'none',
+                  background: 'linear-gradient(90deg, #dc2626, #b91c1c)',
+                  color: '#fff', cursor: requestChangeSending ? 'not-allowed' : 'pointer',
+                  fontSize: 14, fontWeight: 700, opacity: requestChangeSending ? 0.7 : 1
+                }}
+              >
+                {requestChangeSending ? 'Enviando...' : 'Enviar solicitud'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -65,7 +65,9 @@ export const addClientByTrainer = async (req: Request, res: Response): Promise<v
     trainingDaysPerWeek,
     medicalConditions,
     medications,
-    injuries
+    injuries,
+    membershipTier,
+    nickname
   } = req.body;
 
   if (!req.user) {
@@ -124,7 +126,9 @@ export const addClientByTrainer = async (req: Request, res: Response): Promise<v
       trainingDaysPerWeek: trainingDaysPerWeek ? parseInt(trainingDaysPerWeek.toString(), 10) : 3,
       medicalConditions,
       medications,
-      injuries
+      injuries,
+      ...(membershipTier && { membershipTier }),
+      ...(nickname && { nickname })
     };
 
     const newClient = await prisma.user.create({
@@ -402,7 +406,7 @@ export const getClientRoutines = async (req: Request, res: Response) => {
 
         // Buscar rutinas directas
         const directRoutines = await prisma.routine.findMany({
-          where: { 
+          where: {
             clientId: clientId
           },
           include: {
@@ -413,6 +417,9 @@ export const getClientRoutines = async (req: Request, res: Response) => {
                 email: true,
                 role: true
               }
+            },
+            _count: {
+              select: { progress: true }
             }
           }
         });
@@ -440,6 +447,9 @@ export const getClientRoutines = async (req: Request, res: Response) => {
                     email: true,
                     role: true
                   }
+                },
+                _count: {
+                  select: { progress: true }
                 }
               }
             },

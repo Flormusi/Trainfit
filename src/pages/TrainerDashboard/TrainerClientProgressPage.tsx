@@ -75,6 +75,7 @@ interface ClientInfo {
     weight?: number;
     height?: number;
     phone?: string;
+    trainingDaysPerWeek?: number;
   };
 }
 
@@ -341,13 +342,21 @@ const TrainerClientProgressPage: React.FC = () => {
     return `Semana ${Math.min(currentWeek, totalWeeks)}/${totalWeeks}`;
   };
 
-  // Progreso general: usa rutina activa o la más reciente
+  // Progreso general: calcula % en base a los registros de progreso de la rutina activa
   const getOverallProgress = () => {
     if (!routines || routines.length === 0) return 0;
     const active = routines.find(r => r.status === 'active');
-    const target = active || [...routines].sort((a, b) => new Date(b.assignedDate).getTime() - new Date(a.assignedDate).getTime())[0];
-    const p = Number(target?.progress) || 0;
-    return Math.max(0, Math.min(100, Math.round(p)));
+    const target = active || [...routines].sort((a, b) =>
+      new Date((b as any).assignedDate || (b as any).createdAt || 0).getTime() - new Date((a as any).assignedDate || (a as any).createdAt || 0).getTime()
+    )[0];
+    if (!target) return 0;
+
+    // Si el backend devuelve _count.progress, calcular % sobre 4 semanas × días por semana
+    const logged = (target as any)?._count?.progress ?? Number((target as any)?.progress) ?? 0;
+    if (logged === 0) return 0;
+    const daysPerWeek = client?.clientProfile?.trainingDaysPerWeek ?? 3;
+    const expected = daysPerWeek * 4; // 4 semanas
+    return Math.min(100, Math.round((logged / expected) * 100));
   };
 
   const getProgressColor = (p: number) => {
@@ -1346,12 +1355,21 @@ const TrainerClientProgressPage: React.FC = () => {
                       </div>
                     )}
                     <div style={{ margin: '6px 0 12px 0' }}>
-                      <div style={{ color: '#dc2626', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
-                        Progreso: {routine.progress || 0}%
-                      </div>
-                      <div style={{ width: '100%', height: '6px', background: '#3a3a3a', borderRadius: '999px', overflow: 'hidden' }}>
-                        <div style={{ width: `${Math.min(Math.max(Number(routine.progress) || 0, 0), 100)}%`, height: '100%', background: '#dc2626' }} />
-                      </div>
+                      {(() => {
+                        const logged = (routine as any)?._count?.progress ?? Number((routine as any)?.progress) ?? 0;
+                        const daysPerWeek = client?.clientProfile?.trainingDaysPerWeek ?? 3;
+                        const pct = Math.min(100, Math.round((logged / (daysPerWeek * 4)) * 100));
+                        return (
+                          <>
+                            <div style={{ color: '#dc2626', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
+                              Progreso: {pct}% {logged > 0 && <span style={{ color: '#aaa', fontWeight: 400 }}>({logged} registros)</span>}
+                            </div>
+                            <div style={{ width: '100%', height: '6px', background: '#3a3a3a', borderRadius: '999px', overflow: 'hidden' }}>
+                              <div style={{ width: `${pct}%`, height: '100%', background: pct >= 80 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#dc2626' }} />
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                     
                     {routine.exercises && routine.exercises.length > 0 && (

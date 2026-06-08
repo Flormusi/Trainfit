@@ -14,6 +14,7 @@ interface ClientData {
     weight?: number;
     bodyFat?: number;
     membershipTier?: string;
+    nickname?: string;
     medicalConditions?: string;
     medications?: string;
     injuries?: string;
@@ -43,16 +44,19 @@ const clientService = {
 
         // Normalizar la forma de salida: devolver SIEMPRE un array de clientes
         const data = response.data;
+        let rawClients: any[] = [];
         if (data && data.data && Array.isArray(data.data.clients)) {
-            return data.data.clients;
+            rawClients = data.data.clients;
+        } else if (Array.isArray(data)) {
+            rawClients = data;
+        } else if (data && Array.isArray(data.clients)) {
+            rawClients = data.clients;
         }
-        if (Array.isArray(data)) {
-            return data;
-        }
-        if (data && Array.isArray(data.clients)) {
-            return data.clients;
-        }
-        return [];
+        // Aplanar membershipTier del perfil al nivel del cliente
+        return rawClients.map((c: any) => ({
+            ...c,
+            membership_tier: c.membership_tier ?? c.clientProfile?.membershipTier ?? null
+        }));
     },
 
     async deleteClient(clientId: string | number) {

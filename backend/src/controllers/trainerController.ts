@@ -92,7 +92,7 @@ export const updateClientInfo = async (req: Request, res: Response): Promise<voi
     }
 
     const { clientId } = req.params;
-    const { phone, weight, height, age, gender, fitnessLevel, goals, initialObjective, trainingDaysPerWeek, medicalConditions, medications, injuries } = req.body;
+    const { phone, weight, height, age, gender, fitnessLevel, goals, initialObjective, trainingDaysPerWeek, medicalConditions, medications, injuries, membershipTier, nickname } = req.body;
 
     console.log('=== updateClientInfo called ===');
     console.log('Trainer ID:', user.id);
@@ -131,6 +131,8 @@ export const updateClientInfo = async (req: Request, res: Response): Promise<voi
     if (medicalConditions !== undefined) updateData.medicalConditions = medicalConditions;
     if (medications !== undefined) updateData.medications = medications;
     if (injuries !== undefined) updateData.injuries = injuries;
+    if (membershipTier !== undefined) updateData.membershipTier = membershipTier || null;
+    if (nickname !== undefined) updateData.nickname = nickname?.trim() || null;
 
     console.log('Prepared update data:', updateData);
 
@@ -183,7 +185,9 @@ export const updateClientInfo = async (req: Request, res: Response): Promise<voi
             trainingDaysPerWeek: true,
             medicalConditions: true,
             medications: true,
-            injuries: true
+            injuries: true,
+            membershipTier: true,
+            nickname: true
           }
         }
       }
@@ -405,7 +409,12 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
 
     const currentTrainerId = user.id;
 
-    const [clientCount, routineCount, exerciseCount] = await Promise.all([
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const [clientCount, routineCount, exerciseCount, sessionsToday, overdueCount, clients] = await Promise.all([
       prisma.user.count({
         where: {
           role: Role.CLIENT,
@@ -417,13 +426,37 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
       }),
       prisma.exercise.count({
         where: { trainerId: currentTrainerId }
+      }),
+      prisma.appointment.count({
+        where: {
+          trainerId: currentTrainerId,
+          startTime: { gte: todayStart, lte: todayEnd },
+          status: { not: 'CANCELLED' }
+        }
+      }),
+      Promise.resolve(0), // overdueCount: Payment model doesn't link to trainer directly
+      prisma.user.findMany({
+        where: {
+          role: Role.CLIENT,
+          trainersAsClient: { some: { trainerId: currentTrainerId } }
+        },
+        include: { clientProfile: { select: { weight: true } } }
       })
     ]);
+
+    // Progreso promedio: porcentaje de clientes con peso registrado
+    const clientsWithProfile = clients.filter(c => c.clientProfile?.weight);
+    const averageProgress = clients.length > 0
+      ? Math.round((clientsWithProfile.length / clients.length) * 100)
+      : 0;
 
     res.status(200).json({
       clientCount,
       routineCount,
-      exerciseCount
+      exerciseCount,
+      sessionsToday,
+      overdueCount,
+      averageProgress
     });
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
@@ -829,6 +862,84 @@ export const getAnalytics = async (req: Request, res: Response): Promise<void> =
   } catch (error) {
     console.error('Error fetching analytics:', error);
     res.status(500).json({ message: 'Internal server error while fetching analytics' });
+  }
+};
+
+// Charts data: real monthly data for dashboard charts
+export const getChartsData = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = req.user;
+    if (!user?.id) {
+      res.status(401).json({ message: 'User not authenticated' });
+      return;
+    }
+
+    const trainerId = user.id;
+    const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const now = new Date();
+
+    // Últimos 6 meses
+    const months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+      return { label: MONTHS[d.getMonth()], year: d.getFullYear(), month: d.getMonth() };
+    });
+
+    // Progreso (entrenamientos completados) por mes
+    const progressByMonth = await Promise.all(months.map(m =>
+      prisma.progress.count({
+        where: {
+          routine: { trainerId },
+          date: {
+            gte: new Date(m.year, m.month, 1),
+            lt: new Date(m.year, m.month + 1, 1)
+          }
+        }
+      })
+    ));
+
+    // Nuevos clientes por mes (via TrainerClient)
+    const newClientsByMonth = await Promise.all(months.map(m =>
+      prisma.trainerClient.count({
+        where: {
+          trainerId,
+          createdAt: {
+            gte: new Date(m.year, m.month, 1),
+            lt: new Date(m.year, m.month + 1, 1)
+          }
+        }
+      })
+    ));
+
+    // Peso actual de cada cliente
+    const clients = await prisma.user.findMany({
+      where: {
+        role: Role.CLIENT,
+        trainersAsClient: { some: { trainerId } }
+      },
+      include: { clientProfile: { select: { weight: true } } }
+    });
+
+    const weightData = clients
+      .filter(c => c.clientProfile?.weight)
+      .map(c => ({
+        name: c.name?.split(' ')[0] || c.email?.split('@')[0] || 'Cliente',
+        peso: c.clientProfile!.weight
+      }));
+
+    const trainingsData = months.map((m, i) => ({
+      month: m.label,
+      entrenamientos: progressByMonth[i]
+    }));
+
+    const clientsData = months.map((m, i) => ({
+      month: m.label,
+      nuevos: newClientsByMonth[i]
+    }));
+
+    res.status(200).json({ weightData, trainingsData, clientsData });
+  } catch (error) {
+    console.error('Error fetching charts data:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 

@@ -41,7 +41,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 }) => {
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [loading, setLoading] = useState(false);
-  const [editedExercises, setEditedExercises] = useState<{ [key: string]: { weight?: number; sets?: number; reps?: number } }>({});
+  const [editedExercises, setEditedExercises] = useState<{ [key: string]: { weight?: number; sets?: number; reps?: number; rpe?: number } }>({});
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     }
   };
 
-  const handleExerciseEdit = (exerciseId: string, field: 'weight' | 'sets' | 'reps', value: number) => {
+  const handleExerciseEdit = (exerciseId: string, field: 'weight' | 'sets' | 'reps' | 'rpe', value: number) => {
     setEditedExercises(prev => ({
       ...prev,
       [exerciseId]: {
@@ -647,12 +647,12 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                         </div>
                       )}
 
-                      {/* Client weight input */}
+                      {/* Client weight + RPE input */}
                       <div style={{
                         borderTop: '1px solid #222',
                         padding: '12px 14px',
                         background: '#0d1117',
-                        display: 'flex', alignItems: 'center', gap: 10,
+                        display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap'
                       }}>
                         <span style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>
                           💪 Mi peso:
@@ -665,14 +665,34 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                           onChange={(e) => handleExerciseEdit(exercise.id, 'weight', parseFloat(e.target.value))}
                           placeholder="ej: 20"
                           style={{
-                            flex: 1, background: '#1a1a1a', border: '1px solid #dc262650',
+                            background: '#1a1a1a', border: '1px solid #dc262650',
                             borderRadius: 8, color: '#fff', padding: '8px 12px', fontSize: 14,
-                            outline: 'none', maxWidth: 100,
+                            outline: 'none', width: 80,
                           }}
                         />
                         <span style={{ color: '#6b7280', fontSize: 13 }}>kg</span>
+
+                        <span style={{ color: '#f97316', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap', marginLeft: 8 }}>
+                          🔥 RPE:
+                        </span>
+                        <select
+                          value={editedExercises[exercise.id]?.rpe ?? ''}
+                          onChange={(e) => handleExerciseEdit(exercise.id, 'rpe', parseInt(e.target.value))}
+                          style={{
+                            background: '#1a1a1a', border: '1px solid #f9741650',
+                            borderRadius: 8, color: '#fff', padding: '8px 10px', fontSize: 14,
+                            outline: 'none', width: 80,
+                          }}
+                        >
+                          <option value="">-</option>
+                          {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </select>
+                        <span style={{ color: '#6b7280', fontSize: 11 }}>(1=fácil · 10=máximo)</span>
+
                         {myWeight !== undefined && (
-                          <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>✓ Guardado</span>
+                          <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>✓</span>
                         )}
                       </div>
                     </div>

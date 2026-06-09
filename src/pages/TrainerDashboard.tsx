@@ -45,6 +45,8 @@ interface Client {
     profileImage?: string;
     initialObjective?: string;
     goals?: string[];
+    nickname?: string;
+    membershipTier?: string;
   };
   assignedRoutines?: { id: string; name: string }[];
   paymentStatus?: string;
@@ -337,6 +339,7 @@ const TrainerDashboard: React.FC = () => {
                         src={client.clientProfile.profileImage}
                         alt={client.name}
                         style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                       />
                     ) : (
                       <div style={{
@@ -350,10 +353,23 @@ const TrainerDashboard: React.FC = () => {
                     <div style={{ overflow: 'hidden' }}>
                       <div style={{ fontWeight: 700, fontSize: 15, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {client.name || client.email}
+                        {client.clientProfile?.nickname && (
+                          <span style={{ color: '#dc2626', fontStyle: 'italic', fontWeight: 500, fontSize: 13, marginLeft: 6 }}>
+                            "{client.clientProfile.nickname}"
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {client.email}
                       </div>
+                      {client.clientProfile?.membershipTier && (
+                        <div style={{ fontSize: 11, color: '#dc2626', fontWeight: 600, marginTop: 2 }}>
+                          {client.clientProfile.membershipTier === 'semipersonalizado' ? 'Semipersonalizado' :
+                           client.clientProfile.membershipTier === 'grupal' ? 'Grupal' :
+                           client.clientProfile.membershipTier === 'distancia' ? 'A distancia' :
+                           client.clientProfile.membershipTier}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

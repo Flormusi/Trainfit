@@ -1678,9 +1678,23 @@ const TrainerClientProgressPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>
-                No hay información de pagos disponible.
-              </p>
+              <div style={{ textAlign: 'center', padding: '20px' }}>
+                <p style={{ color: '#6b7280', marginBottom: 16 }}>No hay información de pagos disponible.</p>
+                <button
+                  onClick={() => {
+                    setEditPaymentAmount('');
+                    setEditPaymentDueDate(new Date().toISOString().split('T')[0]);
+                    setIsEditPaymentModalOpen(true);
+                  }}
+                  style={{
+                    background: '#dc2626', color: 'white', border: 'none',
+                    borderRadius: 8, padding: '10px 20px', cursor: 'pointer',
+                    fontWeight: 600, fontSize: 14
+                  }}
+                >
+                  ✏️ Agregar información de pago
+                </button>
+              </div>
             )}
           </div>
         </div>

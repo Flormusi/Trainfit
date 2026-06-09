@@ -1470,14 +1470,14 @@ const TrainerClientProgressPage: React.FC = () => {
                         🗑️ Eliminar
                       </button>
                       <button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          const subject = encodeURIComponent(`Rutina asignada: ${routine.name}`);
-                          const body = encodeURIComponent(
-                            `Hola ${client?.name || ''},\n\nTe comparto la rutina "${routine.name}".\n\n¡Éxitos!\nEquipo TrainFit`
-                          );
-                          const email = client?.email || '';
-                          window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                          try {
+                            await trainerApi.resendRoutineEmail(clientId!, routine.id);
+                            toast.success('Email enviado correctamente');
+                          } catch {
+                            toast.error('Error al enviar el email');
+                          }
                         }}
                         style={{
                           display: 'flex',

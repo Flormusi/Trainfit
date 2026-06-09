@@ -647,6 +647,11 @@ export const clientApi = {
     return response.data;
   },
   
+  getMyPaymentHistory: async () => {
+    const response = await axios.get('/payments/my-history');
+    return response.data;
+  },
+
   getPaymentStatus: async () => {
     const response = await axios.get('/clients/payment-status');
     return response.data;

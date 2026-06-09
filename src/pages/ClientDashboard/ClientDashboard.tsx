@@ -888,22 +888,17 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
     }
   };
 
-  const handleViewPaymentHistory = () => {
-    // Siempre inicializar el historial con los montos correctos (9 x 40.000, 3 x 45.000)
-    setPaymentHistory([
-      { id: '1', date: '2025-12-04T12:00:00', description: 'Cuota mensual - Diciembre 2025', amount: 45000, status: 'pending', method: 'Transferencia bancaria' },
-      { id: '2', date: '2025-11-04T12:00:00', description: 'Cuota mensual - Noviembre 2025', amount: 45000, status: 'pending', method: 'Efectivo' },
-      { id: '3', date: '2025-10-04T12:00:00', description: 'Cuota mensual - Octubre 2025', amount: 45000, status: 'paid', method: 'Transferencia bancaria' },
-      { id: '4', date: '2025-09-04T12:00:00', description: 'Cuota mensual - Septiembre 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
-      { id: '5', date: '2025-08-04T12:00:00', description: 'Cuota mensual - Agosto 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
-      { id: '6', date: '2025-07-04T12:00:00', description: 'Cuota mensual - Julio 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
-      { id: '7', date: '2025-06-04T12:00:00', description: 'Cuota mensual - Junio 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
-      { id: '8', date: '2025-05-04T12:00:00', description: 'Cuota mensual - Mayo 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
-      { id: '9', date: '2025-04-04T12:00:00', description: 'Cuota mensual - Abril 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
-      { id: '10', date: '2025-03-04T12:00:00', description: 'Cuota mensual - Marzo 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
-      { id: '11', date: '2025-02-04T12:00:00', description: 'Cuota mensual - Febrero 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
-      { id: '12', date: '2025-01-04T12:00:00', description: 'Cuota mensual - Enero 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
-    ]);
+  const handleViewPaymentHistory = async () => {
+    try {
+      const response = await clientApi.getMyPaymentHistory();
+      if (response?.success && response?.data?.length > 0) {
+        setPaymentHistory(response.data);
+      } else {
+        setPaymentHistory([]);
+      }
+    } catch {
+      setPaymentHistory([]);
+    }
     setShowPaymentHistoryModal(true);
   };
 
@@ -1528,8 +1523,15 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                         </div>
                         <div className="due-date-value">
                         {calculatePaymentProgress(!!paymentStatus?.isUpToDate).monthsPaid < 12 ? (
-                          paymentStatus?.dueDate ? 
-                            formatShortDate(paymentStatus.dueDate) : 
+                          paymentStatus?.dueDate ? (() => {
+                            const due = new Date(paymentStatus.dueDate);
+                            const today = new Date();
+                            // Si la fecha ya pasó y está al día, el próximo es +1 mes
+                            if (due <= today && paymentStatus.isUpToDate) {
+                              due.setMonth(due.getMonth() + 1);
+                            }
+                            return formatShortDate(due.toISOString());
+                          })() :
                             calculateNextPaymentDate()
                         ) : (
                           'No hay más pagos este año'

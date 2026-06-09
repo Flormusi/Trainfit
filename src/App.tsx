@@ -2,6 +2,7 @@ import React, { useEffect, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { Toaster, toast } from 'react-hot-toast';
+import { useKeepAlive } from './hooks/useKeepAlive';
 
 const Login = React.lazy(() => import('./components/auth/Login'));
 const Register = React.lazy(() => import('./components/auth/Register'));
@@ -93,6 +94,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 
 function App() {
+  useKeepAlive();
   return (
     // El Router y AuthProvider han sido removidos de aquí, ya que están en main.tsx
     <ErrorBoundary>

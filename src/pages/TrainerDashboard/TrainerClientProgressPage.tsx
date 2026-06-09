@@ -165,13 +165,20 @@ const TrainerClientProgressPage: React.FC = () => {
       console.log('🔍 Unique routines after filter:', uniqueRoutines);
       console.log('🔍 Duplicates removed:', rawRoutines.length - uniqueRoutines.length);
       
-      // Simular payment status por ahora
-      setPaymentStatus({
-        status: 'paid',
-        amount: 15000,
-        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        lastPayment: new Date().toISOString()
-      });
+      // Cargar payment status real desde la DB
+      try {
+        const paymentResponse = await trainerApi.getClientPaymentStatus(clientId!);
+        if (paymentResponse?.success && paymentResponse?.data) {
+          setPaymentStatus({
+            status: paymentResponse.data.status || 'pending',
+            amount: paymentResponse.data.amount || 0,
+            dueDate: paymentResponse.data.dueDate || new Date().toISOString(),
+            lastPayment: paymentResponse.data.lastPayment || new Date().toISOString()
+          });
+        }
+      } catch {
+        // Si no hay pago registrado, dejar en null
+      }
     } catch (error) {
       console.error('Error fetching client data:', error);
       setError('Error al cargar los datos del cliente');
@@ -259,7 +266,13 @@ const TrainerClientProgressPage: React.FC = () => {
         return;
       }
 
-      // Simular actualización de pago
+      // Guardar en la DB
+      await trainerApi.saveClientPayment(clientId!, {
+        amount,
+        dueDate: new Date(editPaymentDueDate).toISOString(),
+        status: 'paid'
+      });
+
       setPaymentStatus(prev => prev ? {
         ...prev,
         amount: amount,

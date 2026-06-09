@@ -467,6 +467,16 @@ export const trainerApi = {
     const response = await axios.put(`/trainer/clients/${clientId}/membership`, membershipData);
     return response.data;
   },
+
+  getClientPaymentStatus: async (clientId: string) => {
+    const response = await axios.get(`/payments/client/${clientId}/status`);
+    return response.data;
+  },
+
+  saveClientPayment: async (clientId: string, paymentData: { amount: number; dueDate: string; status: string }) => {
+    const response = await axios.put(`/payments/client/${clientId}`, paymentData);
+    return response.data;
+  },
   
   updateClientStatus: async (clientId: string, status: string) => {
     const response = await axios.put(`/trainer/clients/${clientId}/status`, { status });

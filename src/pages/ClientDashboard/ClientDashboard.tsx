@@ -496,12 +496,23 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
       
       // Cargar otros datos del dashboard
       setDashboardData(mockDashboardData);
-      setPaymentStatus({
-        status: 'up-to-date',
-        amount: 45000,
-         dueDate: '2025-11-04T12:00:00',
-          isUpToDate: true
-      });
+
+      // Cargar estado de pago real desde la DB
+      try {
+        const paymentResponse = await clientApi.getPaymentStatus();
+        if (paymentResponse?.success && paymentResponse?.paymentStatus) {
+          const ps = paymentResponse.paymentStatus;
+          setPaymentStatus({
+            status: ps.isUpToDate ? 'up-to-date' : 'overdue',
+            amount: ps.amount || 0,
+            dueDate: ps.dueDate || new Date().toISOString(),
+            isUpToDate: ps.isUpToDate
+          });
+        }
+      } catch {
+        // Si falla, dejar en null (no mostrar datos falsos)
+        setPaymentStatus(null);
+      }
       
     } catch (error) {
       console.error('Error cargando datos del dashboard:', error);

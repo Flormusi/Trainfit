@@ -786,6 +786,10 @@ const ClientList: React.FC = () => {
                     src={(client as any).clientProfile.profileImage}
                     alt={client.name}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).parentElement!.innerHTML = client.name.charAt(0).toUpperCase();
+                    }}
                   />
                 ) : (
                   client.name.charAt(0).toUpperCase()

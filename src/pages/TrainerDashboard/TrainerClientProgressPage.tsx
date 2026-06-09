@@ -1473,10 +1473,12 @@ const TrainerClientProgressPage: React.FC = () => {
                         onClick={async (e) => {
                           e.stopPropagation();
                           try {
+                            console.log('📧 Enviando email, clientId:', clientId, 'routineId:', routine.id);
                             await trainerApi.resendRoutineEmail(clientId!, routine.id);
                             toast.success('Email enviado correctamente');
-                          } catch {
-                            toast.error('Error al enviar el email');
+                          } catch (err: any) {
+                            console.error('Error enviando email:', err);
+                            toast.error(err?.response?.data?.message || 'Error al enviar el email');
                           }
                         }}
                         style={{

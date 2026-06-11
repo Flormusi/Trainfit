@@ -1139,7 +1139,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                               background: '#111', borderRadius: 8, padding: '7px 10px',
                             }}>
                               {ex.image_url && (
-                                <img src={ex.image_url} alt={ex.name} style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }} />
+                                <img src={ex.image_url} alt={ex.name} style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'contain', flexShrink: 0, background: '#1a1a1a', padding: 2 }} />
                               )}
                               <span style={{ flex: 1, fontSize: 13, color: '#e5e7eb', fontWeight: 500 }}>{ex.name}</span>
                               {(series || reps) && (

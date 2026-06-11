@@ -11,7 +11,7 @@ interface WorkoutExerciseItemProps {
 // Un componente placeholder para el icono del ejercicio
 const ExerciseIconPlaceholder: React.FC<{iconUrl?: string; altText?: string}> = ({ iconUrl, altText }) => {
   if (iconUrl) {
-    return <img src={iconUrl} alt={altText || 'Exercise Icon'} className="w-16 h-16 md:w-24 md:h-24 object-cover rounded mr-4 bg-gray-700" />;
+    return <img src={iconUrl} alt={altText || 'Exercise Icon'} className="w-16 h-16 md:w-24 md:h-24 object-contain rounded mr-4 bg-gray-700 p-1" />;
   }
   return (
     <div className="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center bg-gray-700 text-gray-400 rounded mr-4">

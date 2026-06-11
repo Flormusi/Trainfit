@@ -571,8 +571,8 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                 src={exercise.image_url || exercise.imageUrl}
                                 alt={exercise.name}
                                 style={{
-                                  width: 56, height: 56, borderRadius: 8, objectFit: 'cover',
-                                  border: '1px solid #333', flexShrink: 0,
+                                  width: 72, height: 72, borderRadius: 8, objectFit: 'contain',
+                                  border: '1px solid #333', flexShrink: 0, background: '#1a1a1a', padding: 4,
                                 }}
                               />
                             )}

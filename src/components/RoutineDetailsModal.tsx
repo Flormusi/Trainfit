@@ -114,11 +114,15 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     try {
       setIsSaving(true);
 
+      console.log('💾 editedExercises:', JSON.stringify(editedExercises));
       for (const [exerciseKey, changes] of Object.entries(editedExercises)) {
+        console.log('💾 exerciseKey:', exerciseKey, 'changes:', JSON.stringify(changes));
         if (changes.weekWeights && Object.keys(changes.weekWeights).length > 0) {
           const exerciseIndex = parseInt(exerciseKey, 10);
+          console.log('💾 saving index:', exerciseIndex, 'routineId:', routineId, 'weekWeights:', changes.weekWeights);
           if (!isNaN(exerciseIndex)) {
-            await clientApi.saveWeekWeights(routineId, exerciseIndex, changes.weekWeights);
+            const result = await clientApi.saveWeekWeights(routineId, exerciseIndex, changes.weekWeights);
+            console.log('💾 save result:', result);
           }
         }
       }

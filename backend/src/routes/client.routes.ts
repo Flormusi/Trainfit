@@ -2,7 +2,7 @@
 import express, { Response, NextFunction, Request } from 'express';
 import { protect, authorize } from '../middleware/auth.middleware';
 import { upload } from '../middleware/upload.middleware';
-import { getClientRoutines, addClientByTrainer, deleteClient, getPaymentStatus, sendMonthlyRoutineEmail, deleteAssignedRoutine } from '../controllers/client.controller';
+import { getClientRoutines, addClientByTrainer, deleteClient, getPaymentStatus, sendMonthlyRoutineEmail, deleteAssignedRoutine, saveClientWeekWeights } from '../controllers/client.controller';
 import { 
   getClientNotifications, 
   getUnreadNotificationsCount, 
@@ -131,6 +131,15 @@ router.post('/send-monthly-routine', protect, authorize([Role.CLIENT]), async (r
   const typedReq = req as RequestWithUser;
   try {
     await sendMonthlyRoutineEmail(typedReq, res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/routines/:routineId/week-weights', protect, authorize([Role.CLIENT]), async (req: Request<any, any, any, any>, res: Response, next: NextFunction): Promise<void> => {
+  const typedReq = req as RequestWithUser;
+  try {
+    await saveClientWeekWeights(typedReq, res);
   } catch (error) {
     next(error);
   }

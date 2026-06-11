@@ -589,12 +589,10 @@ const EditRoutinePage: React.FC = () => {
 
                     {exercise.image_url && (
                       <div className="mt-4">
-                        <ExerciseImage 
-                          exerciseName={exercise.name}
-                          width={128}
-                          height={128}
-                          className="rounded-lg"
+                        <img
+                          src={exercise.image_url}
                           alt={exercise.name}
+                          style={{ width: 128, height: 128, objectFit: 'contain', borderRadius: 8, background: '#1a1a1a', border: '1px solid #444' }}
                         />
                       </div>
                     )}

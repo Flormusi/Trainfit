@@ -98,17 +98,22 @@ const EditRoutinePage: React.FC = () => {
           setClients(formattedClients);
         }
 
-        // Cargar ejercicios custom del trainer para merge de imágenes
+        // Cargar ejercicios custom del trainer
         let customExerciseMap: Record<string, string> = {};
+        let customExercisesForDropdown: any[] = [];
         try {
           const customRes = await trainerApi.getExercises();
           const customData: any = customRes.data;
           const customList = customData?.data || customData || [];
           customList.forEach((ex: any) => {
-            if (ex.name && ex.imageUrl) {
-              customExerciseMap[ex.name.toLowerCase()] = ex.imageUrl;
-            }
+            if (ex.name && ex.imageUrl) customExerciseMap[ex.name.toLowerCase()] = ex.imageUrl;
           });
+          customExercisesForDropdown = customList.map((ex: any) => ({
+            ...ex,
+            id: `custom_${ex.id}`,
+            image_url: ex.imageUrl || '',
+            isCustom: true,
+          }));
         } catch { /* continúa sin custom exercises */ }
 
         // Cargar rutina existente
@@ -141,8 +146,9 @@ const EditRoutinePage: React.FC = () => {
           }
         }
         
-        // Combinar todos los ejercicios
+        // Combinar todos los ejercicios (custom primero para que aparezcan arriba)
         const allExercises = [
+          ...customExercisesForDropdown,
           ...bicepsExercises.map((ex, i) => ({ ...ex, id: `biceps_${i}` })),
           ...cardioExercises.map((ex, i) => ({ ...ex, id: `cardio_${i}` })),
           ...circuitoExercises.map((ex, i) => ({ ...ex, id: `circuito_${i}` })),
@@ -513,7 +519,8 @@ const EditRoutinePage: React.FC = () => {
                         {showDropdowns[index] && (
                           <div className="absolute z-10 w-full mt-1 bg-[#2a2a2a] border border-[#555555] rounded-lg shadow-lg max-h-60 overflow-y-auto">
                             {getFilteredExercisesForIndex(index).slice(0, 10).map((ex) => (
-                              <div key={ex.id} onClick={() => selectExercise(index, ex)} className="px-4 py-2 hover:bg-[#3a3a3a] cursor-pointer text-white border-b border-[#444444] last:border-b-0">
+                              <div key={ex.id} onClick={() => selectExercise(index, ex)} className="px-4 py-2 hover:bg-[#3a3a3a] cursor-pointer text-white border-b border-[#444444] last:border-b-0 flex items-center gap-2">
+                                {ex.isCustom && <span className="text-yellow-400 text-xs">⭐</span>}
                                 {ex.name}
                               </div>
                             ))}

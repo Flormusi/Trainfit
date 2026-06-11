@@ -29,17 +29,23 @@ export interface Client {
   name: string;
 }
 
+interface WeekData { series: string; reps: string; peso: string; }
+
 export interface ExerciseData {
-  id: string; 
-  exerciseId: string; 
-  name: string; 
+  id: string;
+  exerciseId: string;
+  name: string;
   series: string;
   reps: string;
   weight?: string;
   notes?: string;
   image_url?: string;
   day?: number;
+  weeks?: { week1: WeekData; week2: WeekData; week3: WeekData; week4: WeekData; };
 }
+
+const WEEK_KEYS = ['week1', 'week2', 'week3', 'week4'] as const;
+const emptyWeek = (): WeekData => ({ series: '', reps: '', peso: '' });
 
 export interface RoutineData {
   name: string;
@@ -238,6 +244,22 @@ const EditRoutinePage: React.FC = () => {
     }
   };
 
+  const handleWeekChange = (exerciseIndex: number, week: typeof WEEK_KEYS[number], field: keyof WeekData, value: string) => {
+    setRoutineData(prev => {
+      const exercises = [...prev.exercises];
+      const ex = { ...exercises[exerciseIndex] };
+      ex.weeks = {
+        week1: ex.weeks?.week1 || emptyWeek(),
+        week2: ex.weeks?.week2 || emptyWeek(),
+        week3: ex.weeks?.week3 || emptyWeek(),
+        week4: ex.weeks?.week4 || emptyWeek(),
+        [week]: { ...(ex.weeks?.[week] || emptyWeek()), [field]: value }
+      };
+      exercises[exerciseIndex] = ex;
+      return { ...prev, exercises };
+    });
+  };
+
   const addExercise = () => {
     const newExercise: ExerciseData = {
       id: `exercise_${Date.now()}`,
@@ -247,7 +269,8 @@ const EditRoutinePage: React.FC = () => {
       reps: '',
       weight: '',
       notes: '',
-      day: 1
+      day: 1,
+      weeks: { week1: emptyWeek(), week2: emptyWeek(), week3: emptyWeek(), week4: emptyWeek() }
     };
 
     setRoutineData(prevData => ({
@@ -451,8 +474,8 @@ const EditRoutinePage: React.FC = () => {
                       </button>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                      <div className="relative" ref={(el) => dropdownRefs.current[index] = el}>
+                    <div className="mb-4">
+                      <div className="relative mb-4" ref={(el) => dropdownRefs.current[index] = el}>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">
                           Ejercicio <span className="text-red-400">*</span>
                         </label>
@@ -469,15 +492,10 @@ const EditRoutinePage: React.FC = () => {
                           placeholder="Buscar ejercicio..."
                           required
                         />
-                        
                         {showDropdowns[index] && (
                           <div className="absolute z-10 w-full mt-1 bg-[#2a2a2a] border border-[#555555] rounded-lg shadow-lg max-h-60 overflow-y-auto">
                             {getFilteredExercisesForIndex(index).slice(0, 10).map((ex) => (
-                              <div
-                                key={ex.id}
-                                onClick={() => selectExercise(index, ex)}
-                                className="px-4 py-2 hover:bg-[#3a3a3a] cursor-pointer text-white border-b border-[#444444] last:border-b-0"
-                              >
+                              <div key={ex.id} onClick={() => selectExercise(index, ex)} className="px-4 py-2 hover:bg-[#3a3a3a] cursor-pointer text-white border-b border-[#444444] last:border-b-0">
                                 {ex.name}
                               </div>
                             ))}
@@ -485,64 +503,55 @@ const EditRoutinePage: React.FC = () => {
                         )}
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
-                          Series <span className="text-red-400">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="series"
-                          value={exercise.series}
-                          onChange={(e) => handleExerciseChange(index, e)}
-                          className="w-full px-4 py-3 bg-[#2a2a2a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
-                          placeholder="Ej: 3"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
-                          Repeticiones <span className="text-red-400">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="reps"
-                          value={exercise.reps}
-                          onChange={(e) => handleExerciseChange(index, e)}
-                          className="w-full px-4 py-3 bg-[#2a2a2a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
-                          placeholder="Ej: 12"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
-                          Peso (opcional)
-                        </label>
-                        <input
-                          type="text"
-                          name="weight"
-                          value={exercise.weight || ''}
-                          onChange={(e) => handleExerciseChange(index, e)}
-                          className="w-full px-4 py-3 bg-[#2a2a2a] border border-[#555555] rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
-                          placeholder="Ej: 20kg"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
-                          Día
-                        </label>
-                        <select
-                          name="day"
-                          value={exercise.day || 1}
-                          onChange={(e) => handleExerciseChange(index, e)}
-                          className="w-full px-4 py-3 bg-[#2a2a2a] border border-[#555555] rounded-lg text-white focus:ring-2 focus:ring-[#ff4444] focus:border-[#ff4444] transition-all duration-300"
-                        >
-                          {[1, 2, 3, 4, 5, 6, 7].map(day => (
-                            <option key={day} value={day}>Día {day}</option>
-                          ))}
-                        </select>
+                      {/* Tabla semanas */}
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-gray-400 border-b border-[#333]">
+                              <th className="text-left py-2 pr-3 font-medium">Semana</th>
+                              <th className="text-center py-2 px-2 font-medium">Series</th>
+                              <th className="text-center py-2 px-2 font-medium">Reps</th>
+                              <th className="text-center py-2 px-2 font-medium">Peso obj.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {WEEK_KEYS.map((wk, wi) => {
+                              const weekData = exercise.weeks?.[wk] || emptyWeek();
+                              return (
+                                <tr key={wk} className="border-b border-[#222]">
+                                  <td className="py-2 pr-3 text-gray-300 font-medium">Semana {wi + 1}</td>
+                                  <td className="py-1 px-2">
+                                    <input
+                                      type="text"
+                                      value={weekData.series}
+                                      onChange={e => handleWeekChange(index, wk, 'series', e.target.value)}
+                                      placeholder="3"
+                                      className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#444] rounded text-white text-center focus:ring-1 focus:ring-[#ff4444]"
+                                    />
+                                  </td>
+                                  <td className="py-1 px-2">
+                                    <input
+                                      type="text"
+                                      value={weekData.reps}
+                                      onChange={e => handleWeekChange(index, wk, 'reps', e.target.value)}
+                                      placeholder="12"
+                                      className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#444] rounded text-white text-center focus:ring-1 focus:ring-[#ff4444]"
+                                    />
+                                  </td>
+                                  <td className="py-1 px-2">
+                                    <input
+                                      type="text"
+                                      value={weekData.peso}
+                                      onChange={e => handleWeekChange(index, wk, 'peso', e.target.value)}
+                                      placeholder="10kg"
+                                      className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#444] rounded text-white text-center focus:ring-1 focus:ring-[#ff4444]"
+                                    />
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
 

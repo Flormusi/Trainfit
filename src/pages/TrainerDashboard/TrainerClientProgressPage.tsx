@@ -135,19 +135,36 @@ const TrainerClientProgressPage: React.FC = () => {
   const fetchClientData = async () => {
     try {
       setLoading(true);
-      const [clientResponse, routinesResponse] = await Promise.all([
+      const [clientResponse, routinesResponse, customExercisesResponse] = await Promise.all([
         trainerApi.getClientDetails(clientId!),
-        trainerApi.getClientRoutines(clientId!)
+        trainerApi.getClientRoutines(clientId!),
+        trainerApi.getExercises().catch(() => ({ data: [] }))
       ]);
 
       setClient(clientResponse);
-      
+
+      // Mapa de ejercicios custom: nombre (lowercase) → imageUrl
+      const customExData: any = (customExercisesResponse as any)?.data;
+      const customExList = customExData?.data || customExData || [];
+      const customImageMap: Record<string, string> = {};
+      customExList.forEach((ex: any) => {
+        if (ex.name && ex.imageUrl) customImageMap[ex.name.toLowerCase()] = ex.imageUrl;
+      });
+
       // Filtrar rutinas duplicadas por ID
       const rawRoutines = routinesResponse.data || [];
-      const uniqueRoutines = rawRoutines.filter((routine: Routine, index: number, self: Routine[]) => 
+      const uniqueRoutines = rawRoutines.map((routine: Routine) => ({
+        ...routine,
+        exercises: Array.isArray(routine.exercises)
+          ? routine.exercises.map((ex: any) => ({
+              ...ex,
+              imageUrl: ex.imageUrl || ex.image_url || customImageMap[ex.name?.toLowerCase()] || '',
+            }))
+          : routine.exercises,
+      })).filter((routine: Routine, index: number, self: Routine[]) =>
         index === self.findIndex((r: Routine) => r.id === routine.id)
       );
-      
+
       setRoutines(uniqueRoutines);
       
       // Debug logs detallados

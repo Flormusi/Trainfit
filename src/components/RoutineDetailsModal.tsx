@@ -17,6 +17,7 @@ interface Exercise {
   restTime?: number;
   notes?: string;
   image_url?: string;
+  imageUrl?: string;
 }
 
 interface Routine {
@@ -202,8 +203,9 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       const exercisesWithImages = await Promise.allSettled(
         routine.exercises.map(async (exercise) => {
           let imageBase64 = null;
-          if (exercise.image_url) {
-            try { imageBase64 = await getImageAsBase64(exercise.image_url); } catch { /* sin imagen */ }
+          const imgSrc = exercise.image_url || exercise.imageUrl;
+          if (imgSrc) {
+            try { imageBase64 = await getImageAsBase64(imgSrc); } catch { /* sin imagen */ }
           }
           return { ...exercise, imageBase64 };
         })
@@ -564,9 +566,9 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                         {/* Image + info */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                            {exercise.image_url && (
+                            {(exercise.image_url || exercise.imageUrl) && (
                               <img
-                                src={exercise.image_url}
+                                src={exercise.image_url || exercise.imageUrl}
                                 alt={exercise.name}
                                 style={{
                                   width: 56, height: 56, borderRadius: 8, objectFit: 'cover',

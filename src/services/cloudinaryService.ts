@@ -50,7 +50,7 @@ export const uploadImage = async (file: File, folder = 'exercises'): Promise<str
     }
 
     const data = await response.json();
-    return data.public_id;
+    return data.secure_url;
   } catch (error) {
     console.error('Error uploading image:', error);
     return null;

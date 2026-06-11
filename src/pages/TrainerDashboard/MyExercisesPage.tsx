@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as apiService from '../../services/api';
+import { uploadImage } from '../../services/cloudinaryService';
 const { trainerApi }: { trainerApi: typeof apiService.trainerApi } = apiService;
 
 interface Exercise {
@@ -23,10 +24,25 @@ const MyExercisesPage: React.FC = () => {
   const [editing, setEditing] = useState<Exercise | null>(null);
   const [form, setForm] = useState<Exercise>(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const url = await uploadImage(file, 'trainfit/exercises');
+    if (url) {
+      setForm(prev => ({ ...prev, imageUrl: url }));
+    } else {
+      setError('Error al subir la imagen. Intentá de nuevo.');
+    }
+    setUploadingImage(false);
+  };
 
   useEffect(() => {
     fetchExercises();
@@ -269,16 +285,34 @@ const MyExercisesPage: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    URL de imagen
+                    Imagen del ejercicio
                   </label>
                   <input
-                    type="url"
-                    name="imageUrl"
-                    value={form.imageUrl || ''}
-                    onChange={handleChange}
-                    placeholder="https://..."
-                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#555] rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#ff4444] transition-all"
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
                   />
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="px-4 py-2 bg-[#1a1a1a] border border-[#555] rounded-lg text-white text-sm hover:border-[#ff4444] transition-all disabled:opacity-50"
+                    >
+                      {uploadingImage ? 'Subiendo...' : '📷 Subir imagen'}
+                    </button>
+                    {form.imageUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setForm(prev => ({ ...prev, imageUrl: '' }))}
+                        className="text-xs text-gray-400 hover:text-red-400"
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </div>
                   {form.imageUrl && (
                     <img src={form.imageUrl} alt="preview" className="mt-2 h-24 rounded-lg object-cover border border-[#444]" />
                   )}

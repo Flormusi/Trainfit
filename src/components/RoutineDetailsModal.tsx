@@ -42,7 +42,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 }) => {
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [loading, setLoading] = useState(false);
-  const [editedExercises, setEditedExercises] = useState<{ [key: string]: { weight?: number; sets?: number; reps?: number; rpe?: number } }>({});
+  const [editedExercises, setEditedExercises] = useState<{ [key: string]: { weight?: number; sets?: number; reps?: number; rpe?: number; weekWeights?: Record<string, string> } }>({});
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -73,6 +73,16 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleWeekWeightEdit = (exerciseId: string, weekKey: string, value: string) => {
+    setEditedExercises(prev => ({
+      ...prev,
+      [exerciseId]: {
+        ...prev[exerciseId],
+        weekWeights: { ...(prev[exerciseId]?.weekWeights || {}), [weekKey]: value }
+      }
+    }));
   };
 
   const handleExerciseEdit = (exerciseId: string, field: 'weight' | 'sets' | 'reps' | 'rpe', value: number) => {
@@ -627,6 +637,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                 <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Series</th>
                                 <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Reps</th>
                                 <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Peso obj.</th>
+                                <th style={{ padding: '8px 6px', textAlign: 'center', color: '#dc2626', fontWeight: 600, fontSize: 11 }}>💪 Mi peso</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -642,6 +653,24 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                   <td style={{ padding: '8px 6px', textAlign: 'center', color: '#d1d5db' }}>
                                     {data?.peso ? `${data.peso} kg` : '-'}
                                   </td>
+                                  <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        step="0.5"
+                                        value={editedExercises[exercise.id]?.weekWeights?.[key] ?? data?.peso ?? ''}
+                                        onChange={e => handleWeekWeightEdit(exercise.id, key, e.target.value)}
+                                        placeholder={data?.peso || '-'}
+                                        style={{
+                                          width: 60, background: '#1a1a1a', border: '1px solid #dc262650',
+                                          borderRadius: 6, color: '#fff', padding: '4px 6px', fontSize: 12,
+                                          outline: 'none', textAlign: 'center'
+                                        }}
+                                      />
+                                      <span style={{ color: '#6b7280', fontSize: 11 }}>kg</span>
+                                    </div>
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>
@@ -649,30 +678,34 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                         </div>
                       )}
 
-                      {/* Client weight + RPE input */}
+                      {/* RPE + (Mi peso solo si no hay semanas) */}
                       <div style={{
                         borderTop: '1px solid #222',
                         padding: '12px 14px',
                         background: '#0d1117',
                         display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap'
                       }}>
-                        <span style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>
-                          💪 Mi peso:
-                        </span>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.5"
-                          value={myWeight !== undefined ? myWeight : ''}
-                          onChange={(e) => handleExerciseEdit(exercise.id, 'weight', parseFloat(e.target.value))}
-                          placeholder="ej: 20"
-                          style={{
-                            background: '#1a1a1a', border: '1px solid #dc262650',
-                            borderRadius: 8, color: '#fff', padding: '8px 12px', fontSize: 14,
-                            outline: 'none', width: 80,
-                          }}
-                        />
-                        <span style={{ color: '#6b7280', fontSize: 13 }}>kg</span>
+                        {weeksWithData.length === 0 && (
+                          <>
+                            <span style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                              💪 Mi peso:
+                            </span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.5"
+                              value={myWeight !== undefined ? myWeight : ''}
+                              onChange={(e) => handleExerciseEdit(exercise.id, 'weight', parseFloat(e.target.value))}
+                              placeholder="ej: 20"
+                              style={{
+                                background: '#1a1a1a', border: '1px solid #dc262650',
+                                borderRadius: 8, color: '#fff', padding: '8px 12px', fontSize: 14,
+                                outline: 'none', width: 80,
+                              }}
+                            />
+                            <span style={{ color: '#6b7280', fontSize: 13 }}>kg</span>
+                          </>
+                        )}
 
                         <span style={{ color: '#f97316', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap', marginLeft: 8 }}>
                           🔥 RPE:

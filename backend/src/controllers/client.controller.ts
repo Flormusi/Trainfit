@@ -17,7 +17,7 @@ const enrichRoutineExercises = async (routines: any[]) => {
             // Try to find the exercise in the Exercise table by name
             const exerciseData = await prisma.exercise.findFirst({
               where: {
-                name: exercise.name || exercise.exerciseId
+                name: { equals: exercise.name || exercise.exerciseId, mode: 'insensitive' }
               }
             });
 
@@ -529,17 +529,38 @@ export const getPaymentStatus = async (req: Request, res: Response): Promise<voi
   const user = req.user;
 
   try {
-    // Por ahora devolvemos datos simulados
-    // En una implementación real, esto se conectaría con un sistema de pagos
-    const paymentStatus = {
-      isUpToDate: Math.random() > 0.3, // 70% probabilidad de estar al día
-      lastPaymentDate: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000),
-      nextPaymentDue: new Date(Date.now() + Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000),
-      amount: 50.00,
-      currency: 'USD'
-    };
+    // Leer el último pago real desde la DB
+    const lastPayment = await prisma.paymentPreference.findFirst({
+      where: { clientId: user.id },
+      orderBy: { createdAt: 'desc' }
+    });
 
-    res.status(200).json({ success: true, paymentStatus });
+    if (!lastPayment) {
+      res.status(200).json({
+        success: true,
+        paymentStatus: {
+          isUpToDate: false,
+          amount: 0,
+          dueDate: null,
+          status: 'pending'
+        }
+      });
+      return;
+    }
+
+    const dueDate = (lastPayment as any).dueDate || lastPayment.createdAt;
+    const isUpToDate = lastPayment.status === 'paid' || lastPayment.status === 'approved';
+
+    res.status(200).json({
+      success: true,
+      paymentStatus: {
+        isUpToDate,
+        amount: lastPayment.amount,
+        dueDate: dueDate instanceof Date ? dueDate.toISOString() : dueDate,
+        status: lastPayment.status,
+        lastPaymentDate: lastPayment.updatedAt
+      }
+    });
   } catch (error) {
     console.error('Error fetching payment status:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -676,9 +697,48 @@ export const sendMonthlyRoutineEmail = async (req: Request, res: Response): Prom
     });
   } catch (error) {
     console.error('Error sending monthly routine email:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error al enviar el email. Por favor, inténtalo de nuevo más tarde.' 
+    res.status(500).json({
+      success: false,
+      message: 'Error al enviar el email. Por favor, inténtalo de nuevo más tarde.'
     });
+  }
+};
+
+// Save client per-week weights into the routine exercise JSON
+export const saveClientWeekWeights = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { routineId } = req.params;
+    const { exerciseIndex, weekWeights } = req.body;
+    const user = (req as any).user;
+
+    const routine = await prisma.routine.findFirst({
+      where: { id: routineId, clientId: user.id }
+    });
+
+    if (!routine) {
+      res.status(404).json({ success: false, message: 'Rutina no encontrada' });
+      return;
+    }
+
+    const exercises = Array.isArray(routine.exercises) ? [...(routine.exercises as any[])] : [];
+    if (exerciseIndex < 0 || exerciseIndex >= exercises.length) {
+      res.status(400).json({ success: false, message: 'Índice de ejercicio inválido' });
+      return;
+    }
+
+    exercises[exerciseIndex] = {
+      ...exercises[exerciseIndex],
+      clientWeekWeights: weekWeights
+    };
+
+    await prisma.routine.update({
+      where: { id: routineId },
+      data: { exercises: exercises as Prisma.InputJsonValue }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error saving week weights:', error);
+    res.status(500).json({ success: false, message: 'Error al guardar los pesos' });
   }
 };

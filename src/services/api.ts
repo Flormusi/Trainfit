@@ -579,6 +579,11 @@ export const clientApi = {
     const response = await axios.post(`/progress/exercise/${exerciseId}`, progressData);
     return response.data;
   },
+
+  saveWeekWeights: async (routineId: string, exerciseIndex: number, weekWeights: Record<string, string>) => {
+    const response = await axios.post(`/clients/routines/${routineId}/week-weights`, { exerciseIndex, weekWeights });
+    return response.data;
+  },
   
   // Perfil del cliente
   getProfile: async (clientId: string) => {

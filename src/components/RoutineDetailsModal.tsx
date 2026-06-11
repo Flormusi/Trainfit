@@ -62,6 +62,16 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       
       if (routineData && routineData.id && routineData.name) {
         setRoutine(routineData);
+        // Pre-load any previously saved client week weights
+        if (Array.isArray(routineData.exercises)) {
+          const preloaded: typeof editedExercises = {};
+          routineData.exercises.forEach((ex: any) => {
+            if (ex.clientWeekWeights && Object.keys(ex.clientWeekWeights).length > 0) {
+              preloaded[ex.id] = { weekWeights: ex.clientWeekWeights };
+            }
+          });
+          if (Object.keys(preloaded).length > 0) setEditedExercises(preloaded);
+        }
         console.log('✅ Rutina establecida correctamente:', routineData.name);
       } else {
         console.error('❌ Datos de rutina inválidos:', routineData);
@@ -103,15 +113,19 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 
     try {
       setIsSaving(true);
-      
-      // Actualizar cada ejercicio modificado
+
       for (const [exerciseId, changes] of Object.entries(editedExercises)) {
-        await clientApi.updateExerciseProgress(exerciseId, changes);
+        if (changes.weekWeights && Object.keys(changes.weekWeights).length > 0) {
+          const exerciseIndex = routine.exercises.findIndex(ex => ex.id === exerciseId);
+          if (exerciseIndex !== -1) {
+            await clientApi.saveWeekWeights(routineId, exerciseIndex, changes.weekWeights);
+          }
+        }
       }
-      
+
       toast.success('Cambios guardados exitosamente');
       setEditedExercises({});
-      loadRoutineDetails(); // Recargar datos
+      loadRoutineDetails();
     } catch (error) {
       console.error('Error saving changes:', error);
       toast.error('Error al guardar los cambios');

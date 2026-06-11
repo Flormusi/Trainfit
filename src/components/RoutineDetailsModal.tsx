@@ -65,9 +65,9 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         // Pre-load any previously saved client week weights
         if (Array.isArray(routineData.exercises)) {
           const preloaded: typeof editedExercises = {};
-          routineData.exercises.forEach((ex: any) => {
+          routineData.exercises.forEach((ex: any, i: number) => {
             if (ex.clientWeekWeights && Object.keys(ex.clientWeekWeights).length > 0) {
-              preloaded[ex.id] = { weekWeights: ex.clientWeekWeights };
+              preloaded[String(i)] = { weekWeights: ex.clientWeekWeights };
             }
           });
           if (Object.keys(preloaded).length > 0) setEditedExercises(preloaded);
@@ -85,12 +85,12 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     }
   };
 
-  const handleWeekWeightEdit = (exerciseId: string, weekKey: string, value: string) => {
+  const handleWeekWeightEdit = (exerciseKey: string, weekKey: string, value: string) => {
     setEditedExercises(prev => ({
       ...prev,
-      [exerciseId]: {
-        ...prev[exerciseId],
-        weekWeights: { ...(prev[exerciseId]?.weekWeights || {}), [weekKey]: value }
+      [exerciseKey]: {
+        ...prev[exerciseKey],
+        weekWeights: { ...(prev[exerciseKey]?.weekWeights || {}), [weekKey]: value }
       }
     }));
   };
@@ -114,10 +114,10 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     try {
       setIsSaving(true);
 
-      for (const [exerciseId, changes] of Object.entries(editedExercises)) {
+      for (const [exerciseKey, changes] of Object.entries(editedExercises)) {
         if (changes.weekWeights && Object.keys(changes.weekWeights).length > 0) {
-          const exerciseIndex = routine.exercises.findIndex(ex => ex.id === exerciseId);
-          if (exerciseIndex !== -1) {
+          const exerciseIndex = parseInt(exerciseKey, 10);
+          if (!isNaN(exerciseIndex)) {
             await clientApi.saveWeekWeights(routineId, exerciseIndex, changes.weekWeights);
           }
         }
@@ -563,13 +563,14 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 
                 {/* Exercise cards */}
                 {routine.exercises.map((exercise: any, index: number) => {
+                  const exKey = String(index);
                   const weeks = ['week1', 'week2', 'week3', 'week4'];
                   const weeksWithData = weeks.map(w => ({ key: w, data: getWeekData(exercise, w) })).filter(w => w.data && (w.data.series || w.data.reps || w.data.peso));
                   const rpeInfo = exercise.rpe ? getRpeLabel(exercise.rpe) : null;
-                  const myWeight = editedExercises[exercise.id]?.weight;
+                  const myWeight = editedExercises[exKey]?.weight;
 
                   return (
-                    <div key={exercise.id} style={{
+                    <div key={index} style={{
                       background: '#111',
                       borderRadius: 12,
                       border: '1px solid #2a2a2a',
@@ -656,7 +657,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                             <tbody>
                               {weeksWithData.map(({ key, data }, wi) => {
                                 const pesoRaw = String(data?.peso ?? '').replace(/kg/gi, '').trim();
-                                const editedVal = editedExercises[exercise.id]?.weekWeights?.[key];
+                                const editedVal = editedExercises[exKey]?.weekWeights?.[key];
                                 return (
                                 <tr key={key} style={{ borderTop: '1px solid #222', background: wi % 2 === 0 ? 'transparent' : '#0d0d0d' }}>
                                   <td style={{ padding: '8px 10px', color: '#e5e7eb', fontWeight: 600, fontSize: 12 }}>
@@ -671,7 +672,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                       <input
                                         type="text"
                                         value={editedVal !== undefined ? editedVal : pesoRaw}
-                                        onChange={e => handleWeekWeightEdit(exercise.id, key, e.target.value)}
+                                        onChange={e => handleWeekWeightEdit(exKey, key, e.target.value)}
                                         placeholder="-"
                                         style={{
                                           width: 58, background: '#1a1a1a', border: '1px solid #dc262650',

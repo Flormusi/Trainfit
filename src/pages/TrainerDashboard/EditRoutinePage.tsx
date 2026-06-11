@@ -98,25 +98,43 @@ const EditRoutinePage: React.FC = () => {
           setClients(formattedClients);
         }
 
+        // Cargar ejercicios custom del trainer para merge de imágenes
+        let customExerciseMap: Record<string, string> = {};
+        try {
+          const customRes = await trainerApi.getExercises();
+          const customData: any = customRes.data;
+          const customList = customData?.data || customData || [];
+          customList.forEach((ex: any) => {
+            if (ex.name && ex.imageUrl) {
+              customExerciseMap[ex.name.toLowerCase()] = ex.imageUrl;
+            }
+          });
+        } catch { /* continúa sin custom exercises */ }
+
         // Cargar rutina existente
         if (routineId) {
           try {
             const routineResponse = await trainerApi.getRoutineById(routineId);
             const routine = routineResponse.data;
-            
+
+            // Merge imageUrl de ejercicios custom
+            const exercises = (routine.exercises || []).map((ex: any) => ({
+              ...ex,
+              image_url: ex.image_url || customExerciseMap[ex.name?.toLowerCase()] || '',
+            }));
+
             setRoutineData({
               name: routine.name || '',
               clientId: routine.clientId || '',
               duration: routine.duration || '',
               notes: routine.notes || '',
-              exercises: routine.exercises || [],
+              exercises,
               totalWeeks: typeof routine.totalWeeks === 'number' && !isNaN(routine.totalWeeks) ? routine.totalWeeks : 4,
             });
 
-            // Inicializar términos de búsqueda con los nombres de ejercicios existentes
-            const initialSearchTerms = routine.exercises?.map((ex: ExerciseData) => ex.name || '') || [];
+            const initialSearchTerms = exercises.map((ex: ExerciseData) => ex.name || '');
             setSearchTerms(initialSearchTerms);
-            setShowDropdowns(new Array(routine.exercises?.length || 0).fill(false));
+            setShowDropdowns(new Array(exercises.length).fill(false));
           } catch (routineError) {
             console.error('Error al cargar la rutina:', routineError);
             setError('Error al cargar la rutina. Intenta de nuevo más tarde.');

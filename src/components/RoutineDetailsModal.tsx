@@ -636,12 +636,14 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                 <th style={{ padding: '8px 10px', textAlign: 'left', color: '#6b7280', fontWeight: 600, fontSize: 11, width: '30%' }}>Semana</th>
                                 <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Series</th>
                                 <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Reps</th>
-                                <th style={{ padding: '8px 6px', textAlign: 'center', color: '#6b7280', fontWeight: 600, fontSize: 11 }}>Peso obj.</th>
-                                <th style={{ padding: '8px 6px', textAlign: 'center', color: '#dc2626', fontWeight: 600, fontSize: 11 }}>💪 Mi peso</th>
+                                <th style={{ padding: '8px 6px', textAlign: 'center', color: '#dc2626', fontWeight: 600, fontSize: 11 }}>💪 Peso (kg)</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {weeksWithData.map(({ key, data }, wi) => (
+                              {weeksWithData.map(({ key, data }, wi) => {
+                                const pesoRaw = String(data?.peso ?? '').replace(/kg/gi, '').trim();
+                                const editedVal = editedExercises[exercise.id]?.weekWeights?.[key];
+                                return (
                                 <tr key={key} style={{ borderTop: '1px solid #222', background: wi % 2 === 0 ? 'transparent' : '#0d0d0d' }}>
                                   <td style={{ padding: '8px 10px', color: '#e5e7eb', fontWeight: 600, fontSize: 12 }}>
                                     Semana {wi + 1}
@@ -650,20 +652,15 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                   <td style={{ padding: '8px 6px', textAlign: 'center', color: exercise.pyramidal ? '#f59e0b' : '#d1d5db' }}>
                                     {data?.reps || '-'}
                                   </td>
-                                  <td style={{ padding: '8px 6px', textAlign: 'center', color: '#d1d5db' }}>
-                                    {data?.peso ? `${data.peso} kg` : '-'}
-                                  </td>
                                   <td style={{ padding: '4px 6px', textAlign: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, justifyContent: 'center' }}>
                                       <input
-                                        type="number"
-                                        min="0"
-                                        step="0.5"
-                                        value={editedExercises[exercise.id]?.weekWeights?.[key] ?? data?.peso ?? ''}
+                                        type="text"
+                                        value={editedVal !== undefined ? editedVal : pesoRaw}
                                         onChange={e => handleWeekWeightEdit(exercise.id, key, e.target.value)}
-                                        placeholder={data?.peso || '-'}
+                                        placeholder="-"
                                         style={{
-                                          width: 60, background: '#1a1a1a', border: '1px solid #dc262650',
+                                          width: 58, background: '#1a1a1a', border: '1px solid #dc262650',
                                           borderRadius: 6, color: '#fff', padding: '4px 6px', fontSize: 12,
                                           outline: 'none', textAlign: 'center'
                                         }}
@@ -672,7 +669,8 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                     </div>
                                   </td>
                                 </tr>
-                              ))}
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>

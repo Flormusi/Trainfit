@@ -34,6 +34,7 @@ const ClientList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTier, setFilterTier] = useState('all');
   const [openActionsClientId, setOpenActionsClientId] = useState<string | number | null>(null);
+  const [copiedClientId, setCopiedClientId] = useState<string | number | null>(null);
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -118,14 +119,16 @@ const ClientList: React.FC = () => {
   }, [clients, searchTerm, filterTier]);
 
   const handleCopyInviteLink = async (clientId: string | number) => {
+    setOpenActionsClientId(null);
     try {
       const response = await axios.post(`/auth/invite/${clientId}`);
       await navigator.clipboard.writeText(response.data.inviteUrl);
-      toast.success('¡Link copiado! Mandáselo al alumno por WhatsApp');
+      setCopiedClientId(clientId);
+      setTimeout(() => setCopiedClientId(null), 3000);
+      toast.success('¡Link copiado! Mandáselo al alumno por WhatsApp 📋');
     } catch {
       toast.error('Error al generar el link');
     }
-    setOpenActionsClientId(null);
   };
 
   const handleDeleteClick = (client: Client) => {
@@ -768,12 +771,14 @@ const ClientList: React.FC = () => {
                         padding: '8px',
                         border: 'none',
                         borderRadius: '6px',
-                        background: 'transparent',
-                        color: '#34d399',
-                        cursor: 'pointer'
+                        background: copiedClientId === client.id ? '#064e3b' : 'transparent',
+                        color: copiedClientId === client.id ? '#6ee7b7' : '#34d399',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        fontWeight: copiedClientId === client.id ? 600 : 400,
                       }}
                     >
-                      🔗 Copiar link de acceso
+                      {copiedClientId === client.id ? '✅ ¡Link copiado!' : '🔗 Copiar link de acceso'}
                     </button>
                     <button
                       onClick={() => { setOpenActionsClientId(null); handleDeleteClick(client); }}

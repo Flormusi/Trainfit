@@ -41,6 +41,7 @@ export interface ExerciseData {
   notes?: string;
   image_url?: string;
   day?: number;
+  inCircuit?: boolean;
   weeks?: { week1: WeekData; week2: WeekData; week3: WeekData; week4: WeekData; };
 }
 
@@ -578,6 +579,32 @@ const EditRoutinePage: React.FC = () => {
                           </tbody>
                         </table>
                       </div>
+                    </div>
+
+                    {/* Toggle En Circuito */}
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...routineData.exercises];
+                          updated[index] = { ...updated[index], inCircuit: !updated[index].inCircuit };
+                          setRoutineData(prev => ({ ...prev, exercises: updated }));
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          background: exercise.inCircuit ? '#b45309' : '#1a1a1a',
+                          border: `1px solid ${exercise.inCircuit ? '#f59e0b' : '#555'}`,
+                          borderRadius: 8, padding: '8px 14px', cursor: 'pointer',
+                          color: exercise.inCircuit ? '#fde68a' : '#9ca3af',
+                          fontWeight: 600, fontSize: 13, transition: 'all 0.2s',
+                        }}
+                      >
+                        <span style={{ fontSize: 16 }}>⚡</span>
+                        EN CIRCUITO
+                      </button>
+                      {exercise.inCircuit && (
+                        <span style={{ color: '#9ca3af', fontSize: 12 }}>Este ejercicio se realizará en circuito</span>
+                      )}
                     </div>
 
                     <div>

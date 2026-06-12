@@ -340,13 +340,24 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         }
         x += colW[1];
 
+        // Etiqueta EN CIRCUITO (fondo amarillo sobre la fila)
+        if (exercise.inCircuit) {
+          pdf.setFillColor(251, 191, 36);
+          pdf.roundedRect(x + 1, yPosition + 1.5, 28, 5, 1, 1, 'F');
+          pdf.setFontSize(6);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(120, 60, 0);
+          pdf.text('EN CIRCUITO', x + 14.5, yPosition + 5.2, { align: 'center' });
+        }
+
         // Nombre + notas
         pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(20, 20, 20);
         const nameLines = pdf.splitTextToSize(exercise.name, colW[2] - 4);
-        const visibleName = Array.isArray(nameLines) ? nameLines.slice(0, hasNotes ? 1 : 2) : [nameLines];
-        const nameStartY = hasNotes ? yPosition + 5 : midY - (visibleName.length - 1) * 2;
+        const hasCircuit = !!exercise.inCircuit;
+        const visibleName = Array.isArray(nameLines) ? nameLines.slice(0, (hasNotes || hasCircuit) ? 1 : 2) : [nameLines];
+        const nameStartY = (hasNotes || hasCircuit) ? yPosition + 9 : midY - (visibleName.length - 1) * 2;
         visibleName.forEach((line: string, li: number) => pdf.text(line, x + 2, nameStartY + li * 4));
         if (hasNotes) {
           pdf.setFont('helvetica', 'italic');
@@ -624,6 +635,14 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                     background: rpeInfo.color + '22', color: rpeInfo.color, border: `1px solid ${rpeInfo.color}44`,
                                   }}>
                                     {rpeInfo.label}
+                                  </span>
+                                )}
+                                {exercise.inCircuit && (
+                                  <span style={{
+                                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                                    background: '#b4530922', color: '#fde68a', border: '1px solid #f59e0b88',
+                                  }}>
+                                    ⚡ EN CIRCUITO
                                   </span>
                                 )}
                                 {exercise.pyramidal && (

@@ -21,7 +21,7 @@ interface OnboardingFormData {
 
 const ClientOnboarding: React.FC = () => {
   const navigate = useNavigate();
-  const { user, saveOnboardingData } = useAuth();
+  const { user, saveOnboardingData, logout } = useAuth();
   const [formData, setFormData] = useState<OnboardingFormData>({
     weight: '',
     height: '',
@@ -107,6 +107,18 @@ const ClientOnboarding: React.FC = () => {
         <div className="onboarding-header">
           <img src="/images/logo-trainfit.png" alt="Trainfit Logo" className="logo" />
           <h1>Completá tus datos para personalizar tu entrenamiento!</h1>
+          <button
+            type="button"
+            onClick={() => { logout(); navigate('/'); }}
+            style={{
+              position: 'absolute', top: 16, right: 16,
+              background: 'transparent', border: '1px solid #555',
+              color: '#9ca3af', borderRadius: 8, padding: '6px 14px',
+              fontSize: 13, cursor: 'pointer'
+            }}
+          >
+            Cerrar sesión
+          </button>
         </div>
         <form onSubmit={handleSubmit} className="onboarding-form">
           

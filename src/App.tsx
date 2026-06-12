@@ -34,6 +34,7 @@ const AppointmentCalendar = React.lazy(() => import('./components/AppointmentCal
 const UnifiedCalendar = React.lazy(() => import('./components/UnifiedCalendar'));
 const SubscriptionPage = React.lazy(() => import('./pages/SubscriptionPage'));
 const MyExercisesPage = React.lazy(() => import('./pages/TrainerDashboard/MyExercisesPage'));
+const JoinPage = React.lazy(() => import('./pages/JoinPage'));
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; role?: 'client' | 'trainer' }> = ({ children, role }) => {
   const { user, loading, isAuthenticated } = useAuth();
@@ -103,6 +104,7 @@ function App() {
         <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/join/:token" element={<JoinPage />} />
         <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
         <Route path="/trainer/exercises" element={<ProtectedRoute role="trainer"><MyExercisesPage /></ProtectedRoute>} />
         <Route path="/debug-clients" element={<ProtectedRoute role="trainer"><DebugClients /></ProtectedRoute>} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 import { Button, Modal } from 'react-bootstrap';
 import { clientService } from '../../services/clientService';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -115,6 +116,17 @@ const ClientList: React.FC = () => {
 
     setFilteredClients(filtered);
   }, [clients, searchTerm, filterTier]);
+
+  const handleCopyInviteLink = async (clientId: string | number) => {
+    try {
+      const response = await axios.post(`/auth/invite/${clientId}`);
+      await navigator.clipboard.writeText(response.data.inviteUrl);
+      toast.success('¡Link copiado! Mandáselo al alumno por WhatsApp');
+    } catch {
+      toast.error('Error al generar el link');
+    }
+    setOpenActionsClientId(null);
+  };
 
   const handleDeleteClick = (client: Client) => {
     setClientToDelete(client);
@@ -747,6 +759,21 @@ const ClientList: React.FC = () => {
                       }}
                     >
                       Enviar mensaje
+                    </button>
+                    <button
+                      onClick={() => handleCopyInviteLink(client.id)}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px',
+                        border: 'none',
+                        borderRadius: '6px',
+                        background: 'transparent',
+                        color: '#34d399',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🔗 Copiar link de acceso
                     </button>
                     <button
                       onClick={() => { setOpenActionsClientId(null); handleDeleteClick(client); }}

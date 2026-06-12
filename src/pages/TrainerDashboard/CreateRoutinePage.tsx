@@ -44,6 +44,7 @@ export interface ExerciseData {
   video_url?: string;
   rpe?: string;
   pyramidal?: boolean;
+  inCircuit?: boolean;
   weeks: {
     week1: WeekData;
     week2: WeekData;
@@ -617,6 +618,22 @@ const CreateRoutinePage: React.FC = () => {
                             title="Activar repeticiones piramidales"
                           >
                             {exercise.pyramidal ? '▲ Piramidal ON' : '▲ Piramidal'}
+                          </button>
+                          {/* Toggle en circuito */}
+                          <button
+                            type="button"
+                            onClick={() => setRoutineData(prev => {
+                              const exercises = [...prev.exercises];
+                              exercises[index] = { ...exercises[index], inCircuit: !exercises[index].inCircuit };
+                              return { ...prev, exercises };
+                            })}
+                            className={`mt-1 w-full text-xs py-1 px-2 rounded border transition-all ${
+                              exercise.inCircuit
+                                ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300'
+                                : 'bg-[#1a1a1a] border-[#444] text-gray-500 hover:text-gray-300'
+                            }`}
+                          >
+                            {exercise.inCircuit ? '⚡ Circuito ON' : '⚡ Circuito'}
                           </button>
                         </td>
 

@@ -843,6 +843,15 @@ const ClientList: React.FC = () => {
                   outline: 'none',
                   boxShadow: 'none'
                 }}>{client.name}</h3>
+                {copiedClientId === client.id && (
+                  <span style={{
+                    display: 'inline-block', background: '#064e3b', color: '#6ee7b7',
+                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                    marginBottom: 4, border: '1px solid #6ee7b744'
+                  }}>
+                    ✅ Link copiado
+                  </span>
+                )}
                 {(client as any).clientProfile?.nickname && (
                   <p style={{
                     margin: '0 0 6px 0',

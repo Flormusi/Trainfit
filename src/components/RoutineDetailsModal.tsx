@@ -162,7 +162,15 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
   };
 
   // Helper: get series/reps/peso from new weeks structure or legacy fields
-  const getExerciseField = (ex: any, field: 'series' | 'reps' | 'peso') => {
+  const getExerciseField = (ex: any, field: 'series' | 'reps' | 'peso', exIndex?: number) => {
+    // For peso: prioritize client's saved week weights
+    if (field === 'peso' && exIndex !== undefined) {
+      const clientWeight = editedExercises[String(exIndex)]?.weekWeights?.week1
+        ?? ex.clientWeekWeights?.week1;
+      if (clientWeight && String(clientWeight).trim()) {
+        return `${String(clientWeight).replace(/kg/gi,'').trim()} kg`;
+      }
+    }
     // Try new weeks structure first (use week1 as reference for PDF)
     if (ex.weeks?.week1) {
       const val = ex.weeks.week1[field];
@@ -353,9 +361,9 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         x += colW[2];
 
         // Series / Reps / Peso — leer del nuevo formato weeks o fallback legacy
-        const seriesVal = getExerciseField(exercise, 'series');
-        const repsVal = getExerciseField(exercise, 'reps');
-        const pesoVal = getExerciseField(exercise, 'peso');
+        const seriesVal = getExerciseField(exercise, 'series', index);
+        const repsVal = getExerciseField(exercise, 'reps', index);
+        const pesoVal = getExerciseField(exercise, 'peso', index);
 
         pdf.setFontSize(9);
         pdf.setFont('helvetica', 'normal');

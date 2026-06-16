@@ -38,7 +38,7 @@ axios.interceptors.response.use(
   },
   (error) => {
     console.error('[Axios] Error en respuesta:', error.response?.status, error.config?.url);
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/')) {
       console.log('[Axios] Error de autenticación, limpiando sesión');
       authService.logout();
       // Evitar redirección forzada aquí para prevenir bucles; las rutas protegidas gestionan la navegación.

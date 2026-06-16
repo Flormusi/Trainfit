@@ -1,6 +1,8 @@
 // Google Calendar REST API Service
 // Using direct REST API calls instead of googleapis library for browser compatibility
 
+import axios from './axiosConfig';
+
 // Configuración de Google Calendar API
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
@@ -49,17 +51,8 @@ class GoogleCalendarService {
   // Intercambiar código de autorización por tokens (via backend para proteger el client secret)
   async getTokens(code: string): Promise<GoogleTokens> {
     try {
-      const response = await fetch('/auth/google/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, redirect_uri: REDIRECT_URI }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const tokens = await response.json();
+      const response = await axios.post('/auth/google/token', { code, redirect_uri: REDIRECT_URI });
+      const tokens = response.data;
       this.tokens = tokens;
       localStorage.setItem('google_calendar_tokens', JSON.stringify(tokens));
       return tokens;

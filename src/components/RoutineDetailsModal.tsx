@@ -116,14 +116,12 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 
       console.log('💾 editedExercises:', JSON.stringify(editedExercises));
       for (const [exerciseKey, changes] of Object.entries(editedExercises)) {
-        console.log('💾 exerciseKey:', exerciseKey, 'changes:', JSON.stringify(changes));
-        if (changes.weekWeights && Object.keys(changes.weekWeights).length > 0) {
-          const exerciseIndex = parseInt(exerciseKey, 10);
-          console.log('💾 saving index:', exerciseIndex, 'routineId:', routineId, 'weekWeights:', changes.weekWeights);
-          if (!isNaN(exerciseIndex)) {
-            const result = await clientApi.saveWeekWeights(routineId, exerciseIndex, changes.weekWeights);
-            console.log('💾 save result:', result);
-          }
+        const exerciseIndex = parseInt(exerciseKey, 10);
+        if (isNaN(exerciseIndex)) continue;
+        const hasWeekWeights = changes.weekWeights && Object.keys(changes.weekWeights).length > 0;
+        const hasRpe = changes.rpe !== undefined;
+        if (hasWeekWeights || hasRpe) {
+          await clientApi.saveWeekWeights(routineId, exerciseIndex, changes.weekWeights, changes.rpe);
         }
       }
 
@@ -752,7 +750,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                               min="0"
                               step="0.5"
                               value={myWeight !== undefined ? myWeight : ''}
-                              onChange={(e) => handleExerciseEdit(exercise.id, 'weight', parseFloat(e.target.value))}
+                              onChange={(e) => handleExerciseEdit(exKey, 'weight', parseFloat(e.target.value))}
                               placeholder="ej: 20"
                               style={{
                                 background: '#1a1a1a', border: '1px solid #dc262650',
@@ -768,8 +766,8 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                           🔥 RPE:
                         </span>
                         <select
-                          value={editedExercises[exercise.id]?.rpe ?? ''}
-                          onChange={(e) => handleExerciseEdit(exercise.id, 'rpe', parseInt(e.target.value))}
+                          value={editedExercises[exKey]?.rpe ?? exercise.clientRpe ?? ''}
+                          onChange={(e) => handleExerciseEdit(exKey, 'rpe', parseInt(e.target.value))}
                           style={{
                             background: '#1a1a1a', border: '1px solid #f9741650',
                             borderRadius: 8, color: '#fff', padding: '8px 10px', fontSize: 14,

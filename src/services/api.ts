@@ -580,8 +580,8 @@ export const clientApi = {
     return response.data;
   },
 
-  saveWeekWeights: async (routineId: string, exerciseIndex: number, weekWeights: Record<string, string>) => {
-    const response = await axios.post(`/clients/routines/${routineId}/week-weights`, { exerciseIndex, weekWeights });
+  saveWeekWeights: async (routineId: string, exerciseIndex: number, weekWeights?: Record<string, string>, rpe?: number) => {
+    const response = await axios.post(`/clients/routines/${routineId}/week-weights`, { exerciseIndex, weekWeights, rpe });
     return response.data;
   },
   

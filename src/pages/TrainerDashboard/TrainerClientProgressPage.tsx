@@ -2221,6 +2221,38 @@ const TrainerClientProgressPage: React.FC = () => {
                            </div>
                          )}
 
+                         {/* RPE del alumno */}
+                         {exercise.clientRpe && (
+                           <div style={{
+                             marginTop: 12,
+                             display: 'inline-flex', alignItems: 'center', gap: 8,
+                             background: Number(exercise.clientRpe) >= 9 ? 'rgba(220,38,38,0.15)' :
+                                         Number(exercise.clientRpe) >= 7 ? 'rgba(234,88,12,0.15)' :
+                                         Number(exercise.clientRpe) >= 5 ? 'rgba(202,138,4,0.15)' : 'rgba(22,163,74,0.15)',
+                             border: `1px solid ${
+                               Number(exercise.clientRpe) >= 9 ? '#dc2626' :
+                               Number(exercise.clientRpe) >= 7 ? '#ea580c' :
+                               Number(exercise.clientRpe) >= 5 ? '#ca8a04' : '#16a34a'
+                             }`,
+                             borderRadius: 8, padding: '6px 12px',
+                           }}>
+                             <span style={{ fontSize: 14 }}>🔥</span>
+                             <span style={{ color: '#9ca3af', fontSize: 13 }}>RPE del alumno:</span>
+                             <span style={{
+                               fontWeight: 700, fontSize: 14,
+                               color: Number(exercise.clientRpe) >= 9 ? '#f87171' :
+                                      Number(exercise.clientRpe) >= 7 ? '#fb923c' :
+                                      Number(exercise.clientRpe) >= 5 ? '#facc15' : '#4ade80'
+                             }}>
+                               {exercise.clientRpe} · {
+                                 Number(exercise.clientRpe) >= 9 ? 'Máximo' :
+                                 Number(exercise.clientRpe) >= 7 ? 'Alto' :
+                                 Number(exercise.clientRpe) >= 5 ? 'Moderado' : 'Suave'
+                               }
+                             </span>
+                           </div>
+                         )}
+
                          {/* Video link si existe */}
                          {exercise.videoUrl && (
                            <div style={{ marginTop: '15px' }}>

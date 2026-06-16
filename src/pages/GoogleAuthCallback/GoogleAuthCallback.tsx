@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useGoogleCalendar } from '../../hooks/useGoogleCalendar';
 
 const GoogleAuthCallback: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { handleAuthCallback } = useGoogleCalendar();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -10,32 +13,22 @@ const GoogleAuthCallback: React.FC = () => {
     const error = urlParams.get('error');
 
     if (code) {
-      // Enviar código al componente padre
-      if (window.opener) {
-        window.opener.postMessage({
-          type: 'GOOGLE_AUTH_SUCCESS',
-          code: code
-        }, window.location.origin);
-      }
-    } else if (error) {
-      // Enviar error al componente padre
-      if (window.opener) {
-        window.opener.postMessage({
-          type: 'GOOGLE_AUTH_ERROR',
-          error: error
-        }, window.location.origin);
-      }
+      handleAuthCallback(code).then(() => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        navigate('/client-dashboard/' + (user.id || ''), { replace: true });
+      }).catch(() => {
+        navigate(-1);
+      });
+    } else {
+      navigate(-1);
     }
-
-    // Cerrar la ventana popup
-    window.close();
-  }, [location]);
+  }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Procesando autenticación...</p>
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ textAlign: 'center', color: '#fff' }}>
+        <div style={{ fontSize: 32, marginBottom: 16 }}>📅</div>
+        <p>Conectando con Google Calendar...</p>
       </div>
     </div>
   );

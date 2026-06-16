@@ -34,44 +34,12 @@ export const useGoogleCalendar = (): UseGoogleCalendarReturn => {
     checkAuth();
   }, []);
 
-  // Conectar con Google Calendar
+  // Conectar con Google Calendar (redirect directo, sin popup)
   const connectToGoogle = useCallback(() => {
     try {
       setError(null);
       const authUrl = googleCalendarService.getAuthUrl();
-      
-      // Abrir ventana de autorización
-      const popup = window.open(
-        authUrl,
-        'google-auth',
-        'width=500,height=600,scrollbars=yes,resizable=yes'
-      );
-
-      // Escuchar el mensaje de la ventana popup
-      const handleMessage = (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
-        
-        if (event.data.type === 'GOOGLE_AUTH_SUCCESS') {
-          handleAuthCallback(event.data.code);
-          popup?.close();
-          window.removeEventListener('message', handleMessage);
-        } else if (event.data.type === 'GOOGLE_AUTH_ERROR') {
-          setError('Error en la autenticación con Google');
-          popup?.close();
-          window.removeEventListener('message', handleMessage);
-        }
-      };
-
-      window.addEventListener('message', handleMessage);
-
-      // Verificar si la ventana se cerró manualmente
-      const checkClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(checkClosed);
-          window.removeEventListener('message', handleMessage);
-        }
-      }, 1000);
-
+      window.location.href = authUrl;
     } catch (err) {
       setError('Error al iniciar la autenticación');
       console.error('Error connecting to Google:', err);

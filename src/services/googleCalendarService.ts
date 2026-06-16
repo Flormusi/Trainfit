@@ -51,7 +51,9 @@ class GoogleCalendarService {
   // Intercambiar código de autorización por tokens (via backend para proteger el client secret)
   async getTokens(code: string): Promise<GoogleTokens> {
     try {
-      const response = await axios.post('/auth/google/token', { code, redirect_uri: REDIRECT_URI });
+      const response = await axios.post('/auth/google/token', { code, redirect_uri: REDIRECT_URI }, {
+        headers: { Authorization: undefined }
+      });
       const tokens = response.data;
       this.tokens = tokens;
       localStorage.setItem('google_calendar_tokens', JSON.stringify(tokens));

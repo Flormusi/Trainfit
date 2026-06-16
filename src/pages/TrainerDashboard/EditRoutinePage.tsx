@@ -42,6 +42,8 @@ export interface ExerciseData {
   image_url?: string;
   day?: number;
   inCircuit?: boolean;
+  rpe?: string;
+  pyramidal?: boolean;
   weeks?: { week1: WeekData; week2: WeekData; week3: WeekData; week4: WeekData; };
 }
 
@@ -581,8 +583,9 @@ const EditRoutinePage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Toggle En Circuito */}
-                    <div className="flex items-center gap-3">
+                    {/* Toggles y RPE */}
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {/* EN CIRCUITO */}
                       <button
                         type="button"
                         onClick={() => {
@@ -600,11 +603,62 @@ const EditRoutinePage: React.FC = () => {
                         }}
                       >
                         <span style={{ fontSize: 16 }}>⚡</span>
-                        EN CIRCUITO
+                        {exercise.inCircuit ? 'Circuito ON' : 'EN CIRCUITO'}
                       </button>
-                      {exercise.inCircuit && (
-                        <span style={{ color: '#9ca3af', fontSize: 12 }}>Este ejercicio se realizará en circuito</span>
-                      )}
+
+                      {/* Piramidal */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...routineData.exercises];
+                          updated[index] = { ...updated[index], pyramidal: !updated[index].pyramidal };
+                          setRoutineData(prev => ({ ...prev, exercises: updated }));
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          background: exercise.pyramidal ? 'rgba(249,115,22,0.2)' : '#1a1a1a',
+                          border: `1px solid ${exercise.pyramidal ? 'rgba(249,115,22,0.5)' : '#555'}`,
+                          borderRadius: 8, padding: '8px 14px', cursor: 'pointer',
+                          color: exercise.pyramidal ? '#fb923c' : '#9ca3af',
+                          fontWeight: 600, fontSize: 13, transition: 'all 0.2s',
+                        }}
+                      >
+                        ▲ {exercise.pyramidal ? 'Piramidal ON' : 'Piramidal'}
+                      </button>
+
+                      {/* RPE */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ color: '#9ca3af', fontSize: 13, fontWeight: 600 }}>🔥 RPE:</span>
+                        <select
+                          value={exercise.rpe || ''}
+                          onChange={(e) => {
+                            const updated = [...routineData.exercises];
+                            updated[index] = { ...updated[index], rpe: e.target.value };
+                            setRoutineData(prev => ({ ...prev, exercises: updated }));
+                          }}
+                          style={{
+                            padding: '6px 10px', background: '#1a1a1a', border: '1px solid #555',
+                            borderRadius: 8, color: '#fff', fontSize: 14, cursor: 'pointer',
+                          }}
+                        >
+                          <option value="">–</option>
+                          {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </select>
+                        {exercise.rpe && (
+                          <span style={{
+                            fontSize: 12, fontWeight: 700,
+                            color: Number(exercise.rpe) >= 9 ? '#f87171' :
+                                   Number(exercise.rpe) >= 7 ? '#fb923c' :
+                                   Number(exercise.rpe) >= 5 ? '#facc15' : '#4ade80'
+                          }}>
+                            {Number(exercise.rpe) >= 9 ? 'Máximo' :
+                             Number(exercise.rpe) >= 7 ? 'Alto' :
+                             Number(exercise.rpe) >= 5 ? 'Moderado' : 'Suave'}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div>

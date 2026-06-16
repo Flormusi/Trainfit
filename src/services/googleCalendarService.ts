@@ -46,21 +46,13 @@ class GoogleCalendarService {
     return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }
 
-  // Intercambiar código de autorización por tokens
+  // Intercambiar código de autorización por tokens (via backend para proteger el client secret)
   async getTokens(code: string): Promise<GoogleTokens> {
     try {
-      const response = await fetch('https://oauth2.googleapis.com/token', {
+      const response = await fetch('/auth/google/token', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: CLIENT_ID || '',
-          client_secret: CLIENT_SECRET || '',
-          code: code,
-          grant_type: 'authorization_code',
-          redirect_uri: REDIRECT_URI,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, redirect_uri: REDIRECT_URI }),
       });
 
       if (!response.ok) {
@@ -69,10 +61,7 @@ class GoogleCalendarService {
 
       const tokens = await response.json();
       this.tokens = tokens;
-      
-      // Guardar tokens en localStorage para persistencia
       localStorage.setItem('google_calendar_tokens', JSON.stringify(tokens));
-      
       return tokens;
     } catch (error) {
       console.error('Error getting tokens:', error);

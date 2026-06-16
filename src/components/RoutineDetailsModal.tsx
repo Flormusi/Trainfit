@@ -140,11 +140,23 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 
   const getImageAsBase64 = async (imageUrl: string): Promise<string | null> => {
     try {
-      const response = await fetch(imageUrl);
+      // Add Cloudinary transformation for smaller size on mobile
+      const optimizedUrl = imageUrl.includes('cloudinary.com')
+        ? imageUrl.replace('/upload/', '/upload/w_200,f_jpg,q_70/')
+        : imageUrl;
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
+      const response = await fetch(optimizedUrl, { signal: controller.signal });
+      clearTimeout(timeout);
+
+      if (!response.ok) return null;
       const blob = await response.blob();
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
         reader.readAsDataURL(blob);
       });
     } catch (error: unknown) {
@@ -354,7 +366,8 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(20, 20, 20);
-        const nameLines = pdf.splitTextToSize(exercise.name, colW[2] - 4);
+        const safeName = (exercise.name || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\x00-\x7F]/g, '');
+        const nameLines = pdf.splitTextToSize(safeName, colW[2] - 4);
         const hasCircuit = !!exercise.inCircuit;
         const visibleName = Array.isArray(nameLines) ? nameLines.slice(0, (hasNotes || hasCircuit) ? 1 : 2) : [nameLines];
         const nameStartY = (hasNotes || hasCircuit) ? yPosition + 9 : midY - (visibleName.length - 1) * 2;

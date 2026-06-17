@@ -80,6 +80,18 @@ body {
   color: #aaa;
 }
 
+/* Fix autofill amarillo en iOS/Chrome */
+.login-form input:-webkit-autofill,
+.login-form input:-webkit-autofill:hover,
+.login-form input:-webkit-autofill:focus,
+.login-form input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #3a3a3a inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 .btn-login {
   background: linear-gradient(145deg, #FF3C38, #e6322f);
   color: white;

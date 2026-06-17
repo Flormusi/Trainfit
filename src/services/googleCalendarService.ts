@@ -122,24 +122,11 @@ class GoogleCalendarService {
     }
 
     try {
-      const response = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: CLIENT_ID || '',
-          client_secret: CLIENT_SECRET || '',
-          refresh_token: this.tokens.refresh_token,
-          grant_type: 'refresh_token',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const newTokens = await response.json();
+      const response = await axios.post('/auth/google/refresh',
+        { refresh_token: this.tokens.refresh_token },
+        { headers: { Authorization: undefined } }
+      );
+      const newTokens = response.data;
       this.tokens = { ...this.tokens, ...newTokens };
       localStorage.setItem('google_calendar_tokens', JSON.stringify(this.tokens));
     } catch (error) {

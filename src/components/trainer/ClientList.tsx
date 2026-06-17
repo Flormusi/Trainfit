@@ -436,12 +436,8 @@ const ClientList: React.FC = () => {
       {/* Estadísticas rápidas */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isLargeDesktop 
-          ? 'repeat(auto-fit, minmax(150px, 1fr))' 
-          : isDesktop
-          ? 'repeat(2, 1fr)' 
-          : '1fr',
-        gap: '12px',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '10px',
         marginBottom: '20px',
         border: 'none',
         outline: 'none',
@@ -449,22 +445,18 @@ const ClientList: React.FC = () => {
       }}>
         <div style={{
           background: 'linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%)',
-          padding: isMobile ? '16px' : '20px',
-          borderRadius: '20px',
+          padding: isMobile ? '12px 8px' : '20px',
+          borderRadius: '16px',
           textAlign: 'center',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 12px 32px rgba(0, 0, 0, 0.4),
-            0 4px 16px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.05)
-          `,
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
           overflow: 'hidden'
         }}>
           <h3 style={{
             margin: '0 0 8px 0',
-            fontSize: isMobile ? '1.5rem' : '2rem',
+            fontSize: isMobile ? '1.4rem' : '2rem',
             fontWeight: '700',
             color: '#ffffff',
             border: 'none',
@@ -483,22 +475,18 @@ const ClientList: React.FC = () => {
         </div>
         <div style={{
           background: 'linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%)',
-          padding: isMobile ? '16px' : '20px',
-          borderRadius: '20px',
+          padding: isMobile ? '12px 8px' : '20px',
+          borderRadius: '16px',
           textAlign: 'center',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 12px 32px rgba(0, 0, 0, 0.4),
-            0 4px 16px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.05)
-          `,
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
           overflow: 'hidden'
         }}>
           <h3 style={{
             margin: '0 0 8px 0',
-            fontSize: isMobile ? '1.5rem' : '2rem',
+            fontSize: isMobile ? '1.4rem' : '2rem',
             fontWeight: '700',
             color: '#ffffff',
             border: 'none',
@@ -517,22 +505,18 @@ const ClientList: React.FC = () => {
         </div>
         <div style={{
           background: 'linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%)',
-          padding: isMobile ? '16px' : '20px',
-          borderRadius: '20px',
+          padding: isMobile ? '12px 8px' : '20px',
+          borderRadius: '16px',
           textAlign: 'center',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 12px 32px rgba(0, 0, 0, 0.4),
-            0 4px 16px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.05)
-          `,
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
           overflow: 'hidden'
         }}>
           <h3 style={{
             margin: '0 0 8px 0',
-            fontSize: isMobile ? '1.5rem' : '2rem',
+            fontSize: isMobile ? '1.4rem' : '2rem',
             fontWeight: '700',
             color: '#ffffff',
             border: 'none',

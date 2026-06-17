@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import { formatCurrencyARS, calculateAnnualTotal } from '../../utils/payments';
 import { useSocket } from '../../hooks/useSocket';
 import axios from '../../services/axiosConfig';
+import LoadingScreen from '../../components/common/LoadingScreen';
 
 interface PaymentStatus {
   status: string;
@@ -959,52 +960,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
   };
 
   if (isLoadingData || !dashboardData) {
-    return (
-      <div className={`client-dashboard-page ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-        <motion.aside
-          className="dashboard-sidebar"
-          initial={false}
-          animate={{ width: isSidebarOpen ? 250 : 60 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        >
-          <div className="sidebar-header">
-            <motion.h2 
-              animate={{ opacity: isSidebarOpen ? 1 : 0, x: isSidebarOpen ? 0 : -10 }}
-              transition={{ delay: isSidebarOpen ? 0.1 : 0 }}
-            >
-              {isSidebarOpen ? "TRAINFIT" : ""} 
-            </motion.h2>
-            <button onClick={toggleSidebar} className="sidebar-toggle">
-              {isSidebarOpen ? '←' : '→'}
-            </button>
-          </div>
-          <nav className="sidebar-nav">
-            {isSidebarOpen ? (
-              <>
-                <a href="#/">Cargando...</a>
-                <a href="#/">Cargando...</a>
-              </>
-            ) : (
-              <>
-                <a href="#/" title="Cargando">...</a>
-                <a href="#/" title="Cargando">...</a>
-              </>
-            )}
-          </nav>
-        </motion.aside>
-        <div className="dashboard-content-wrapper">
-          <header className="dashboard-header">
-            <h1>Cargando...</h1>
-          </header>
-          <main className="dashboard-main-content">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </main>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Preparando tu dashboard..." />;
   }
 
   return (

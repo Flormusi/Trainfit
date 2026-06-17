@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import { useAuth } from './contexts/AuthContext';
 import { Toaster, toast } from 'react-hot-toast';
 import { useKeepAlive } from './hooks/useKeepAlive';
+import LoadingScreen from './components/common/LoadingScreen';
 
 const Login = React.lazy(() => import('./components/auth/Login'));
 const Register = React.lazy(() => import('./components/auth/Register'));
@@ -41,7 +42,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; role?: 'client' | 't
   const location = useLocation();
 
   if (loading) {
-    return <div style={{ color: '#fff' }}>Cargando...</div>;
+    return <LoadingScreen />;
   }
 
   const authed = isAuthenticated();
@@ -100,7 +101,7 @@ function App() {
     // El Router y AuthProvider han sido removidos de aquí, ya que están en main.tsx
     <ErrorBoundary>
       <Toaster position="top-center" reverseOrder={false} />
-      <Suspense fallback={<div style={{ color: '#fff' }}>Cargando...</div>}>
+      <Suspense fallback={<LoadingScreen />}>
         <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -384,7 +385,7 @@ const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div style={{ color: '#fff' }}>Cargando...</div>;
+    return <LoadingScreen />;
   }
 
   if (!isAuthenticated()) {

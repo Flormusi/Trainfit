@@ -270,13 +270,17 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       // Usamos márgenes fijos de 15mm y ajustamos columnas para que el ancho total
       // sea exactamente pageWidth - 30mm, evitando recortes y desbordes.
       // ── TABLA DE EJERCICIOS ─────────────────────────────────
-      // Columnas: # | Imagen | Ejercicio+Notas | Series | Reps | Peso
+      // Columnas: # | Imagen | Ejercicio+Notas | Series | Reps | S1 | S2 | S3 | S4
       const tableStartX = 10;
       const tableWidth = pageWidth - 20;
       // Anchos columnas en portrait A4 (210mm ancho - 20mm márgenes = 190mm)
-      const colW = [8, 28, 90, 16, 20, 28] as const; // suma = 190
-      const tableHeaders = ['#', 'Img', 'Ejercicio', 'Series', 'Reps', 'Peso'];
-      const rowH = 22; // compacto: ~8 ejercicios por página
+      const colW = [8, 24, 76, 14, 18, 17, 17, 17, 17] as const; // suma = 208 -> ajustar
+      // Total: 8+24+76+14+18+17+17+17+17 = 208, reducir ejercicio a 68
+      // 8+24+68+14+18+17+17+17+17 = 200 -> ok pero 190mm disponibles, reducir más
+      // 7+22+63+13+16+17+17+17+17 = 189 ~ 190 ✓
+      const colWf = [7, 22, 63, 13, 16, 17, 17, 17, 18] as [number,number,number,number,number,number,number,number,number];
+      const tableHeaders = ['#', 'Img', 'Ejercicio', 'Series', 'Reps', 'Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+      const rowH = 22;
       const headerH2 = 9;
 
       const drawTableHeader = () => {
@@ -284,11 +288,11 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         pdf.rect(tableStartX, yPosition, tableWidth, headerH2, 'F');
         pdf.setTextColor(...trainfitWhite);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(8);
+        pdf.setFontSize(7);
         let x = tableStartX;
         tableHeaders.forEach((h, i) => {
-          pdf.text(h, x + colW[i] / 2, yPosition + 6, { align: 'center' });
-          x += colW[i];
+          pdf.text(h, x + colWf[i] / 2, yPosition + 6, { align: 'center' });
+          x += colWf[i];
         });
         yPosition += headerH2;
         pdf.setTextColor(...trainfitBlack);
@@ -324,12 +328,12 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
 
         // # con círculo rojo
         pdf.setFillColor(...trainfitRed);
-        pdf.circle(x + colW[0] / 2, midY, 3.5, 'F');
+        pdf.circle(x + colWf[0] / 2, midY, 3.5, 'F');
         pdf.setTextColor(...trainfitWhite);
         pdf.setFontSize(7);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(String(index + 1), x + colW[0] / 2, midY + 1.5, { align: 'center' });
-        x += colW[0];
+        pdf.text(String(index + 1), x + colWf[0] / 2, midY + 1.5, { align: 'center' });
+        x += colWf[0];
 
         // Imagen
         pdf.setTextColor(...trainfitBlack);
@@ -337,7 +341,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         if (exercise.imageBase64) {
           try {
             const pad = 2;
-            const bW = colW[1] - pad * 2;
+            const bW = colWf[1] - pad * 2;
             const bH = rowH - pad * 2;
             const imgEl = new Image();
             imgEl.src = exercise.imageBase64 as string;
@@ -348,24 +352,24 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
             pdf.addImage(imgEl, 'JPEG', x + pad + (bW - iW) / 2, yPosition + pad + (bH - iH) / 2, iW, iH);
           } catch { /* sin imagen */ }
         }
-        x += colW[1];
+        x += colWf[1];
 
-        // Etiqueta EN CIRCUITO (fondo amarillo sobre la fila)
+        // Etiqueta EN CIRCUITO
         if (exercise.inCircuit) {
           pdf.setFillColor(251, 191, 36);
-          pdf.roundedRect(x + 1, yPosition + 1.5, 28, 5, 1, 1, 'F');
+          pdf.roundedRect(x + 1, yPosition + 1.5, 26, 5, 1, 1, 'F');
           pdf.setFontSize(6);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(120, 60, 0);
-          pdf.text('EN CIRCUITO', x + 14.5, yPosition + 5.2, { align: 'center' });
+          pdf.text('EN CIRCUITO', x + 13, yPosition + 5.2, { align: 'center' });
         }
 
         // Nombre + notas
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(20, 20, 20);
         const safeName = (exercise.name || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\x00-\x7F]/g, '');
-        const nameLines = pdf.splitTextToSize(safeName, colW[2] - 4);
+        const nameLines = pdf.splitTextToSize(safeName, colWf[2] - 4);
         const hasCircuit = !!exercise.inCircuit;
         const visibleName = Array.isArray(nameLines) ? nameLines.slice(0, (hasNotes || hasCircuit) ? 1 : 2) : [nameLines];
         const nameStartY = (hasNotes || hasCircuit) ? yPosition + 9 : midY - (visibleName.length - 1) * 2;
@@ -374,33 +378,54 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
           pdf.setFont('helvetica', 'italic');
           pdf.setFontSize(7);
           pdf.setTextColor(120, 120, 120);
-          const notesLines = pdf.splitTextToSize(String(exercise.notes), colW[2] - 4);
+          const notesLines = pdf.splitTextToSize(String(exercise.notes), colWf[2] - 4);
           const visibleNotes = Array.isArray(notesLines) ? notesLines.slice(0, 2) : [notesLines];
           visibleNotes.forEach((line: string, li: number) => pdf.text(line, x + 2, nameStartY + 5 + li * 3.5));
           pdf.setFont('helvetica', 'normal');
           pdf.setTextColor(20, 20, 20);
         }
-        x += colW[2];
+        x += colWf[2];
 
-        // Series / Reps / Peso — leer del nuevo formato weeks o fallback legacy
+        // Series / Reps
         const seriesVal = getExerciseField(exercise, 'series', index);
         const repsVal = getExerciseField(exercise, 'reps', index);
-        const pesoVal = getExerciseField(exercise, 'peso', index);
 
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(20, 20, 20);
 
-        pdf.text(seriesVal, x + colW[3] / 2, midY + 1, { align: 'center' });
-        x += colW[3];
+        pdf.text(seriesVal, x + colWf[3] / 2, midY + 1, { align: 'center' });
+        x += colWf[3];
 
-        // Reps: si es piramidal mostrar en naranja
         if (exercise.pyramidal) pdf.setTextColor(180, 100, 0);
-        pdf.text(repsVal, x + colW[4] / 2, midY + 1, { align: 'center' });
+        pdf.text(repsVal, x + colWf[4] / 2, midY + 1, { align: 'center' });
         pdf.setTextColor(20, 20, 20);
-        x += colW[4];
+        x += colWf[4];
 
-        pdf.text(pesoVal, x + colW[5] / 2, midY + 1, { align: 'center' });
+        // Pesos por semana (S1-S4) — datos del cliente si existen, sino del trainer
+        const weeks = ['week1', 'week2', 'week3', 'week4'];
+        weeks.forEach((wk, wi) => {
+          const clientW = editedExercises[String(index)]?.weekWeights?.[wk] ?? exercise.clientWeekWeights?.[wk];
+          const trainerW = exercise.weeks?.[wk]?.peso ?? exercise.weeks?.[wk]?.weight;
+          const val = clientW && String(clientW).trim()
+            ? String(clientW).replace(/kg/gi, '').trim() + ' kg'
+            : trainerW && String(trainerW).trim()
+            ? String(trainerW).replace(/kg/gi, '').trim() + ' kg'
+            : '-';
+          // Highlight en rojo si el cliente cargó su peso
+          if (clientW && String(clientW).trim()) {
+            pdf.setTextColor(...trainfitRed);
+            pdf.setFont('helvetica', 'bold');
+          } else {
+            pdf.setTextColor(20, 20, 20);
+            pdf.setFont('helvetica', 'normal');
+          }
+          pdf.setFontSize(7);
+          pdf.text(val, x + colWf[5 + wi] / 2, midY + 1, { align: 'center' });
+          x += colWf[5 + wi];
+        });
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(20, 20, 20);
 
         yPosition += rowH;
       }

@@ -5,12 +5,17 @@
 /* Global overflow control to prevent horizontal scroll */
 html, body {
   overflow-x: hidden;
-  /* Enforce dark background to avoid white flashes during HMR/reloads */
-  background-color: #121212;
+  background-color: #0a0a0a;
   color-scheme: dark;
+  /* Cover iPhone safe areas (notch / home bar) */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 /* Ensure the root element inherits the dark background immediately */
 #root {
-  background-color: #121212;
+  background-color: #0a0a0a;
+  min-height: 100dvh;
 }

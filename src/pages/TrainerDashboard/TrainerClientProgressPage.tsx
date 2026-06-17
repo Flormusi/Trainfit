@@ -905,17 +905,21 @@ const TrainerClientProgressPage: React.FC = () => {
     <div style={{
       backgroundColor: '#0a0a0a',
       minHeight: '100vh',
-      padding: '24px',
+      padding: '16px',
       color: 'white',
       border: 'none',
       outline: 'none',
-      boxShadow: 'none'
+      boxShadow: 'none',
+      overflowX: 'hidden',
+      boxSizing: 'border-box'
     }}>
       {/* Header con navegación */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '12px',
         marginBottom: '24px',
         border: 'none',
         outline: 'none',
@@ -1242,7 +1246,7 @@ const TrainerClientProgressPage: React.FC = () => {
             </div>
 
             {/* Acciones inferiores */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '10px', marginTop: 14 }}>
               <button
                 onClick={() => setActiveTab('rutinas')}
                 style={{

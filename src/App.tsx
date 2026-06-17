@@ -23,7 +23,7 @@ const ClientList = React.lazy(() => import('./components/trainer/ClientList'));
 const ClientListImproved = React.lazy(() => import('./components/trainer/ClientListImproved'));
 const ClientListComparison = React.lazy(() => import('./components/trainer/ClientListComparison'));
 const ExerciseLibrary = React.lazy(() => import('./components/ExerciseLibrary'));
-const GoogleAuthCallback = React.lazy(() => import('./pages/GoogleAuthCallback/GoogleAuthCallback'));
+import GoogleAuthCallback from './pages/GoogleAuthCallback/GoogleAuthCallback';
 const TrainerClientProgressPage = React.lazy(() => import('./pages/TrainerDashboard/TrainerClientProgressPage'));
 const RoutineCalendarPage = React.lazy(() => import('./pages/TrainerDashboard/RoutineCalendarPage'));
 const RoutineDetails = React.lazy(() => import('./components/RoutineDetails'));

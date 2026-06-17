@@ -1419,7 +1419,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                   </motion.span>
                 </h2>
               </div>
-              {lastMessagePreview?.content && (
+              {unreadMessages > 0 && lastMessagePreview?.content && (
                 <div className="messages-preview">
                   <div className="messages-preview-name"><strong>{lastMessagePreview.trainerName}</strong></div>
                   <div className="messages-preview-content">{truncate(lastMessagePreview.content, 120)}</div>

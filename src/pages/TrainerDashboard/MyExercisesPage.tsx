@@ -122,23 +122,23 @@ const MyExercisesPage: React.FC = () => {
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-[#ff4444]">Mis Ejercicios</h1>
-            <p className="text-gray-400 mt-1">Creá y gestioná tus ejercicios personalizados</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', gap: '16px' }}>
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ fontSize: 'clamp(24px, 7vw, 36px)', fontWeight: 700, color: '#ff4444', margin: 0 }}>Mis Ejercicios</h1>
+            <p style={{ color: '#9ca3af', marginTop: '4px' }}>Creá y gestioná tus ejercicios personalizados</p>
           </div>
-          <div className="flex gap-3">
+          <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
             <button
               onClick={() => navigate('/trainer-dashboard')}
-              className="px-5 py-3 border border-[#555] hover:bg-[#333] rounded-lg transition-all"
+              style={{ padding: '8px 16px', border: '1px solid #555', background: 'transparent', color: 'white', borderRadius: '8px', fontSize: '14px', cursor: 'pointer' }}
             >
               ← Dashboard
             </button>
             <button
               onClick={openNew}
-              className="px-5 py-3 bg-[#ff4444] hover:bg-[#ff3333] rounded-lg font-semibold transition-all flex items-center gap-2"
+              style={{ padding: '8px 16px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Nuevo ejercicio

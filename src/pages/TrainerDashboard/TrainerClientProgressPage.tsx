@@ -1092,14 +1092,16 @@ const TrainerClientProgressPage: React.FC = () => {
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        flexWrap: 'wrap',
+        gap: '12px',
         marginBottom: '16px',
         border: 'none',
         outline: 'none',
         boxShadow: 'none'
       }}>
         <h1 style={{
-          fontSize: '32px',
+          fontSize: 'clamp(22px, 6vw, 32px)',
           fontWeight: '700',
           color: 'white',
           margin: 0,
@@ -1107,10 +1109,12 @@ const TrainerClientProgressPage: React.FC = () => {
           letterSpacing: '0.2px',
           border: 'none',
           outline: 'none',
-          boxShadow: 'none'
+          boxShadow: 'none',
+          flexShrink: 1,
+          minWidth: 0
         }}>{client.name}</h1>
 
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
           <button 
             onClick={refreshClientData}
             title="Actualizar datos del cliente"

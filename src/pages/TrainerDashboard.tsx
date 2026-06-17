@@ -325,13 +325,13 @@ const TrainerDashboard: React.FC = () => {
                   key={client.id}
                   onClick={() => navigate(`/trainer/clients/${client.id}`)}
                   style={{
-                    background: '#1a1a2e', borderRadius: 14, padding: '18px 16px',
-                    cursor: 'pointer', border: '1px solid #2a2a3e',
+                    background: '#1e1e1e', borderRadius: 14, padding: '18px 16px',
+                    cursor: 'pointer', border: '1px solid #2a2a2a',
                     transition: 'border-color 0.2s',
                     display: 'flex', flexDirection: 'column', gap: 10
                   }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = '#dc2626')}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#2a2a3e')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#2a2a2a')}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     {client.clientProfile?.profileImage ? (

@@ -11,8 +11,7 @@ const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Cargando...'
     gap: 24,
   }}>
     <div style={{ textAlign: 'center' }}>
-      <span style={{ fontSize: 28, fontWeight: 900, color: '#dc2626', letterSpacing: 2 }}>TRAIN</span>
-      <span style={{ fontSize: 28, fontWeight: 900, color: '#ffffff', letterSpacing: 2 }}>FIT</span>
+      <span style={{ fontSize: 28, fontWeight: 900, color: '#dc2626', letterSpacing: 2 }}>TRAINFIT</span>
     </div>
     <div style={{
       width: 40,

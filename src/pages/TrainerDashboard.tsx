@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import LoadingScreen from "../components/common/LoadingScreen";
 import { useAuth } from "../contexts/AuthContext";
 import {
   UsersIcon,
@@ -141,11 +142,7 @@ const TrainerDashboard: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <div className="trainer-dashboard">
-        <p>Cargando dashboard...</p>
-      </div>
-    );
+    return <LoadingScreen message="Preparando tu dashboard..." />;
   }
 
   return (

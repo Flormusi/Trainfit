@@ -55,42 +55,20 @@
   border: 1px solid #444444 !important;
 }
 
-/* REGLAS RESPONSIVAS - Eliminar fondos blancos en todas las resoluciones */
+/* REGLAS RESPONSIVAS */
 @media (max-width: 768px) {
-  .client-list-container,
-  .client-list-container * {
-    background-color: inherit !important;
-  }
-  
   .client-list-container *[style*="background-color: white"],
   .client-list-container *[style*="background-color: #fff"],
   .client-list-container *[style*="background-color: #ffffff"] {
-    background-color: #1e1e1e !important;
-    background: #1e1e1e !important;
-  }
-  
-  .client-list-container .bg-white,
-  .client-list-container .bg-light {
     background-color: #1e1e1e !important;
     background: #1e1e1e !important;
   }
 }
 
 @media (max-width: 480px) {
-  .client-list-container,
-  .client-list-container * {
-    background-color: inherit !important;
-  }
-  
   .client-list-container *[style*="background-color: white"],
   .client-list-container *[style*="background-color: #fff"],
   .client-list-container *[style*="background-color: #ffffff"] {
-    background-color: #1e1e1e !important;
-    background: #1e1e1e !important;
-  }
-  
-  .client-list-container .bg-white,
-  .client-list-container .bg-light {
     background-color: #1e1e1e !important;
     background: #1e1e1e !important;
   }

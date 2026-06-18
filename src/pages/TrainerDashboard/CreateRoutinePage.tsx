@@ -280,15 +280,18 @@ const CreateRoutinePage: React.FC = () => {
     setError(null);
     setSuccessMessage(null);
 
-    if (!routineData.name || !routineData.clientId || !routineData.duration || !routineData.trainingObjective || routineData.exercises.length === 0) {
-      setError('Por favor, completá todos los campos obligatorios y agregá al menos un ejercicio.');
+    if (!routineData.name || !routineData.clientId || !routineData.duration || !routineData.trainingObjective) {
+      setError('Por favor, completá todos los campos obligatorios (nombre, cliente, duración y objetivo).');
       return;
     }
-    for (const ex of routineData.exercises) {
-      if (!ex.exerciseId) {
-        setError('Seleccioná un ejercicio para cada fila.');
-        return;
-      }
+    if (routineData.exercises.length === 0) {
+      setError('Agregá al menos un ejercicio antes de guardar.');
+      return;
+    }
+    const emptyRow = routineData.exercises.findIndex(ex => !ex.exerciseId || !ex.name);
+    if (emptyRow !== -1) {
+      setError(`El ejercicio #${emptyRow + 1} no tiene ningún ejercicio seleccionado. Seleccioná uno o eliminá la fila.`);
+      return;
     }
 
     try {

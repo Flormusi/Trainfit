@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import GoogleCalendarIntegration from './GoogleCalendarIntegration/GoogleCalendarIntegration';
 import { Calendar, Views, dateFnsLocalizer, View } from 'react-big-calendar';
 import { format, parse, startOfWeek, endOfWeek, startOfMonth, endOfMonth, getDay, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -90,6 +91,7 @@ const UnifiedCalendar: React.FC = () => {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [gcalOpen, setGcalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -643,7 +645,7 @@ const UnifiedCalendar: React.FC = () => {
             <p className="text-gray-400">Gestiona rutinas, sesiones y consultas en un solo lugar</p>
           </div>
           
-          <div className="calendar-actions">
+          <div className="calendar-actions" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
             <button
               onClick={() => setShowCreateModal(true)}
               className="btn-create-event"
@@ -662,8 +664,30 @@ const UnifiedCalendar: React.FC = () => {
               <Plus className="w-5 h-5" />
               <span>Nuevo Evento</span>
             </button>
+            <button
+              onClick={() => setGcalOpen(o => !o)}
+              style={{
+                padding: '10px 16px', background: gcalOpen ? '#1f2937' : '#1e1e1e',
+                border: '1px solid #374151', borderRadius: 10,
+                color: '#9ca3af', fontSize: 14, fontWeight: 600,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                transition: 'background 0.2s'
+              }}
+            >
+              📆 Google Calendar {gcalOpen ? '▲' : '▼'}
+            </button>
           </div>
         </div>
+
+        {/* Google Calendar Integration */}
+        {gcalOpen && (
+          <div style={{ marginBottom: 16 }}>
+            <GoogleCalendarIntegration
+              trainingSchedule={[]}
+              onSyncComplete={() => toast.success('Sincronizado con Google Calendar')}
+            />
+          </div>
+        )}
 
         {/* Calendario */}
         <div className="calendar-container">

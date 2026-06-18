@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import LoadingScreen from "../components/common/LoadingScreen";
-import GoogleCalendarIntegration from "../components/GoogleCalendarIntegration/GoogleCalendarIntegration";
 import { useAuth } from "../contexts/AuthContext";
 import {
   UsersIcon,
@@ -73,7 +72,6 @@ const TrainerDashboard: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showRoutineManagement, setShowRoutineManagement] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const [gcalOpen, setGcalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -436,30 +434,6 @@ const TrainerDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Google Calendar */}
-      <section className="summary-section">
-        <button
-          onClick={() => setGcalOpen(o => !o)}
-          style={{
-            width: '100%', background: '#1e1e1e', border: '1px solid #2a2a2a',
-            borderRadius: 10, padding: '12px 16px', color: '#9ca3af',
-            fontSize: 14, fontWeight: 600, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          }}
-        >
-          <span>📆 Google Calendar</span>
-          <span>{gcalOpen ? '▲' : '▼'}</span>
-        </button>
-        {gcalOpen && (
-          <div style={{ marginTop: 8 }}>
-            <GoogleCalendarIntegration
-              trainingSchedule={[]}
-              onSyncComplete={() => {}}
-            />
-          </div>
-        )}
       </section>
 
       <NotificationCenter

@@ -111,7 +111,48 @@ const CreateRoutinePage: React.FC = () => {
   const [showDropdowns, setShowDropdowns] = useState<boolean[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [hasDraft, setHasDraft] = useState(false);
   const dropdownRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const DRAFT_KEY = 'trainfit_routine_draft';
+
+  // Detectar borrador al cargar
+  useEffect(() => {
+    if (location.state?.presetRoutine) return; // no ofrecer borrador si viene de preset
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved);
+        if (draft.name || draft.exercises?.length > 0) setHasDraft(true);
+      }
+    } catch { /* ignorar */ }
+  }, []);
+
+  // Auto-save en localStorage cada vez que cambia routineData
+  useEffect(() => {
+    if (!routineData.name && routineData.exercises.length === 0) return;
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(routineData));
+    } catch { /* ignorar */ }
+  }, [routineData]);
+
+  const loadDraft = () => {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved);
+        setRoutineData(draft);
+        setSearchTerms((draft.exercises || []).map((ex: any) => ex.name || ''));
+        setShowDropdowns((draft.exercises || []).map(() => false));
+        setHasDraft(false);
+      }
+    } catch { /* ignorar */ }
+  };
+
+  const discardDraft = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    setHasDraft(false);
+  };
 
   // Cargar clientes y ejercicios
   useEffect(() => {
@@ -307,6 +348,7 @@ const CreateRoutinePage: React.FC = () => {
         })),
       };
       await trainerApi.createRoutine(payload);
+      localStorage.removeItem(DRAFT_KEY);
       setSuccessMessage('¡Rutina creada exitosamente!');
       setRoutineData({ name: '', clientId: '', duration: '', notes: '', exercises: [], trainingObjective: '', totalWeeks: 4 });
       setSearchTerms([]);
@@ -341,6 +383,21 @@ const CreateRoutinePage: React.FC = () => {
             ← {((location.state as any)?.fromLibrary) ? 'Volver a la Biblioteca' : 'Volver al Dashboard'}
           </button>
         </div>
+
+        {/* Banner borrador */}
+        {hasDraft && (
+          <div style={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 10, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <span style={{ color: '#d1d5db', fontSize: 14 }}>📝 Tenés una rutina en borrador. ¿Querés continuar donde lo dejaste?</span>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={loadDraft} style={{ padding: '8px 16px', background: '#dc2626', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                Continuar borrador
+              </button>
+              <button onClick={discardDraft} style={{ padding: '8px 16px', background: 'transparent', color: '#9ca3af', border: '1px solid #374151', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}>
+                Descartar
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="bg-[#dc3545]/10 border border-[#dc3545]/30 text-[#dc3545] px-6 py-4 rounded-lg mb-6 flex items-center gap-3">

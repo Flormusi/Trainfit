@@ -1756,20 +1756,27 @@ const TrainerClientProgressPage: React.FC = () => {
                   };
                   const label = methodLabels[p.method] || p.method || 'Sin especificar';
                   const date = new Date(p.date).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+                  const receiptUrl = p.notes?.startsWith('Comprobante: ') ? p.notes.replace('Comprobante: ', '') : null;
                   return (
-                    <div key={p.id} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      background: '#2a2a2a', borderRadius: 8, padding: '12px 16px'
-                    }}>
-                      <div>
-                        <div style={{ color: '#fff', fontWeight: 600, fontSize: 14 }}>{label}</div>
-                        <div style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }}>{date}</div>
-                        {p.notes && <div style={{ color: '#9ca3af', fontSize: 12, marginTop: 2 }}>{p.notes}</div>}
+                    <div key={p.id} style={{ background: '#2a2a2a', borderRadius: 8, padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14 }}>{label}</div>
+                          <div style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }}>{date}</div>
+                          {p.amount > 0 && <div style={{ color: '#10b981', fontSize: 13, fontWeight: 600, marginTop: 2 }}>${p.amount.toLocaleString('es-AR')}</div>}
+                        </div>
+                        <span style={{
+                          background: '#14532d', color: '#4ade80',
+                          borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600, flexShrink: 0
+                        }}>Pagado</span>
                       </div>
-                      <span style={{
-                        background: '#14532d', color: '#4ade80',
-                        borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600
-                      }}>Pagado</span>
+                      {receiptUrl && (
+                        <div style={{ marginTop: 10 }}>
+                          <a href={receiptUrl} target="_blank" rel="noopener noreferrer">
+                            <img src={receiptUrl} alt="comprobante" style={{ maxHeight: 120, borderRadius: 8, maxWidth: '100%', cursor: 'pointer' }} />
+                          </a>
+                        </div>
+                      )}
                     </div>
                   );
                 })}

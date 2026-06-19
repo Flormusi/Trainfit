@@ -251,6 +251,9 @@ const ClientDashboard: React.FC = () => {
   const [showRegisterPaymentModal, setShowRegisterPaymentModal] = useState(false);
   const [registeringPayment, setRegisteringPayment] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
+  const [paymentAmount, setPaymentAmount] = useState<string>('');
+  const [paymentReceipt, setPaymentReceipt] = useState<File | null>(null);
+  const [paymentReceiptPreview, setPaymentReceiptPreview] = useState<string | null>(null);
   const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
   const [editingTraining, setEditingTraining] = useState<any>(null);
   // Añadir contador de mensajes no leídos
@@ -1583,17 +1586,20 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
               {/* Modal inline para registrar pago */}
               {showRegisterPaymentModal && (
                 <div style={{
-                  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }} onClick={() => setShowRegisterPaymentModal(false)}>
+                  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+                  padding: '16px'
+                }} onClick={() => { setShowRegisterPaymentModal(false); setPaymentReceipt(null); setPaymentReceiptPreview(null); }}>
                   <div style={{
-                    background: '#1e1e1e', borderRadius: 16, padding: 28, width: '90%', maxWidth: 360,
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+                    background: '#1e1e1e', borderRadius: 16, padding: 24, width: '100%', maxWidth: 380,
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto'
                   }} onClick={e => e.stopPropagation()}>
-                    <h3 style={{ margin: '0 0 6px', color: '#fff', fontSize: 18, fontWeight: 700 }}>Registrar pago</h3>
-                    <p style={{ margin: '0 0 20px', color: '#9ca3af', fontSize: 13 }}>¿Cómo realizaste el pago?</p>
+                    <h3 style={{ margin: '0 0 4px', color: '#fff', fontSize: 18, fontWeight: 700 }}>Registrar pago</h3>
+                    <p style={{ margin: '0 0 18px', color: '#9ca3af', fontSize: 13 }}>Tu entrenador va a poder verlo en tu perfil.</p>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                    {/* Método de pago */}
+                    <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>¿Cómo pagaste?</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 18 }}>
                       {[
                         { value: 'mercadopago', label: '💳 Mercado Pago' },
                         { value: 'transferencia', label: '🏦 Transferencia bancaria' },
@@ -1603,8 +1609,8 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                           key={opt.value}
                           onClick={() => setSelectedPaymentMethod(opt.value)}
                           style={{
-                            padding: '12px 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                            textAlign: 'left', fontSize: 15, fontWeight: 600,
+                            padding: '11px 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                            textAlign: 'left', fontSize: 14, fontWeight: 600,
                             background: selectedPaymentMethod === opt.value ? '#dc2626' : '#2a2a2a',
                             color: selectedPaymentMethod === opt.value ? '#fff' : '#e5e7eb',
                             transition: 'background 0.15s'
@@ -1615,10 +1621,56 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                       ))}
                     </div>
 
+                    {/* Monto */}
+                    <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Monto abonado</p>
+                    <div style={{ position: 'relative', marginBottom: 18 }}>
+                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#6b7280', fontSize: 14 }}>$</span>
+                      <input
+                        type="number"
+                        placeholder="0"
+                        value={paymentAmount}
+                        onChange={e => setPaymentAmount(e.target.value)}
+                        style={{
+                          width: '100%', padding: '11px 12px 11px 24px', borderRadius: 10,
+                          border: '1px solid #3a3a3a', background: '#2a2a2a', color: '#fff',
+                          fontSize: 14, boxSizing: 'border-box', outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    {/* Comprobante */}
+                    <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Comprobante (opcional)</p>
+                    <label style={{
+                      display: 'block', border: '2px dashed #3a3a3a', borderRadius: 10,
+                      padding: 16, textAlign: 'center', cursor: 'pointer', marginBottom: 18,
+                      background: '#2a2a2a'
+                    }}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setPaymentReceipt(file);
+                            setPaymentReceiptPreview(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                      {paymentReceiptPreview ? (
+                        <img src={paymentReceiptPreview} alt="comprobante" style={{ maxHeight: 120, borderRadius: 8, maxWidth: '100%' }} />
+                      ) : (
+                        <div>
+                          <div style={{ fontSize: 28, marginBottom: 6 }}>📎</div>
+                          <div style={{ color: '#9ca3af', fontSize: 13 }}>Tocá para adjuntar foto del comprobante</div>
+                        </div>
+                      )}
+                    </label>
+
                     <div style={{ display: 'flex', gap: 10 }}>
                       <button
-                        onClick={() => setShowRegisterPaymentModal(false)}
-                        style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: '#2a2a2a', color: '#9ca3af', cursor: 'pointer', fontWeight: 600 }}
+                        onClick={() => { setShowRegisterPaymentModal(false); setPaymentReceipt(null); setPaymentReceiptPreview(null); }}
+                        style={{ flex: 1, padding: '11px', borderRadius: 8, border: 'none', background: '#2a2a2a', color: '#9ca3af', cursor: 'pointer', fontWeight: 600 }}
                       >
                         Cancelar
                       </button>
@@ -1628,9 +1680,23 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                           if (!selectedPaymentMethod) return;
                           setRegisteringPayment(true);
                           try {
-                            await clientApi.registerMyPayment({ paymentMethod: selectedPaymentMethod });
+                            let receiptUrl: string | undefined;
+                            if (paymentReceipt) {
+                              const { uploadImage } = await import('../../services/cloudinaryService');
+                              const url = await uploadImage(paymentReceipt, 'payment_receipts');
+                              if (url) receiptUrl = url;
+                            }
+                            await clientApi.registerMyPayment({
+                              paymentMethod: selectedPaymentMethod,
+                              amount: paymentAmount ? parseFloat(paymentAmount) : undefined,
+                              notes: receiptUrl ? `Comprobante: ${receiptUrl}` : undefined,
+                            });
                             toast.success('¡Pago registrado! Tu entrenador puede verlo.');
                             setShowRegisterPaymentModal(false);
+                            setPaymentReceipt(null);
+                            setPaymentReceiptPreview(null);
+                            setPaymentAmount('');
+                            setSelectedPaymentMethod('');
                           } catch {
                             toast.error('Error al registrar el pago');
                           } finally {
@@ -1638,7 +1704,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                           }
                         }}
                         style={{
-                          flex: 1, padding: '10px', borderRadius: 8, border: 'none',
+                          flex: 1, padding: '11px', borderRadius: 8, border: 'none',
                           background: selectedPaymentMethod ? '#dc2626' : '#3a3a3a',
                           color: selectedPaymentMethod ? '#fff' : '#6b7280',
                           cursor: selectedPaymentMethod ? 'pointer' : 'not-allowed',

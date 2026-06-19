@@ -21,7 +21,6 @@ import { toast } from 'react-toastify';
 import { formatCurrencyARS, calculateAnnualTotal } from '../../utils/payments';
 import { useSocket } from '../../hooks/useSocket';
 import axios from '../../services/axiosConfig';
-import LoadingScreen from '../../components/common/LoadingScreen';
 
 interface PaymentStatus {
   status: string;
@@ -29,17 +28,6 @@ interface PaymentStatus {
   dueDate?: string;
   isUpToDate: boolean;
 }
-// 🔧 Corrige imágenes que vienen con localhost desde el backend
-const normalizeImageUrl = (url?: string) => {
-  if (!url) return "";
-
-  const API_BASE = import.meta.env.VITE_API_URL.replace("/api", "");
-
-  // Si viene con localhost, lo convertimos a Render
-  return url.startsWith("http://localhost")
-    ? url.replace("http://localhost:5002", API_BASE)
-    : url;
-};
 
 interface ProgressMetrics {
   weight?: string;
@@ -225,7 +213,6 @@ const ClientDashboard: React.FC = () => {
   const [showNotificationCenter, setShowNotificationCenter] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [selectedRoutine, setSelectedRoutine] = useState<any>(null);
-  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(0);
   const [showRoutineModal, setShowRoutineModal] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -248,14 +235,6 @@ const ClientDashboard: React.FC = () => {
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showPaymentHistoryModal, setShowPaymentHistoryModal] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
-  const [showRegisterPaymentModal, setShowRegisterPaymentModal] = useState(false);
-  const [registeringPayment, setRegisteringPayment] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
-  const [paymentAmount, setPaymentAmount] = useState<string>('');
-  const [paymentReceipt, setPaymentReceipt] = useState<File | null>(null);
-  const [paymentReceiptPreview, setPaymentReceiptPreview] = useState<string | null>(null);
-  const [trainerPaymentInfo, setTrainerPaymentInfo] = useState<any>(null);
-  const [showPayCuotaModal, setShowPayCuotaModal] = useState(false);
   const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
   const [editingTraining, setEditingTraining] = useState<any>(null);
   // Añadir contador de mensajes no leídos
@@ -277,11 +256,6 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
     clientId?: string;
   }
   const [serverEvents, setServerEvents] = useState<CalendarEvent[]>([]);
-  const [gcalOpen, setGcalOpen] = useState(false);
-  const [requestChangeOpen, setRequestChangeOpen] = useState(false);
-  const [requestChangeMsg, setRequestChangeMsg] = useState('');
-  const [requestChangeSending, setRequestChangeSending] = useState(false);
-  const [trainerIdForMsg, setTrainerIdForMsg] = useState<string | null>(null);
   
   
   // Cargar eventos de Google Calendar cuando el usuario esté autenticado
@@ -315,15 +289,16 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
         params.set('startDate', startOfMonth.toISOString());
         params.set('endDate', endOfMonth.toISOString());
 
-        const [routinesRes, sessionsRes, consultationsRes] = await Promise.all([
+        const [routinesRes, sessionsRes, consultationsRes] = await Promise.allSettled([
           axios.get(`/routine-schedule`, { params: Object.fromEntries(params) }),
           axios.get(`/appointments`, { params: Object.fromEntries(params) }),
-          axios.get(`/appointments/consultations`, { params: Object.fromEntries(params) })
+          // En producción no existe /appointments/consultations; usamos /appointments y filtramos
+          axios.get(`/appointments`, { params: Object.fromEntries(params) })
         ]);
 
-        const routinesJson = routinesRes?.data ?? [];
-        const sessionsJson = sessionsRes?.data ?? [];
-        const consultationsJson = consultationsRes?.data ?? [];
+        const routinesJson = routinesRes.status === 'fulfilled' ? (routinesRes.value?.data ?? []) : [];
+        const sessionsJson = sessionsRes.status === 'fulfilled' ? (sessionsRes.value?.data ?? []) : [];
+        const consultationsJson = consultationsRes.status === 'fulfilled' ? (consultationsRes.value?.data ?? []) : [];
 
         const normalizeArray = (raw: any) => Array.isArray(raw) ? raw : (raw?.data || []);
         const normalizeDate = (v: any) => v ? new Date(v) : undefined;
@@ -506,23 +481,12 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
       
       // Cargar otros datos del dashboard
       setDashboardData(mockDashboardData);
-
-      // Cargar estado de pago real desde la DB
-      try {
-        const paymentResponse = await clientApi.getPaymentStatus();
-        if (paymentResponse?.success && paymentResponse?.paymentStatus) {
-          const ps = paymentResponse.paymentStatus;
-          setPaymentStatus({
-            status: ps.isUpToDate ? 'up-to-date' : 'overdue',
-            amount: ps.amount || 0,
-            dueDate: ps.dueDate || new Date().toISOString(),
-            isUpToDate: ps.isUpToDate
-          });
-        }
-      } catch {
-        // Si falla, dejar en null (no mostrar datos falsos)
-        setPaymentStatus(null);
-      }
+      setPaymentStatus({
+        status: 'up-to-date',
+        amount: 45000,
+         dueDate: '2025-11-04T12:00:00',
+          isUpToDate: true
+      });
       
     } catch (error) {
       console.error('Error cargando datos del dashboard:', error);
@@ -535,12 +499,6 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
   useEffect(() => {
     loadDashboardData();
   }, [user]);
-
-  useEffect(() => {
-    clientApi.getMyTrainerPaymentInfo().then(res => {
-      if (res?.data) setTrainerPaymentInfo(res.data);
-    }).catch(() => {});
-  }, []);
 
   // Obtener contador de mensajes no leídos al montar (y cuando cambie el usuario)
   useEffect(() => {
@@ -572,10 +530,6 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           setLastMessagePreview(null);
           return;
         }
-
-        // Guardar el ID del entrenador para mensajes de solicitud de cambio
-        const firstTrainer = items.find((item: any) => item.userId);
-        if (firstTrainer?.userId) setTrainerIdForMsg(firstTrainer.userId);
 
         const mapped = items
           .map((item: any) => {
@@ -787,14 +741,16 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
     trainingFrequency: string;
     objective: string;
   }) => {
-    if (!clientId) {
+    const targetId = clientId || user?.id;
+
+    if (!targetId) {
       toast.error('Error: ID de cliente no disponible');
       return;
     }
     
     try {
       // Actualizar el perfil usando la API
-      const updateResponse = await clientApi.updateProfile(clientId, {
+      const updateResponse = await clientApi.updateProfile(targetId, {
         weight: parseFloat(profileData.weight),
         trainingDaysPerWeek: parseInt(profileData.trainingFrequency),
         initialObjective: profileData.objective
@@ -828,43 +784,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
 
   // Función para solicitar cambio en el calendario
   const handleRequestChange = () => {
-    setRequestChangeMsg('');
-    setRequestChangeOpen(true);
-  };
-
-  const handleSendRequestChange = async () => {
-    if (!requestChangeMsg.trim()) {
-      toast.error('Escribí tu mensaje antes de enviar');
-      return;
-    }
-    setRequestChangeSending(true);
-    try {
-      let receiverId = trainerIdForMsg;
-      // Si no tenemos el ID del entrenador, intentar obtenerlo de conversaciones
-      if (!receiverId) {
-        const convRes = await axios.get('/messages/conversations');
-        const convItems: any[] = Array.isArray(convRes.data) ? convRes.data : (convRes.data?.data ?? []);
-        const firstTrainer = convItems.find((item: any) => item.userId);
-        if (firstTrainer?.userId) {
-          receiverId = firstTrainer.userId;
-          setTrainerIdForMsg(firstTrainer.userId);
-        }
-      }
-      if (!receiverId) {
-        toast.error('No se encontró el entrenador. Asegurate de tener conversaciones previas.');
-        setRequestChangeSending(false);
-        return;
-      }
-      const fullMsg = `📅 Solicitud de cambio de horario:\n${requestChangeMsg.trim()}`;
-      await axios.post('/messages/send', { receiverId, content: fullMsg });
-      toast.success('Solicitud enviada al entrenador ✓');
-      setRequestChangeOpen(false);
-      setRequestChangeMsg('');
-    } catch (e: any) {
-      toast.error('Error al enviar la solicitud');
-    } finally {
-      setRequestChangeSending(false);
-    }
+    toast.info('Solicitud de cambio enviada al entrenador');
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -904,17 +824,22 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
     }
   };
 
-  const handleViewPaymentHistory = async () => {
-    try {
-      const response = await clientApi.getMyPaymentHistory();
-      if (response?.success && response?.data?.length > 0) {
-        setPaymentHistory(response.data);
-      } else {
-        setPaymentHistory([]);
-      }
-    } catch {
-      setPaymentHistory([]);
-    }
+  const handleViewPaymentHistory = () => {
+    // Siempre inicializar el historial con los montos correctos (9 x 40.000, 3 x 45.000)
+    setPaymentHistory([
+      { id: '1', date: '2025-12-04T12:00:00', description: 'Cuota mensual - Diciembre 2025', amount: 45000, status: 'pending', method: 'Transferencia bancaria' },
+      { id: '2', date: '2025-11-04T12:00:00', description: 'Cuota mensual - Noviembre 2025', amount: 45000, status: 'pending', method: 'Efectivo' },
+      { id: '3', date: '2025-10-04T12:00:00', description: 'Cuota mensual - Octubre 2025', amount: 45000, status: 'paid', method: 'Transferencia bancaria' },
+      { id: '4', date: '2025-09-04T12:00:00', description: 'Cuota mensual - Septiembre 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
+      { id: '5', date: '2025-08-04T12:00:00', description: 'Cuota mensual - Agosto 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
+      { id: '6', date: '2025-07-04T12:00:00', description: 'Cuota mensual - Julio 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
+      { id: '7', date: '2025-06-04T12:00:00', description: 'Cuota mensual - Junio 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
+      { id: '8', date: '2025-05-04T12:00:00', description: 'Cuota mensual - Mayo 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
+      { id: '9', date: '2025-04-04T12:00:00', description: 'Cuota mensual - Abril 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
+      { id: '10', date: '2025-03-04T12:00:00', description: 'Cuota mensual - Marzo 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
+      { id: '11', date: '2025-02-04T12:00:00', description: 'Cuota mensual - Febrero 2025', amount: 40000, status: 'paid', method: 'Transferencia bancaria' },
+      { id: '12', date: '2025-01-04T12:00:00', description: 'Cuota mensual - Enero 2025', amount: 40000, status: 'paid', method: 'Efectivo' },
+    ]);
     setShowPaymentHistoryModal(true);
   };
 
@@ -975,7 +900,52 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
   };
 
   if (isLoadingData || !dashboardData) {
-    return <LoadingScreen message="Preparando tu dashboard..." />;
+    return (
+      <div className={`client-dashboard-page ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+        <motion.aside
+          className="dashboard-sidebar"
+          initial={false}
+          animate={{ width: isSidebarOpen ? 250 : 60 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
+          <div className="sidebar-header">
+            <motion.h2 
+              animate={{ opacity: isSidebarOpen ? 1 : 0, x: isSidebarOpen ? 0 : -10 }}
+              transition={{ delay: isSidebarOpen ? 0.1 : 0 }}
+            >
+              {isSidebarOpen ? "TRAINFIT" : ""} 
+            </motion.h2>
+            <button onClick={toggleSidebar} className="sidebar-toggle">
+              {isSidebarOpen ? '←' : '→'}
+            </button>
+          </div>
+          <nav className="sidebar-nav">
+            {isSidebarOpen ? (
+              <>
+                <a href="#/">Cargando...</a>
+                <a href="#/">Cargando...</a>
+              </>
+            ) : (
+              <>
+                <a href="#/" title="Cargando">...</a>
+                <a href="#/" title="Cargando">...</a>
+              </>
+            )}
+          </nav>
+        </motion.aside>
+        <div className="dashboard-content-wrapper">
+          <header className="dashboard-header">
+            <h1>Cargando...</h1>
+          </header>
+          <main className="dashboard-main-content">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </main>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -985,12 +955,11 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
         <div className="user-info">
           <div className="user-avatar relative cursor-pointer" onClick={() => document.getElementById('profile-image-input')?.click()}>
             {profileImage ? (
-              <img
-  src={normalizeImageUrl(profileImage)}
-  alt="Foto de perfil"
-  className="w-full h-full object-cover rounded-full"
-/>
-
+              <img 
+                src={profileImage} 
+                alt="Foto de perfil" 
+                className="w-full h-full object-cover rounded-full"
+              />
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center text-[0.6rem] font-semibold leading-[1.1]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="mb-1">
@@ -1060,104 +1029,35 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           {/* Rutina del Mes */}
           <div className="dashboard-section routine-overview">
             <div className="card main-routine-card bg-[#1e1e1e] rounded-xl p-6 shadow-md">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <h2 style={{ margin: 0 }}>💪 TU RUTINA</h2>
-                {!isLoadingRoutines && assignedRoutines.length > 0 && (
-                  <button
-                    className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-4 py-2 rounded-lg"
-                    style={{ fontSize: 13 }}
+              <h2>💪 TU RUTINA DEL MES</h2>
+              {!isLoadingRoutines && assignedRoutines.length > 0 ? (
+                <div className="routine-content">
+                  <div className="routine-name">{assignedRoutines[0]?.name}</div>
+                  <div className="routine-objective text-gray-400">🎯 Objetivo: {assignedRoutines[0]?.description || 'Objetivo no especificado'}</div>
+                  <div className="routine-week-progress text-gray-400">📅 Rutina activa</div>
+                  <button 
+                    className="routine-details-btn bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg" 
                     onClick={() => {
-                      setSelectedRoutine(assignedRoutines[selectedRoutineIndex]);
+                      setSelectedRoutine(assignedRoutines[0]);
                       setShowRoutineModal(true);
                     }}
                   >
                     Ver detalles
                   </button>
+                  </div>
+                ) : isLoadingRoutines ? (
+                  <div className="routine-content">
+                    <div className="routine-name">Cargando rutina...</div>
+                    <div className="routine-objective text-gray-400">⏳ Obteniendo información</div>
+                  </div>
+                ) : (
+                  <div className="routine-content">
+                    <div className="routine-name">No hay rutinas asignadas</div>
+                    <div className="routine-objective text-gray-400">📞 Contacta a tu entrenador para que te asigne una rutina</div>
+                  </div>
                 )}
               </div>
-
-              {isLoadingRoutines ? (
-                <div className="routine-content">
-                  <div className="routine-name">Cargando rutina...</div>
-                </div>
-              ) : assignedRoutines.length > 0 ? (
-                <div>
-                  {/* Selector de rutina si hay más de una */}
-                  {assignedRoutines.length > 1 && (
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-                      {assignedRoutines.map((r: any, i: number) => (
-                        <button
-                          key={r.id}
-                          onClick={() => setSelectedRoutineIndex(i)}
-                          style={{
-                            padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600,
-                            cursor: 'pointer', border: 'none',
-                            background: selectedRoutineIndex === i ? '#dc2626' : '#2a2a2a',
-                            color: selectedRoutineIndex === i ? '#fff' : '#9ca3af',
-                            transition: 'background 0.2s'
-                          }}
-                        >
-                          {r.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Nombre de rutina */}
-                  <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-                    {assignedRoutines[selectedRoutineIndex]?.name}
-                  </div>
-                  {assignedRoutines[selectedRoutineIndex]?.description && (
-                    <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 12 }}>
-                      🎯 {assignedRoutines[selectedRoutineIndex].description}
-                    </div>
-                  )}
-
-                  {/* Preview de ejercicios */}
-                  {(() => {
-                    const exercises: any[] = assignedRoutines[selectedRoutineIndex]?.exercises || [];
-                    const preview = exercises.slice(0, 5);
-                    if (preview.length === 0) return null;
-                    return (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {preview.map((ex: any, i: number) => {
-                          const week1 = ex.weeks?.week1;
-                          const series = week1?.series || ex.series || ex.sets || '';
-                          const reps = week1?.reps || ex.reps || '';
-                          return (
-                            <div key={i} style={{
-                              display: 'flex', alignItems: 'center', gap: 10,
-                              background: '#111', borderRadius: 8, padding: '7px 10px',
-                            }}>
-                              {ex.image_url && (
-                                <img src={ex.image_url} alt={ex.name} style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'contain', flexShrink: 0, background: '#1a1a1a', padding: 2 }} />
-                              )}
-                              <span style={{ flex: 1, fontSize: 13, color: '#e5e7eb', fontWeight: 500 }}>{ex.name}</span>
-                              {(series || reps) && (
-                                <span style={{ fontSize: 12, color: '#6b7280', flexShrink: 0 }}>
-                                  {series && `${series}×`}{reps}
-                                </span>
-                              )}
-                            </div>
-                          );
-                        })}
-                        {exercises.length > 5 && (
-                          <div style={{ fontSize: 12, color: '#6b7280', textAlign: 'center', paddingTop: 2 }}>
-                            +{exercises.length - 5} ejercicios más
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-              ) : (
-                <div className="routine-content">
-                  <div className="routine-name" style={{ color: '#9ca3af' }}>No hay rutinas asignadas</div>
-                  <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Contactá a tu entrenador para que te asigne una rutina</div>
-                </div>
-              )}
             </div>
-          </div>
 
           {/* Calendario de Entrenamientos */}
           <div className="dashboard-section training-calendar">
@@ -1320,38 +1220,13 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
             </div>
           </div>
 
-          {/* Integración Google Calendar — colapsada */}
-          <div style={{ marginTop: 8 }}>
-            <button
-              onClick={() => setGcalOpen(o => !o)}
-              style={{
-                width: '100%', background: '#1e1e1e', border: '1px solid #2a2a2a',
-                borderRadius: 10, padding: '10px 16px', color: '#9ca3af',
-                fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              }}
-            >
-              <span>📆 Integración Google Calendar</span>
-              <span>{gcalOpen ? '▲' : '▼'}</span>
-            </button>
-            {gcalOpen && (
-              <div style={{ marginTop: 4 }}>
-                <GoogleCalendarIntegration
-                  trainingSchedule={serverEvents.map((ev, i) => ({
-                    id: i + 1,
-                    date: ev.start,
-                    type: ev.title || (ev.type === 'session' ? 'Sesión' : ev.type === 'consultation' ? 'Consulta' : 'Entrenamiento'),
-                    hour: ev.start.getHours(),
-                    minute: ev.start.getMinutes(),
-                    duration: Math.max(1, (ev.end.getTime() - ev.start.getTime()) / 3600000),
-                    exercises: [],
-                    location: 'Gimnasio TrainFit'
-                  }))}
-                  onSyncComplete={() => toast.success('Entrenamientos sincronizados con Google Calendar')}
-                />
-              </div>
-            )}
-          </div>
+          {/* Integración Google Calendar */}
+          <GoogleCalendarIntegration 
+            trainingSchedule={mockTrainingSchedule}
+            onSyncComplete={() => {
+              toast.success('Entrenamientos sincronizados con Google Calendar');
+            }}
+          />
         </div>
 
         <div className="dashboard-right-column">
@@ -1410,9 +1285,9 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                   </motion.span>
                 </h2>
               </div>
-              {unreadMessages > 0 && lastMessagePreview?.content && (
+              {lastMessagePreview?.content && (
                 <div className="messages-preview">
-                  <div className="messages-preview-name"><strong>{lastMessagePreview.trainerName.split(' ')[0]}</strong></div>
+                  <div className="messages-preview-name"><strong>{lastMessagePreview.trainerName}</strong></div>
                   <div className="messages-preview-content">{truncate(lastMessagePreview.content, 120)}</div>
                   {lastMessagePreview.time && (
                     <div className="messages-preview-time">{formatShortTime(lastMessagePreview.time)}</div>
@@ -1514,15 +1389,8 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                         </div>
                         <div className="due-date-value">
                         {calculatePaymentProgress(!!paymentStatus?.isUpToDate).monthsPaid < 12 ? (
-                          paymentStatus?.dueDate ? (() => {
-                            const due = new Date(paymentStatus.dueDate);
-                            const today = new Date();
-                            // Si la fecha ya pasó y está al día, el próximo es +1 mes
-                            if (due <= today && paymentStatus.isUpToDate) {
-                              due.setMonth(due.getMonth() + 1);
-                            }
-                            return formatShortDate(due.toISOString());
-                          })() :
+                          paymentStatus?.dueDate ? 
+                            formatShortDate(paymentStatus.dueDate) : 
                             calculateNextPaymentDate()
                         ) : (
                           'No hay más pagos este año'
@@ -1580,223 +1448,15 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                   <FileText size={16} />
                   Ver historial
                 </button>
-                {trainerPaymentInfo && (trainerPaymentInfo.mpLink || trainerPaymentInfo.cbu || trainerPaymentInfo.alias) && (
-                  <button
-                    className="btn-payment primary bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold px-5 py-2 rounded-lg"
-                    onClick={() => setShowPayCuotaModal(true)}
-                  >
+                {!paymentStatus?.isUpToDate && (
+                  <button className="btn-payment primary bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg" onClick={handleMakePayment}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    Pagar cuota
+                    Pagar ahora
                   </button>
                 )}
-                <button
-                  className="btn-payment primary bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg"
-                  onClick={() => { setSelectedPaymentMethod(''); setShowRegisterPaymentModal(true); }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  Registrar pago
-                </button>
               </div>
-
-              {/* Modal inline para registrar pago */}
-              {showRegisterPaymentModal && (
-                <div style={{
-                  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-                  padding: '16px'
-                }} onClick={() => { setShowRegisterPaymentModal(false); setPaymentReceipt(null); setPaymentReceiptPreview(null); }}>
-                  <div style={{
-                    background: '#1e1e1e', borderRadius: 16, padding: 24, width: '100%', maxWidth: 380,
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto'
-                  }} onClick={e => e.stopPropagation()}>
-                    <h3 style={{ margin: '0 0 4px', color: '#fff', fontSize: 18, fontWeight: 700 }}>Registrar pago</h3>
-                    <p style={{ margin: '0 0 18px', color: '#9ca3af', fontSize: 13 }}>Tu entrenador va a poder verlo en tu perfil.</p>
-
-                    {/* Método de pago */}
-                    <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>¿Cómo pagaste?</p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 18 }}>
-                      {[
-                        { value: 'mercadopago', label: '💳 Mercado Pago' },
-                        { value: 'transferencia', label: '🏦 Transferencia bancaria' },
-                        { value: 'efectivo', label: '💵 Efectivo' },
-                      ].map(opt => (
-                        <button
-                          key={opt.value}
-                          onClick={() => setSelectedPaymentMethod(opt.value)}
-                          style={{
-                            padding: '11px 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                            textAlign: 'left', fontSize: 14, fontWeight: 600,
-                            background: selectedPaymentMethod === opt.value ? '#dc2626' : '#2a2a2a',
-                            color: selectedPaymentMethod === opt.value ? '#fff' : '#e5e7eb',
-                            transition: 'background 0.15s'
-                          }}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Monto */}
-                    <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Monto abonado</p>
-                    <div style={{ position: 'relative', marginBottom: 18 }}>
-                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#6b7280', fontSize: 14 }}>$</span>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={paymentAmount}
-                        onChange={e => setPaymentAmount(e.target.value)}
-                        style={{
-                          width: '100%', padding: '11px 12px 11px 24px', borderRadius: 10,
-                          border: '1px solid #3a3a3a', background: '#2a2a2a', color: '#fff',
-                          fontSize: 14, boxSizing: 'border-box', outline: 'none'
-                        }}
-                      />
-                    </div>
-
-                    {/* Comprobante */}
-                    <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Comprobante (opcional)</p>
-                    <label style={{
-                      display: 'block', border: '2px dashed #3a3a3a', borderRadius: 10,
-                      padding: 16, textAlign: 'center', cursor: 'pointer', marginBottom: 18,
-                      background: '#2a2a2a'
-                    }}>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={e => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setPaymentReceipt(file);
-                            setPaymentReceiptPreview(URL.createObjectURL(file));
-                          }
-                        }}
-                      />
-                      {paymentReceiptPreview ? (
-                        <img src={paymentReceiptPreview} alt="comprobante" style={{ maxHeight: 120, borderRadius: 8, maxWidth: '100%' }} />
-                      ) : (
-                        <div>
-                          <div style={{ fontSize: 28, marginBottom: 6 }}>📎</div>
-                          <div style={{ color: '#9ca3af', fontSize: 13 }}>Tocá para adjuntar foto del comprobante</div>
-                        </div>
-                      )}
-                    </label>
-
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <button
-                        onClick={() => { setShowRegisterPaymentModal(false); setPaymentReceipt(null); setPaymentReceiptPreview(null); }}
-                        style={{ flex: 1, padding: '11px', borderRadius: 8, border: 'none', background: '#2a2a2a', color: '#9ca3af', cursor: 'pointer', fontWeight: 600 }}
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        disabled={!selectedPaymentMethod || registeringPayment}
-                        onClick={async () => {
-                          if (!selectedPaymentMethod) return;
-                          setRegisteringPayment(true);
-                          try {
-                            let receiptUrl: string | undefined;
-                            if (paymentReceipt) {
-                              const { uploadImage } = await import('../../services/cloudinaryService');
-                              const url = await uploadImage(paymentReceipt, 'payment_receipts');
-                              if (url) receiptUrl = url;
-                            }
-                            await clientApi.registerMyPayment({
-                              paymentMethod: selectedPaymentMethod,
-                              amount: paymentAmount ? parseFloat(paymentAmount) : undefined,
-                              notes: receiptUrl ? `Comprobante: ${receiptUrl}` : undefined,
-                            });
-                            toast.success('¡Pago registrado! Tu entrenador puede verlo.');
-                            setShowRegisterPaymentModal(false);
-                            setPaymentReceipt(null);
-                            setPaymentReceiptPreview(null);
-                            setPaymentAmount('');
-                            setSelectedPaymentMethod('');
-                          } catch {
-                            toast.error('Error al registrar el pago');
-                          } finally {
-                            setRegisteringPayment(false);
-                          }
-                        }}
-                        style={{
-                          flex: 1, padding: '11px', borderRadius: 8, border: 'none',
-                          background: selectedPaymentMethod ? '#dc2626' : '#3a3a3a',
-                          color: selectedPaymentMethod ? '#fff' : '#6b7280',
-                          cursor: selectedPaymentMethod ? 'pointer' : 'not-allowed',
-                          fontWeight: 700, fontSize: 14
-                        }}
-                      >
-                        {registeringPayment ? 'Enviando...' : 'Confirmar'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Modal Pagar cuota */}
-              {showPayCuotaModal && trainerPaymentInfo && (
-                <div style={{
-                  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16
-                }} onClick={() => setShowPayCuotaModal(false)}>
-                  <div style={{
-                    background: '#1e1e1e', borderRadius: 16, padding: 24, width: '100%', maxWidth: 380,
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto'
-                  }} onClick={e => e.stopPropagation()}>
-                    <h3 style={{ margin: '0 0 4px', color: '#fff', fontSize: 18, fontWeight: 700 }}>Pagar cuota</h3>
-                    {trainerPaymentInfo.monthlyFee && (
-                      <p style={{ margin: '0 0 18px', color: '#10b981', fontSize: 16, fontWeight: 700 }}>
-                        ${parseFloat(trainerPaymentInfo.monthlyFee).toLocaleString('es-AR')}
-                      </p>
-                    )}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {trainerPaymentInfo.mpLink && (
-                        <a href={trainerPaymentInfo.mpLink} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                          <div style={{ background: '#009ee3', borderRadius: 12, padding: 16, textAlign: 'center' }}>
-                            <div style={{ color: '#fff', fontWeight: 700, fontSize: 16, marginBottom: 4 }}>💳 Mercado Pago</div>
-                            <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>Tocá para pagar online</div>
-                          </div>
-                        </a>
-                      )}
-                      {(trainerPaymentInfo.cbu || trainerPaymentInfo.alias) && (
-                        <div style={{ background: '#2a2a2a', borderRadius: 12, padding: 16 }}>
-                          <div style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 10 }}>🏦 Transferencia bancaria</div>
-                          {trainerPaymentInfo.bankName && <div style={{ color: '#9ca3af', fontSize: 13, marginBottom: 4 }}>Banco: <span style={{ color: '#e5e7eb' }}>{trainerPaymentInfo.bankName}</span></div>}
-                          {trainerPaymentInfo.cbu && (
-                            <div style={{ color: '#9ca3af', fontSize: 13, marginBottom: 4 }}>
-                              CBU: <span style={{ color: '#e5e7eb', fontFamily: 'monospace' }}>{trainerPaymentInfo.cbu}</span>
-                              <button onClick={() => { navigator.clipboard.writeText(trainerPaymentInfo.cbu); toast.success('CBU copiado'); }}
-                                style={{ marginLeft: 8, background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>Copiar</button>
-                            </div>
-                          )}
-                          {trainerPaymentInfo.alias && (
-                            <div style={{ color: '#9ca3af', fontSize: 13 }}>
-                              Alias: <span style={{ color: '#e5e7eb', fontFamily: 'monospace' }}>{trainerPaymentInfo.alias}</span>
-                              <button onClick={() => { navigator.clipboard.writeText(trainerPaymentInfo.alias); toast.success('Alias copiado'); }}
-                                style={{ marginLeft: 8, background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>Copiar</button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <div style={{ background: '#1a2e1a', borderRadius: 12, padding: 16 }}>
-                        <div style={{ color: '#4ade80', fontWeight: 700, fontSize: 15, marginBottom: 4 }}>💵 Efectivo</div>
-                        <div style={{ color: '#9ca3af', fontSize: 13 }}>Coordiná con tu entrenador para pagar en mano.</div>
-                      </div>
-                    </div>
-                    <p style={{ color: '#6b7280', fontSize: 12, marginTop: 16, textAlign: 'center' }}>
-                      Una vez que pagás, usá "Registrar pago" para avisarle a tu entrenador.
-                    </p>
-                    <button onClick={() => setShowPayCuotaModal(false)}
-                      style={{ width: '100%', marginTop: 8, padding: '11px', borderRadius: 8, border: 'none', background: '#2a2a2a', color: '#9ca3af', cursor: 'pointer', fontWeight: 600 }}>
-                      Cerrar
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -1895,68 +1555,6 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           onClose={() => setShowPaymentHistoryModal(false)}
           paymentHistory={paymentHistory}
         />
-      )}
-
-      {/* Modal de Solicitud de Cambio de Horario */}
-      {requestChangeOpen && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 9999,
-            background: 'rgba(0,0,0,0.55)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center'
-          }}
-          onClick={() => setRequestChangeOpen(false)}
-        >
-          <div
-            style={{
-              background: '#fff', borderRadius: 16, padding: '28px 28px 24px',
-              maxWidth: 440, width: '90%', boxShadow: '0 8px 40px rgba(0,0,0,0.18)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 style={{ margin: '0 0 6px', fontSize: 18, fontWeight: 700, color: '#1a1a2e' }}>
-              📅 Solicitar cambio de horario
-            </h3>
-            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#666' }}>
-              Contale a tu entrenador qué necesitás cambiar: si no podés ir, necesitás otro horario, día u otra aclaración.
-            </p>
-            <textarea
-              value={requestChangeMsg}
-              onChange={(e) => setRequestChangeMsg(e.target.value)}
-              placeholder="Ej: No puedo ir el martes, ¿podemos cambiar al miércoles a las 18hs?"
-              style={{
-                width: '100%', minHeight: 110, border: '1.5px solid #ddd',
-                borderRadius: 10, padding: '10px 12px', fontSize: 14,
-                resize: 'vertical', outline: 'none', fontFamily: 'inherit',
-                boxSizing: 'border-box'
-              }}
-              autoFocus
-            />
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
-              <button
-                onClick={() => setRequestChangeOpen(false)}
-                style={{
-                  padding: '9px 20px', borderRadius: 8, border: '1.5px solid #ddd',
-                  background: '#f5f5f5', cursor: 'pointer', fontSize: 14, fontWeight: 600
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSendRequestChange}
-                disabled={requestChangeSending}
-                style={{
-                  padding: '9px 22px', borderRadius: 8, border: 'none',
-                  background: 'linear-gradient(90deg, #dc2626, #b91c1c)',
-                  color: '#fff', cursor: requestChangeSending ? 'not-allowed' : 'pointer',
-                  fontSize: 14, fontWeight: 700, opacity: requestChangeSending ? 0.7 : 1
-                }}
-              >
-                {requestChangeSending ? 'Enviando...' : 'Enviar solicitud'}
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

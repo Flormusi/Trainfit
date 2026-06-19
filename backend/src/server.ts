@@ -30,11 +30,23 @@ const PORT = process.env.PORT || 5004;
 // process.exit(1); // Salir si no se puede conectar a la BD
 // });
 
+async function runMigrations() {
+  try {
+    await prisma.$executeRaw`ALTER TABLE "ClientProfile" ADD COLUMN IF NOT EXISTS "membershipTier" TEXT`;
+    await prisma.$executeRaw`ALTER TABLE "ClientProfile" ADD COLUMN IF NOT EXISTS "nickname" TEXT`;
+    await prisma.$executeRaw`ALTER TABLE "PaymentPreference" ADD COLUMN IF NOT EXISTS "dueDate" TIMESTAMP`;
+    console.log('✅ Migrations OK (membershipTier, nickname, dueDate)');
+  } catch (e: any) {
+    console.log('⚠️ Migration warning:', e.message);
+  }
+}
+
 async function main() {
   // Prisma Client se conecta automáticamente basado en DATABASE_URL en .env
   try {
     await prisma.$connect();
     console.log('✅ Connected to PostgreSQL via Prisma');
+    await runMigrations();
     console.log('🔄 Starting server with cron jobs and WebSocket support...');
 
     // Crear servidor HTTP

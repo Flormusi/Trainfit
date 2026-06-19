@@ -478,6 +478,16 @@ export const trainerApi = {
     return response.data;
   },
 
+  getPaymentInfo: async () => {
+    const response = await axios.get('/trainer/payment-info');
+    return response.data;
+  },
+
+  savePaymentInfo: async (data: { mpLink?: string; cbu?: string; alias?: string; bankName?: string; monthlyFee?: number }) => {
+    const response = await axios.put('/trainer/payment-info', data);
+    return response.data;
+  },
+
   saveClientPayment: async (clientId: string, paymentData: { amount: number; dueDate: string; status: string }) => {
     const response = await axios.put(`/payments/client/${clientId}`, paymentData);
     return response.data;
@@ -664,6 +674,11 @@ export const clientApi = {
 
   registerMyPayment: async (data: { paymentMethod: string; amount?: number; notes?: string }) => {
     const response = await axios.post('/payments/my-payment', data);
+    return response.data;
+  },
+
+  getMyTrainerPaymentInfo: async () => {
+    const response = await axios.get('/trainer/my-trainer-payment-info');
     return response.data;
   },
 

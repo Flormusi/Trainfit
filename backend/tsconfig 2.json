@@ -8,7 +8,6 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "noEmitOnError": false,
     "resolveJsonModule": true,
     "typeRoots": [
       "./node_modules/@types",
@@ -24,17 +23,10 @@
     "routes/**/*",
     "server.ts",
     "prisma/**/*",
-    "src/types/**/*"
+    "src/types/**/*" // <--- LÍNEA AGREGADA
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "src/legacy/**/*",
-    "src/controllers/calendarController.ts",
-    "src/services/calendarService.ts",
-    "src/services/icsService.ts",
-    "src/services/whatsappService.ts",
-    "src/middleware/emailValidation.middleware.ts",
-    "src/scripts/**/*"
+    "dist"
   ]
 }

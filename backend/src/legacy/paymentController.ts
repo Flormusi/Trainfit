@@ -241,14 +241,22 @@ export const updateClientPayment = async (req: AuthenticatedRequest, res: Respon
     }
 
     // Crear o actualizar información de pago
+    // Obtener nombre del cliente para la descripción
+    const clientUser = await prisma.user.findUnique({
+      where: { id: clientId },
+      select: { name: true }
+    });
+    const clientName = clientUser?.name || clientId;
+
     const paymentData = {
       trainerId: user.id,
       clientId: clientId,
       amount: parseFloat(amount),
-      planType: planType,
-      status: status || 'pending',
-      description: `Plan ${planType} - Cliente ${clientId}`,
-      externalReference: `manual-${user.id}-${clientId}-${Date.now()}`
+      planType: planType || 'mensual',
+      status: status || 'paid',
+      description: `Cuota mensual - ${clientName}`,
+      externalReference: `manual-${user.id}-${clientId}-${Date.now()}`,
+      ...(dueDate && { dueDate: new Date(dueDate) })
     };
 
     const updatedPayment = await prisma.paymentPreference.create({
@@ -267,5 +275,34 @@ export const updateClientPayment = async (req: AuthenticatedRequest, res: Respon
       message: 'Error al actualizar información de pago',
       error: error.message 
     });
+  }
+};
+// Obtener historial de pagos del cliente (para el dashboard del cliente)
+export const getMyPaymentHistory = async (req: any, res: Response): Promise<void> => {
+  try {
+    const user = req.user;
+    if (!user || !user.id) {
+      res.status(401).json({ message: 'Usuario no autenticado' });
+      return;
+    }
+
+    const payments = await prisma.paymentPreference.findMany({
+      where: { clientId: user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 24
+    });
+
+    const history = payments.map((p: any, i: number) => ({
+      id: p.id,
+      date: p.dueDate || p.createdAt,
+      description: p.description || `Cuota mensual`,
+      amount: p.amount,
+      status: p.status === 'paid' || p.status === 'approved' ? 'paid' : 'pending',
+      method: 'Transferencia bancaria'
+    }));
+
+    res.status(200).json({ success: true, data: history });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Error al obtener historial', error: error.message });
   }
 };

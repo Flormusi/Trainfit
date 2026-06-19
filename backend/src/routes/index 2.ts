@@ -7,12 +7,10 @@ import clientStatsRoutes from './clientStats.routes';
 import userRoutes from './user.routes';
 import trainerRoutes from './trainer.routes';
 import routineRoutes from './routine.routes';
-import routineTemplateRoutes from './routineTemplate.routes';
 import messageRoutes from './messageRoutes';
 import appointmentRoutes from './appointmentRoutes';
 import reminderRoutes from './reminderRoutes';
 import paymentRoutes from './payment.routes';
-import clientPaymentRoutes from './paymentRoutes';
 import paymentReminderRoutes from './paymentReminderRoutes';
 import webhookRoutes from './webhook.routes';
 
@@ -31,12 +29,10 @@ router.use('/clients/stats', clientStatsRoutes);
 router.use('/users', userRoutes);
 router.use('/trainer', trainerRoutes);
 router.use('/routines', routineRoutes);
-router.use('/routine-templates', routineTemplateRoutes);
 router.use('/messages', messageRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/reminders', reminderRoutes);
 router.use('/payments', paymentRoutes);
-router.use('/payments', clientPaymentRoutes);
 router.use('/payment-reminders', paymentReminderRoutes);
 router.use('/webhooks', webhookRoutes);
 

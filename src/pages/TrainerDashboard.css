@@ -500,3 +500,25 @@
   background: #242424;
   border-color: rgba(255,59,48,0.45);
 }
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .dashboard-header {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .greeting h2 {
+    font-size: 18px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .logout-btn {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+}

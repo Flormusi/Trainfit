@@ -9,17 +9,8 @@ import { errorHandler, notFound } from './utils/responseHandler';
 
 const app = express();
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5174',
-  'https://trainfit.vercel.app',
-  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [])
-];
-
 app.use(cors({
-  origin: allowedOrigins,
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
@@ -58,11 +49,6 @@ app.use((req, res, next) => {
 // Ruta raíz
 app.get('/', (req, res) => {
   res.json({ message: 'Bienvenido a la API de Trainfit' });
-});
-
-// Health check para keep-alive (Render free tier)
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
 });
 
 // Rutas

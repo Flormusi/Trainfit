@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LoadingScreen from "../components/common/LoadingScreen";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -27,6 +27,120 @@ import NotificationCenter from "../components/NotificationCenter";
 import DashboardCharts from "../components/charts/DashboardCharts";
 import RoutineManagement from "../components/RoutineManagement";
 import "./TrainerDashboard.css";
+import toast from "react-hot-toast";
+
+const PaymentInfoSection: React.FC = () => {
+  const [info, setInfo] = useState({ mpLink: '', cbu: '', alias: '', bankName: '', monthlyFee: '' });
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    trainerApi.getPaymentInfo().then(res => {
+      if (res?.data) {
+        setInfo({
+          mpLink: res.data.mpLink || '',
+          cbu: res.data.cbu || '',
+          alias: res.data.alias || '',
+          bankName: res.data.bankName || '',
+          monthlyFee: res.data.monthlyFee ? String(res.data.monthlyFee) : '',
+        });
+      }
+      setLoaded(true);
+    }).catch(() => setLoaded(true));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await trainerApi.savePaymentInfo({
+        mpLink: info.mpLink || undefined,
+        cbu: info.cbu || undefined,
+        alias: info.alias || undefined,
+        bankName: info.bankName || undefined,
+        monthlyFee: info.monthlyFee ? parseFloat(info.monthlyFee) : undefined,
+      });
+      toast.success('Datos de cobro guardados');
+      setEditing(false);
+    } catch {
+      toast.error('Error al guardar');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!loaded) return null;
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 12px', borderRadius: 8,
+    border: '1px solid #3a3a3a', background: '#111', color: '#fff',
+    fontSize: 14, boxSizing: 'border-box', outline: 'none'
+  };
+
+  const hasData = info.mpLink || info.cbu || info.alias;
+
+  return (
+    <section style={{ padding: '0 24px 24px' }}>
+      <div style={{ background: '#1e1e1e', borderRadius: 12, padding: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h2 style={{ margin: 0, color: '#fff', fontSize: 18, fontWeight: 700 }}>💳 Mis datos de cobro</h2>
+          {!editing && (
+            <button onClick={() => setEditing(true)} style={{ background: '#2a2a2a', color: '#e5e7eb', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+              {hasData ? 'Editar' : 'Configurar'}
+            </button>
+          )}
+        </div>
+
+        {!editing ? (
+          <div>
+            {!hasData && !info.monthlyFee ? (
+              <p style={{ color: '#6b7280', fontSize: 14, margin: 0 }}>
+                Configurá tus datos de cobro para que los alumnos puedan pagar y recibir recordatorios con la info correcta.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {info.monthlyFee && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>Cuota mensual:</span> <strong style={{ color: '#10b981' }}>${parseFloat(info.monthlyFee).toLocaleString('es-AR')}</strong></div>}
+                {info.mpLink && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>Link MP:</span> <a href={info.mpLink} target="_blank" rel="noreferrer" style={{ color: '#009ee3' }}>{info.mpLink}</a></div>}
+                {info.cbu && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>CBU:</span> <span style={{ fontFamily: 'monospace' }}>{info.cbu}</span></div>}
+                {info.alias && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>Alias:</span> <span style={{ fontFamily: 'monospace' }}>{info.alias}</span></div>}
+                {info.bankName && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>Banco:</span> {info.bankName}</div>}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={{ color: '#9ca3af', fontSize: 12, display: 'block', marginBottom: 4 }}>Cuota mensual ($)</label>
+              <input style={inputStyle} type="number" placeholder="Ej: 50000" value={info.monthlyFee} onChange={e => setInfo(p => ({ ...p, monthlyFee: e.target.value }))} />
+            </div>
+            <div>
+              <label style={{ color: '#9ca3af', fontSize: 12, display: 'block', marginBottom: 4 }}>Link de Mercado Pago</label>
+              <input style={inputStyle} type="url" placeholder="https://link.mercadopago.com.ar/..." value={info.mpLink} onChange={e => setInfo(p => ({ ...p, mpLink: e.target.value }))} />
+            </div>
+            <div>
+              <label style={{ color: '#9ca3af', fontSize: 12, display: 'block', marginBottom: 4 }}>CBU</label>
+              <input style={inputStyle} type="text" placeholder="22 dígitos" value={info.cbu} onChange={e => setInfo(p => ({ ...p, cbu: e.target.value }))} />
+            </div>
+            <div>
+              <label style={{ color: '#9ca3af', fontSize: 12, display: 'block', marginBottom: 4 }}>Alias</label>
+              <input style={inputStyle} type="text" placeholder="nombre.apellido.banco" value={info.alias} onChange={e => setInfo(p => ({ ...p, alias: e.target.value }))} />
+            </div>
+            <div>
+              <label style={{ color: '#9ca3af', fontSize: 12, display: 'block', marginBottom: 4 }}>Nombre del banco (opcional)</label>
+              <input style={inputStyle} type="text" placeholder="Ej: Banco Galicia" value={info.bankName} onChange={e => setInfo(p => ({ ...p, bankName: e.target.value }))} />
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+              <button onClick={() => setEditing(false)} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: '#2a2a2a', color: '#9ca3af', cursor: 'pointer', fontWeight: 600 }}>Cancelar</button>
+              <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: '#dc2626', color: '#fff', cursor: 'pointer', fontWeight: 700 }}>
+                {saving ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
 
 interface DashboardData {
   clientCount: number;
@@ -435,6 +549,9 @@ const TrainerDashboard: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Datos de cobro */}
+      <PaymentInfoSection />
 
       <NotificationCenter
         isVisible={showNotifications}

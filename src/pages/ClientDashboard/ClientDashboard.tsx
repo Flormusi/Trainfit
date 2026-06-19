@@ -1640,23 +1640,6 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                       ))}
                     </div>
 
-                    {/* Monto */}
-                    <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Monto abonado</p>
-                    <div style={{ position: 'relative', marginBottom: 18 }}>
-                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#6b7280', fontSize: 14 }}>$</span>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={paymentAmount}
-                        onChange={e => setPaymentAmount(e.target.value)}
-                        style={{
-                          width: '100%', padding: '11px 12px 11px 24px', borderRadius: 10,
-                          border: '1px solid #3a3a3a', background: '#2a2a2a', color: '#fff',
-                          fontSize: 14, boxSizing: 'border-box', outline: 'none'
-                        }}
-                      />
-                    </div>
-
                     {/* Comprobante */}
                     <p style={{ color: '#e5e7eb', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Comprobante (opcional)</p>
                     <label style={{
@@ -1748,11 +1731,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                     boxShadow: '0 20px 60px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto'
                   }} onClick={e => e.stopPropagation()}>
                     <h3 style={{ margin: '0 0 4px', color: '#fff', fontSize: 18, fontWeight: 700 }}>Pagar cuota</h3>
-                    {trainerPaymentInfo.monthlyFee && (
-                      <p style={{ margin: '0 0 18px', color: '#10b981', fontSize: 16, fontWeight: 700 }}>
-                        ${parseFloat(trainerPaymentInfo.monthlyFee).toLocaleString('es-AR')}
-                      </p>
-                    )}
+                    <p style={{ margin: '0 0 18px', color: '#9ca3af', fontSize: 13 }}>Elegí cómo querés pagar.</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {trainerPaymentInfo.mpLink && (
                         <a href={trainerPaymentInfo.mpLink} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>

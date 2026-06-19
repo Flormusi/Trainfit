@@ -99,7 +99,6 @@ const PaymentInfoSection: React.FC = () => {
               </p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {info.monthlyFee && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>Cuota mensual:</span> <strong style={{ color: '#10b981' }}>${parseFloat(info.monthlyFee).toLocaleString('es-AR')}</strong></div>}
                 {info.mpLink && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>Link MP:</span> <a href={info.mpLink} target="_blank" rel="noreferrer" style={{ color: '#009ee3' }}>{info.mpLink}</a></div>}
                 {info.cbu && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>CBU:</span> <span style={{ fontFamily: 'monospace' }}>{info.cbu}</span></div>}
                 {info.alias && <div style={{ color: '#e5e7eb', fontSize: 14 }}><span style={{ color: '#6b7280' }}>Alias:</span> <span style={{ fontFamily: 'monospace' }}>{info.alias}</span></div>}
@@ -109,10 +108,6 @@ const PaymentInfoSection: React.FC = () => {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div>
-              <label style={{ color: '#9ca3af', fontSize: 12, display: 'block', marginBottom: 4 }}>Cuota mensual ($)</label>
-              <input style={inputStyle} type="number" placeholder="Ej: 50000" value={info.monthlyFee} onChange={e => setInfo(p => ({ ...p, monthlyFee: e.target.value }))} />
-            </div>
             <div>
               <label style={{ color: '#9ca3af', fontSize: 12, display: 'block', marginBottom: 4 }}>Link de Mercado Pago</label>
               <input style={inputStyle} type="url" placeholder="https://link.mercadopago.com.ar/..." value={info.mpLink} onChange={e => setInfo(p => ({ ...p, mpLink: e.target.value }))} />

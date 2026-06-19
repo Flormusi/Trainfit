@@ -98,12 +98,24 @@ const TrainerClientProgressPage: React.FC = () => {
   const [isEditPaymentModalOpen, setIsEditPaymentModalOpen] = useState(false);
   const [editPaymentAmount, setEditPaymentAmount] = useState('');
   const [editPaymentDueDate, setEditPaymentDueDate] = useState('');
+  const [clientPaymentHistory, setClientPaymentHistory] = useState<any[]>([]);
+  const [loadingPaymentHistory, setLoadingPaymentHistory] = useState(false);
 
   useEffect(() => {
     if (clientId) {
       fetchClientData();
     }
   }, [clientId]);
+
+  useEffect(() => {
+    if (activeTab === 'pagos' && clientId && clientPaymentHistory.length === 0) {
+      setLoadingPaymentHistory(true);
+      trainerApi.getClientPaymentHistory(clientId)
+        .then(res => setClientPaymentHistory(res?.data || []))
+        .catch(() => {})
+        .finally(() => setLoadingPaymentHistory(false));
+    }
+  }, [activeTab, clientId]);
 
   // Detectar cuando se regresa de la edición y recargar datos
   useEffect(() => {
@@ -1721,6 +1733,46 @@ const TrainerClientProgressPage: React.FC = () => {
                 >
                   ✏️ Agregar información de pago
                 </button>
+              </div>
+            )}
+          </div>
+
+          {/* Historial de pagos registrados por el cliente */}
+          <div style={{ backgroundColor: '#1a1a1a', borderRadius: 12, padding: 24, border: 'none' }}>
+            <h3 style={{ color: '#fff', marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
+              Pagos registrados por el alumno
+            </h3>
+            {loadingPaymentHistory ? (
+              <p style={{ color: '#6b7280', fontSize: 13 }}>Cargando...</p>
+            ) : clientPaymentHistory.length === 0 ? (
+              <p style={{ color: '#6b7280', fontSize: 13 }}>El alumno no registró pagos todavía.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {clientPaymentHistory.map((p: any) => {
+                  const methodLabels: Record<string, string> = {
+                    mercadopago: '💳 Mercado Pago',
+                    transferencia: '🏦 Transferencia',
+                    efectivo: '💵 Efectivo',
+                  };
+                  const label = methodLabels[p.method] || p.method || 'Sin especificar';
+                  const date = new Date(p.date).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+                  return (
+                    <div key={p.id} style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      background: '#2a2a2a', borderRadius: 8, padding: '12px 16px'
+                    }}>
+                      <div>
+                        <div style={{ color: '#fff', fontWeight: 600, fontSize: 14 }}>{label}</div>
+                        <div style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }}>{date}</div>
+                        {p.notes && <div style={{ color: '#9ca3af', fontSize: 12, marginTop: 2 }}>{p.notes}</div>}
+                      </div>
+                      <span style={{
+                        background: '#14532d', color: '#4ade80',
+                        borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600
+                      }}>Pagado</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

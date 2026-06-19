@@ -248,6 +248,9 @@ const ClientDashboard: React.FC = () => {
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showPaymentHistoryModal, setShowPaymentHistoryModal] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
+  const [showRegisterPaymentModal, setShowRegisterPaymentModal] = useState(false);
+  const [registeringPayment, setRegisteringPayment] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
   const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
   const [editingTraining, setEditingTraining] = useState<any>(null);
   // Añadir contador de mensajes no leídos
@@ -1566,15 +1569,88 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                   <FileText size={16} />
                   Ver historial
                 </button>
-                {!paymentStatus?.isUpToDate && (
-                  <button className="btn-payment primary bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg" onClick={handleMakePayment}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Pagar ahora
-                  </button>
-                )}
+                <button
+                  className="btn-payment primary bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-5 py-2 rounded-lg"
+                  onClick={() => { setSelectedPaymentMethod(''); setShowRegisterPaymentModal(true); }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Registrar pago
+                </button>
               </div>
+
+              {/* Modal inline para registrar pago */}
+              {showRegisterPaymentModal && (
+                <div style={{
+                  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                }} onClick={() => setShowRegisterPaymentModal(false)}>
+                  <div style={{
+                    background: '#1e1e1e', borderRadius: 16, padding: 28, width: '90%', maxWidth: 360,
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+                  }} onClick={e => e.stopPropagation()}>
+                    <h3 style={{ margin: '0 0 6px', color: '#fff', fontSize: 18, fontWeight: 700 }}>Registrar pago</h3>
+                    <p style={{ margin: '0 0 20px', color: '#9ca3af', fontSize: 13 }}>¿Cómo realizaste el pago?</p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                      {[
+                        { value: 'mercadopago', label: '💳 Mercado Pago' },
+                        { value: 'transferencia', label: '🏦 Transferencia bancaria' },
+                        { value: 'efectivo', label: '💵 Efectivo' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setSelectedPaymentMethod(opt.value)}
+                          style={{
+                            padding: '12px 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                            textAlign: 'left', fontSize: 15, fontWeight: 600,
+                            background: selectedPaymentMethod === opt.value ? '#dc2626' : '#2a2a2a',
+                            color: selectedPaymentMethod === opt.value ? '#fff' : '#e5e7eb',
+                            transition: 'background 0.15s'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button
+                        onClick={() => setShowRegisterPaymentModal(false)}
+                        style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: '#2a2a2a', color: '#9ca3af', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        disabled={!selectedPaymentMethod || registeringPayment}
+                        onClick={async () => {
+                          if (!selectedPaymentMethod) return;
+                          setRegisteringPayment(true);
+                          try {
+                            await clientApi.registerMyPayment({ paymentMethod: selectedPaymentMethod });
+                            toast.success('¡Pago registrado! Tu entrenador puede verlo.');
+                            setShowRegisterPaymentModal(false);
+                          } catch {
+                            toast.error('Error al registrar el pago');
+                          } finally {
+                            setRegisteringPayment(false);
+                          }
+                        }}
+                        style={{
+                          flex: 1, padding: '10px', borderRadius: 8, border: 'none',
+                          background: selectedPaymentMethod ? '#dc2626' : '#3a3a3a',
+                          color: selectedPaymentMethod ? '#fff' : '#6b7280',
+                          cursor: selectedPaymentMethod ? 'pointer' : 'not-allowed',
+                          fontWeight: 700, fontSize: 14
+                        }}
+                      >
+                        {registeringPayment ? 'Enviando...' : 'Confirmar'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

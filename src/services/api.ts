@@ -473,6 +473,11 @@ export const trainerApi = {
     return response.data;
   },
 
+  getClientPaymentHistory: async (clientId: string) => {
+    const response = await axios.get(`/payments/client/${clientId}/history`);
+    return response.data;
+  },
+
   saveClientPayment: async (clientId: string, paymentData: { amount: number; dueDate: string; status: string }) => {
     const response = await axios.put(`/payments/client/${clientId}`, paymentData);
     return response.data;
@@ -654,6 +659,11 @@ export const clientApi = {
   
   getMyPaymentHistory: async () => {
     const response = await axios.get('/payments/my-history');
+    return response.data;
+  },
+
+  registerMyPayment: async (data: { paymentMethod: string; amount?: number; notes?: string }) => {
+    const response = await axios.post('/payments/my-payment', data);
     return response.data;
   },
 

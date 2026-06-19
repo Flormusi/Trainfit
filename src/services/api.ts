@@ -538,7 +538,7 @@ export const clientApi = {
   },
   
   getAssignedRoutines: async () => {
-    const response = await axios.get('/clients/profile/routines');
+    const response = await axios.get('/clients/routines');
     // El backend devuelve { success: true, data: rutinas }
     return response.data;
   },

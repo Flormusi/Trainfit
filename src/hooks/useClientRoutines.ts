@@ -35,14 +35,9 @@ export const useClientRoutines = (): UseClientRoutinesReturn => {
       console.log('📊 Datos de rutinas:', response.data);
       console.log('📈 Cantidad de rutinas:', response.data?.length || 0);
       
-      if (response.success) {
-        const routinesData = response.data || [];
-        console.log('🎯 Estableciendo rutinas:', routinesData);
-        setRoutines(routinesData);
-      } else {
-        console.log('❌ Respuesta no exitosa:', response);
-        setError('Error al obtener las rutinas');
-      }
+      const routinesData = response.data || response || [];
+      console.log('🎯 Estableciendo rutinas:', routinesData);
+      setRoutines(Array.isArray(routinesData) ? routinesData : []);
     } catch (err: any) {
       console.error('❌ Error al obtener rutinas:', err);
       setError(err.response?.data?.message || 'Error al cargar las rutinas');

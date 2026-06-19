@@ -225,6 +225,7 @@ const ClientDashboard: React.FC = () => {
   const [showNotificationCenter, setShowNotificationCenter] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [selectedRoutine, setSelectedRoutine] = useState<any>(null);
+  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(0);
   const [showRoutineModal, setShowRoutineModal] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -1052,7 +1053,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                     className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold px-4 py-2 rounded-lg"
                     style={{ fontSize: 13 }}
                     onClick={() => {
-                      setSelectedRoutine(assignedRoutines[0]);
+                      setSelectedRoutine(assignedRoutines[selectedRoutineIndex]);
                       setShowRoutineModal(true);
                     }}
                   >
@@ -1067,20 +1068,40 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
                 </div>
               ) : assignedRoutines.length > 0 ? (
                 <div>
+                  {/* Selector de rutina si hay más de una */}
+                  {assignedRoutines.length > 1 && (
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                      {assignedRoutines.map((r: any, i: number) => (
+                        <button
+                          key={r.id}
+                          onClick={() => setSelectedRoutineIndex(i)}
+                          style={{
+                            padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600,
+                            cursor: 'pointer', border: 'none',
+                            background: selectedRoutineIndex === i ? '#dc2626' : '#2a2a2a',
+                            color: selectedRoutineIndex === i ? '#fff' : '#9ca3af',
+                            transition: 'background 0.2s'
+                          }}
+                        >
+                          {r.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   {/* Nombre de rutina */}
                   <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-                    {assignedRoutines[0]?.name}
+                    {assignedRoutines[selectedRoutineIndex]?.name}
                   </div>
-                  {/* Objetivo solo si está definido */}
-                  {assignedRoutines[0]?.description && (
+                  {assignedRoutines[selectedRoutineIndex]?.description && (
                     <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 12 }}>
-                      🎯 {assignedRoutines[0].description}
+                      🎯 {assignedRoutines[selectedRoutineIndex].description}
                     </div>
                   )}
 
                   {/* Preview de ejercicios */}
                   {(() => {
-                    const exercises: any[] = assignedRoutines[0]?.exercises || [];
+                    const exercises: any[] = assignedRoutines[selectedRoutineIndex]?.exercises || [];
                     const preview = exercises.slice(0, 5);
                     if (preview.length === 0) return null;
                     return (

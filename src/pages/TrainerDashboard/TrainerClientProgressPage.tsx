@@ -79,7 +79,7 @@ interface ClientInfo {
   };
 }
 
-type TabType = 'resumen' | 'rutinas' | 'pagos' | 'notas';
+type TabType = 'resumen' | 'rutinas' | 'pagos' | 'notas' | 'rpe';
 
 const TrainerClientProgressPage: React.FC = () => {
   const { clientId } = useParams<{ clientId: string }>();
@@ -100,12 +100,24 @@ const TrainerClientProgressPage: React.FC = () => {
   const [editPaymentDueDate, setEditPaymentDueDate] = useState('');
   const [clientPaymentHistory, setClientPaymentHistory] = useState<any[]>([]);
   const [loadingPaymentHistory, setLoadingPaymentHistory] = useState(false);
+  const [rpeData, setRpeData] = useState<{ logs: any[]; byMonth: any[]; byExercise: any[] } | null>(null);
+  const [loadingRpe, setLoadingRpe] = useState(false);
 
   useEffect(() => {
     if (clientId) {
       fetchClientData();
     }
   }, [clientId]);
+
+  useEffect(() => {
+    if (activeTab === 'rpe' && clientId && !rpeData) {
+      setLoadingRpe(true);
+      trainerApi.getClientRpeLogs(clientId)
+        .then(res => setRpeData(res?.data || { logs: [], byMonth: [], byExercise: [] }))
+        .catch(() => setRpeData({ logs: [], byMonth: [], byExercise: [] }))
+        .finally(() => setLoadingRpe(false));
+    }
+  }, [activeTab, clientId]);
 
   useEffect(() => {
     if (activeTab === 'pagos' && clientId && clientPaymentHistory.length === 0) {
@@ -1096,6 +1108,17 @@ const TrainerClientProgressPage: React.FC = () => {
         >
           Notas
         </button>
+        <button
+          style={{
+            backgroundColor: activeTab === 'rpe' ? '#dc2626' : 'transparent',
+            color: 'white', border: 'none', padding: '8px 16px',
+            borderRadius: '6px', cursor: 'pointer', fontSize: '14px',
+            fontWeight: '500', outline: 'none', boxShadow: 'none'
+          }}
+          onClick={() => setActiveTab('rpe')}
+        >
+          🔥 RPE
+        </button>
       </div>
 
       {/* Contenedor de contenido principal para alinear título y secciones */}
@@ -1844,6 +1867,66 @@ const TrainerClientProgressPage: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Tab RPE */}
+      {activeTab === 'rpe' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {loadingRpe ? (
+            <div style={{ color: '#6b7280', padding: 24 }}>Cargando datos de RPE...</div>
+          ) : !rpeData || rpeData.logs.length === 0 ? (
+            <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 24, color: '#6b7280' }}>
+              El alumno todavía no registró RPE en ningún ejercicio.
+            </div>
+          ) : (
+            <>
+              {/* Promedio por mes */}
+              <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 24 }}>
+                <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700, margin: '0 0 16px' }}>📅 Intensidad por mes</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {rpeData.byMonth.map((m: any) => {
+                    const monthNames = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                    const color = m.avgRpe >= 8 ? '#dc2626' : m.avgRpe >= 6 ? '#f97316' : m.avgRpe >= 4 ? '#eab308' : '#22c55e';
+                    return (
+                      <div key={`${m.year}-${m.month}`} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ color: '#9ca3af', fontSize: 13, minWidth: 60 }}>{monthNames[m.month]} {m.year}</span>
+                        <div style={{ flex: 1, background: '#2a2a2a', borderRadius: 20, height: 10, overflow: 'hidden' }}>
+                          <div style={{ width: `${(m.avgRpe / 10) * 100}%`, height: '100%', background: color, borderRadius: 20, transition: 'width 0.5s' }} />
+                        </div>
+                        <span style={{ color, fontWeight: 700, fontSize: 14, minWidth: 40, textAlign: 'right' }}>RPE {m.avgRpe}</span>
+                        <span style={{ color: '#6b7280', fontSize: 11 }}>({m.count} ejerc.)</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Por ejercicio */}
+              <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 24 }}>
+                <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>💪 Por ejercicio</h3>
+                <p style={{ color: '#6b7280', fontSize: 12, margin: '0 0 16px' }}>Promedio histórico de RPE</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {rpeData.byExercise.map((ex: any, i: number) => {
+                    const color = ex.avgRpe >= 8 ? '#dc2626' : ex.avgRpe >= 6 ? '#f97316' : ex.avgRpe >= 4 ? '#eab308' : '#22c55e';
+                    const tag = ex.avgRpe >= 8 ? '⚠️ Bajar carga' : ex.avgRpe <= 4 ? '⬆️ Progresar' : '';
+                    return (
+                      <div key={i} style={{ background: '#2a2a2a', borderRadius: 8, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <div style={{ color: '#e5e7eb', fontWeight: 600, fontSize: 14 }}>{ex.name}</div>
+                          {tag && <div style={{ color, fontSize: 11, fontWeight: 600, marginTop: 2 }}>{tag}</div>}
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ color, fontWeight: 700, fontSize: 16 }}>RPE {ex.avgRpe}</div>
+                          <div style={{ color: '#6b7280', fontSize: 11 }}>último: {ex.lastRpe}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 

@@ -102,6 +102,8 @@ const TrainerClientProgressPage: React.FC = () => {
   const [loadingPaymentHistory, setLoadingPaymentHistory] = useState(false);
   const [rpeData, setRpeData] = useState<{ logs: any[]; byMonth: any[]; byExercise: any[] } | null>(null);
   const [loadingRpe, setLoadingRpe] = useState(false);
+  const [monthlyReports, setMonthlyReports] = useState<any[]>([]);
+  const [loadingReports, setLoadingReports] = useState(false);
 
   useEffect(() => {
     if (clientId) {
@@ -110,12 +112,21 @@ const TrainerClientProgressPage: React.FC = () => {
   }, [clientId]);
 
   useEffect(() => {
-    if (activeTab === 'rpe' && clientId && !rpeData) {
-      setLoadingRpe(true);
-      trainerApi.getClientRpeLogs(clientId)
-        .then(res => setRpeData(res?.data || { logs: [], byMonth: [], byExercise: [] }))
-        .catch(() => setRpeData({ logs: [], byMonth: [], byExercise: [] }))
-        .finally(() => setLoadingRpe(false));
+    if (activeTab === 'rpe' && clientId) {
+      if (!rpeData) {
+        setLoadingRpe(true);
+        trainerApi.getClientRpeLogs(clientId)
+          .then(res => setRpeData(res?.data || { logs: [], byMonth: [], byExercise: [] }))
+          .catch(() => setRpeData({ logs: [], byMonth: [], byExercise: [] }))
+          .finally(() => setLoadingRpe(false));
+      }
+      if (monthlyReports.length === 0) {
+        setLoadingReports(true);
+        trainerApi.getClientMonthlyReports(clientId)
+          .then(res => setMonthlyReports(res?.data || []))
+          .catch(() => setMonthlyReports([]))
+          .finally(() => setLoadingReports(false));
+      }
     }
   }, [activeTab, clientId]);
 
@@ -1943,6 +1954,36 @@ const TrainerClientProgressPage: React.FC = () => {
                 </div>
               </div>
             </>
+          )}
+
+          {/* Reportes mensuales automáticos */}
+          {monthlyReports.length > 0 && (
+            <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 24, marginTop: 8 }}>
+              <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700, margin: '0 0 16px' }}>📊 Reportes mensuales automáticos</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {monthlyReports.map((r: any) => {
+                  const monthNames = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                  const color = r.avgRpe >= 8 ? '#dc2626' : r.avgRpe >= 6 ? '#f97316' : r.avgRpe >= 4 ? '#eab308' : '#22c55e';
+                  const high = Array.isArray(r.highRpeExercises) ? r.highRpeExercises : [];
+                  const low = Array.isArray(r.lowRpeExercises) ? r.lowRpeExercises : [];
+                  return (
+                    <div key={r.id} style={{ background: '#2a2a2a', borderRadius: 10, padding: '14px 16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ color: '#e5e7eb', fontWeight: 700, fontSize: 15 }}>{monthNames[r.month]} {r.year}</span>
+                        <span style={{ color, fontWeight: 700, fontSize: 16 }}>RPE {r.avgRpe}</span>
+                      </div>
+                      {high.length > 0 && (
+                        <p style={{ margin: '0 0 4px', fontSize: 12, color: '#f97316' }}>⚠️ Bajar carga: {high.map((e: any) => e.name).join(', ')}</p>
+                      )}
+                      {low.length > 0 && (
+                        <p style={{ margin: '0 0 4px', fontSize: 12, color: '#22c55e' }}>⬆️ Progresar: {low.map((e: any) => e.name).join(', ')}</p>
+                      )}
+                      <p style={{ margin: 0, fontSize: 11, color: '#6b7280' }}>{r.totalExercises} ejercicios registrados</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
       )}

@@ -488,6 +488,11 @@ export const trainerApi = {
     return response.data;
   },
 
+  getClientMonthlyReports: async (clientId: string) => {
+    const response = await axios.get(`/trainer/clients/${clientId}/monthly-reports`);
+    return response.data;
+  },
+
   getPaymentInfo: async () => {
     const response = await axios.get('/trainer/payment-info');
     return response.data;

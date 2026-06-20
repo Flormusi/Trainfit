@@ -278,8 +278,8 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       // Total: 8+24+76+14+18+17+17+17+17 = 208, reducir ejercicio a 68
       // 8+24+68+14+18+17+17+17+17 = 200 -> ok pero 190mm disponibles, reducir más
       // 7+22+63+13+16+17+17+17+17 = 189 ~ 190 ✓
-      const colWf = [7, 22, 63, 13, 16, 17, 17, 17, 18] as [number,number,number,number,number,number,number,number,number];
-      const tableHeaders = ['#', 'Img', 'Ejercicio', 'Series', 'Reps', 'Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+      const colWf = [7, 20, 52, 12, 14, 13, 16, 16, 16, 16] as [number,number,number,number,number,number,number,number,number,number];
+      const tableHeaders = ['#', 'Img', 'Ejercicio', 'Series', 'Reps', 'RiR', 'Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
       const rowH = 22;
       const headerH2 = 9;
 
@@ -402,6 +402,15 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
         pdf.setTextColor(20, 20, 20);
         x += colWf[4];
 
+        // RiR
+        const rirVal = exercise.rir !== undefined && exercise.rir !== '' && exercise.rir !== null ? String(exercise.rir) : '-';
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text(rirVal, x + colWf[5] / 2, midY + 1, { align: 'center' });
+        pdf.setTextColor(20, 20, 20);
+        pdf.setFont('helvetica', 'normal');
+        x += colWf[5];
+
         // Pesos por semana (S1-S4) — datos del cliente si existen, sino del trainer
         const weeks = ['week1', 'week2', 'week3', 'week4'];
         weeks.forEach((wk, wi) => {
@@ -421,8 +430,8 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
             pdf.setFont('helvetica', 'normal');
           }
           pdf.setFontSize(7);
-          pdf.text(val, x + colWf[5 + wi] / 2, midY + 1, { align: 'center' });
-          x += colWf[5 + wi];
+          pdf.text(val, x + colWf[6 + wi] / 2, midY + 1, { align: 'center' });
+          x += colWf[6 + wi];
         });
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(20, 20, 20);
@@ -671,6 +680,14 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
                                     background: rpeInfo.color + '22', color: rpeInfo.color, border: `1px solid ${rpeInfo.color}44`,
                                   }}>
                                     {rpeInfo.label}
+                                  </span>
+                                )}
+                                {exercise.rir !== undefined && exercise.rir !== '' && exercise.rir !== null && (
+                                  <span style={{
+                                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                                    background: '#1e3a5f', color: '#60a5fa', border: '1px solid #3b82f644',
+                                  }}>
+                                    RiR {exercise.rir}{exercise.rir === '0' || exercise.rir === 0 ? ' · Al fallo' : exercise.rir === '1' || exercise.rir === 1 ? ' · 1 rep en reserva' : ` · ${exercise.rir} reps en reserva`}
                                   </span>
                                 )}
                                 {exercise.inCircuit && (

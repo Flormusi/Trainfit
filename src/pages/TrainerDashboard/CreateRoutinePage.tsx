@@ -43,6 +43,7 @@ export interface ExerciseData {
   image_url?: string;
   video_url?: string;
   rpe?: string;
+  rir?: string;
   pyramidal?: boolean;
   inCircuit?: boolean;
   weeks: {
@@ -77,6 +78,7 @@ const emptyExercise = (): ExerciseData => ({
   image_url: '',
   video_url: '',
   rpe: '',
+  rir: '',
   pyramidal: false,
   weeks: {
     week1: emptyWeek(),
@@ -552,6 +554,9 @@ const CreateRoutinePage: React.FC = () => {
                       <th className="text-center py-3 px-2 border-l border-[#444]" style={{ minWidth: '70px' }}>
                         <span className="text-orange-400">RPE</span>
                       </th>
+                      <th className="text-center py-3 px-2 border-l border-[#444]" style={{ minWidth: '70px' }}>
+                        <span className="text-blue-400">RiR</span>
+                      </th>
                       {WEEK_LABELS.map((label, wi) => (
                         <th key={wi} colSpan={3} className="text-center py-3 px-2 border-l border-[#444]" style={{ minWidth: '180px' }}>
                           <span className="text-[#ff4444]">{label}</span>
@@ -722,6 +727,31 @@ const CreateRoutinePage: React.FC = () => {
                               {Number(exercise.rpe) >= 9 ? 'Máximo' :
                                Number(exercise.rpe) >= 7 ? 'Alto' :
                                Number(exercise.rpe) >= 5 ? 'Moderado' : 'Suave'}
+                            </div>
+                          )}
+                        </td>
+
+                        {/* RiR */}
+                        <td className="py-3 px-1 border-l border-[#444] text-center">
+                          <select
+                            value={exercise.rir || ''}
+                            onChange={(e) => setRoutineData(prev => {
+                              const exercises = [...prev.exercises];
+                              exercises[index] = { ...exercises[index], rir: e.target.value };
+                              return { ...prev, exercises };
+                            })}
+                            className="w-full px-1 py-1.5 bg-[#1a1a1a] border border-[#444] rounded-md text-white text-center text-sm focus:ring-1 focus:ring-blue-400 transition-all"
+                          >
+                            <option value="">–</option>
+                            {[0,1,2,3,4].map(n => (
+                              <option key={n} value={n}>RiR {n}</option>
+                            ))}
+                          </select>
+                          {exercise.rir !== '' && exercise.rir !== undefined && (
+                            <div className="mt-1 text-xs font-semibold text-blue-400">
+                              {exercise.rir === '0' ? 'Al fallo' :
+                               exercise.rir === '1' ? '1 rep' :
+                               `${exercise.rir} reps`}
                             </div>
                           )}
                         </td>

@@ -69,7 +69,7 @@
 
 /* Botón de notificaciones: círculo rojo compacto con icono centrado */
 .client-dashboard-page .dashboard-header .notification-btn {
-  background-image: linear-gradient(to right, #dc2626, #ef4444);
+  background-image: linear-gradient(to right, #2a2a2a, #3a3a3a);
   border: none;
   color: #fff;
   font-weight: 600;

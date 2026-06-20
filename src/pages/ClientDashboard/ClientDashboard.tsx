@@ -1039,9 +1039,10 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           </div>
         </div>
         <div className="header-actions">
-          <button 
+          <button
             className="notification-btn"
             onClick={() => setShowNotificationCenter(!showNotificationCenter)}
+            style={unreadNotifications > 0 ? { backgroundImage: 'linear-gradient(to right, #dc2626, #ef4444)' } : {}}
           >
             🔔
             {unreadNotifications > 0 && (

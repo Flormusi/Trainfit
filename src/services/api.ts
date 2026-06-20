@@ -483,6 +483,11 @@ export const trainerApi = {
     return response.data;
   },
 
+  migrateRpeLogs: async () => {
+    const response = await axios.post('/trainer/migrate-rpe-logs');
+    return response.data;
+  },
+
   getPaymentInfo: async () => {
     const response = await axios.get('/trainer/payment-info');
     return response.data;

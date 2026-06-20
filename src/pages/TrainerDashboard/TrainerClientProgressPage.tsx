@@ -1876,8 +1876,25 @@ const TrainerClientProgressPage: React.FC = () => {
           {loadingRpe ? (
             <div style={{ color: '#6b7280', padding: 24 }}>Cargando datos de RPE...</div>
           ) : !rpeData || rpeData.logs.length === 0 ? (
-            <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 24, color: '#6b7280' }}>
-              El alumno todavía no registró RPE en ningún ejercicio.
+            <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 24, color: '#6b7280', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
+              <p style={{ margin: 0 }}>El alumno todavía no registró RPE en ningún ejercicio.</p>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await trainerApi.migrateRpeLogs();
+                    if (res?.imported > 0) {
+                      const fresh = await trainerApi.getClientRpeLogs(clientId!);
+                      setRpeData(fresh?.data || { logs: [], byMonth: [], byExercise: [] });
+                      toast.success(`${res.imported} RPE importados`);
+                    } else {
+                      toast('No hay RPE previos para importar');
+                    }
+                  } catch { toast.error('Error al importar'); }
+                }}
+                style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
+              >
+                Importar RPE existentes
+              </button>
             </div>
           ) : (
             <>

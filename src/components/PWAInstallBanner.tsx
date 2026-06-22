@@ -3,17 +3,21 @@ import { useState, useEffect } from 'react';
 export default function PWAInstallBanner() {
   const [visible, setVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const android = /android/i.test(navigator.userAgent);
+    const ua = navigator.userAgent;
+    const ios = /iphone|ipad|ipod/i.test(ua);
+    const android = /android/i.test(ua);
     const isInStandaloneMode =
       (window.navigator as any).standalone === true ||
       window.matchMedia('(display-mode: standalone)').matches;
     const dismissed = localStorage.getItem('pwa-banner-dismissed');
 
-    if ((ios || android) && !isInStandaloneMode && !dismissed) {
+    if (!isInStandaloneMode && !dismissed) {
+      const desktop = !ios && !android;
       setIsIOS(ios);
+      setIsDesktop(desktop);
       setTimeout(() => setVisible(true), 2000);
     }
   }, []);
@@ -59,6 +63,12 @@ export default function PWAInstallBanner() {
             <Step n={1} text={<>Tocá el botón <strong style={{ color: '#fff' }}>Compartir</strong> <ShareIcon /> en la barra de Safari</>} />
             <Step n={2} text={<>Deslizá y tocá <strong style={{ color: '#fff' }}>"Agregar a pantalla de inicio"</strong></>} />
             <Step n={3} text={<>Tocá <strong style={{ color: '#fff' }}>"Agregar"</strong> arriba a la derecha</>} />
+          </>
+        ) : isDesktop ? (
+          <>
+            <Step n={1} text={<>En Chrome, hacé clic en el ícono <strong style={{ color: '#fff' }}>⊕</strong> que aparece en la barra de direcciones (arriba a la derecha)</>} />
+            <Step n={2} text={<>Hacé clic en <strong style={{ color: '#fff' }}>"Instalar"</strong> en el mensaje que aparece</>} />
+            <Step n={3} text={<>TrainFit se abre como una app independiente en tu escritorio</>} />
           </>
         ) : (
           <>

@@ -2,13 +2,18 @@ import { useState, useEffect } from 'react';
 
 export default function PWAInstallBanner() {
   const [visible, setVisible] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isInStandaloneMode = (window.navigator as any).standalone === true;
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const android = /android/i.test(navigator.userAgent);
+    const isInStandaloneMode =
+      (window.navigator as any).standalone === true ||
+      window.matchMedia('(display-mode: standalone)').matches;
     const dismissed = localStorage.getItem('pwa-banner-dismissed');
 
-    if (isIOS && !isInStandaloneMode && !dismissed) {
+    if ((ios || android) && !isInStandaloneMode && !dismissed) {
+      setIsIOS(ios);
       setTimeout(() => setVisible(true), 2000);
     }
   }, []);
@@ -49,9 +54,19 @@ export default function PWAInstallBanner() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <Step n={1} text={<>Tocá el botón <strong style={{ color: '#fff' }}>Compartir</strong> <ShareIcon /> en la barra de Safari</>} />
-        <Step n={2} text={<>Deslizá y tocá <strong style={{ color: '#fff' }}>"Agregar a pantalla de inicio"</strong></>} />
-        <Step n={3} text={<>Tocá <strong style={{ color: '#fff' }}>"Agregar"</strong> arriba a la derecha</>} />
+        {isIOS ? (
+          <>
+            <Step n={1} text={<>Tocá el botón <strong style={{ color: '#fff' }}>Compartir</strong> <ShareIcon /> en la barra de Safari</>} />
+            <Step n={2} text={<>Deslizá y tocá <strong style={{ color: '#fff' }}>"Agregar a pantalla de inicio"</strong></>} />
+            <Step n={3} text={<>Tocá <strong style={{ color: '#fff' }}>"Agregar"</strong> arriba a la derecha</>} />
+          </>
+        ) : (
+          <>
+            <Step n={1} text={<>Tocá el menú <strong style={{ color: '#fff' }}>⋮</strong> arriba a la derecha en Chrome</>} />
+            <Step n={2} text={<>Tocá <strong style={{ color: '#fff' }}>"Agregar a pantalla de inicio"</strong></>} />
+            <Step n={3} text={<>Tocá <strong style={{ color: '#fff' }}>"Instalar"</strong> en el mensaje que aparece</>} />
+          </>
+        )}
       </div>
 
       <button

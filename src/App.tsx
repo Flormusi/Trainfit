@@ -1,4 +1,5 @@
 import React, { useEffect, Suspense } from 'react';
+import PWAInstallBanner from './components/PWAInstallBanner';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { Toaster, toast } from 'react-hot-toast';
@@ -101,6 +102,7 @@ function App() {
     // El Router y AuthProvider han sido removidos de aquí, ya que están en main.tsx
     <ErrorBoundary>
       <Toaster position="top-center" reverseOrder={false} />
+      <PWAInstallBanner />
       <Suspense fallback={<LoadingScreen />}>
         <Routes>
         <Route path="/login" element={<Login />} />

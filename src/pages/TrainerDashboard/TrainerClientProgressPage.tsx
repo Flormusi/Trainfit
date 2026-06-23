@@ -1933,21 +1933,37 @@ const TrainerClientProgressPage: React.FC = () => {
               {/* Por ejercicio */}
               <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 24 }}>
                 <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>💪 Por ejercicio</h3>
-                <p style={{ color: '#6b7280', fontSize: 12, margin: '0 0 16px' }}>Promedio histórico de RPE</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <p style={{ color: '#6b7280', fontSize: 12, margin: '0 0 16px' }}>Evolución semanal de RPE</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {rpeData.byExercise.map((ex: any, i: number) => {
                     const color = ex.avgRpe >= 8 ? '#dc2626' : ex.avgRpe >= 6 ? '#f97316' : ex.avgRpe >= 4 ? '#eab308' : '#22c55e';
                     const tag = ex.avgRpe >= 8 ? '⚠️ Bajar carga' : ex.avgRpe <= 4 ? '⬆️ Progresar' : '';
+                    const monthNames = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                     return (
-                      <div key={i} style={{ background: '#2a2a2a', borderRadius: 8, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div style={{ color: '#e5e7eb', fontWeight: 600, fontSize: 14 }}>{ex.name}</div>
-                          {tag && <div style={{ color, fontSize: 11, fontWeight: 600, marginTop: 2 }}>{tag}</div>}
+                      <div key={i} style={{ background: '#2a2a2a', borderRadius: 8, padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: ex.weekly?.length > 0 ? 10 : 0 }}>
+                          <div>
+                            <div style={{ color: '#e5e7eb', fontWeight: 600, fontSize: 14 }}>{ex.name}</div>
+                            {tag && <div style={{ color, fontSize: 11, fontWeight: 600, marginTop: 2 }}>{tag}</div>}
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ color, fontWeight: 700, fontSize: 16 }}>RPE {ex.avgRpe}</div>
+                            <div style={{ color: '#6b7280', fontSize: 11 }}>promedio</div>
+                          </div>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ color, fontWeight: 700, fontSize: 16 }}>RPE {ex.avgRpe}</div>
-                          <div style={{ color: '#6b7280', fontSize: 11 }}>último: {ex.lastRpe}</div>
-                        </div>
+                        {ex.weekly?.length > 0 && (
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {ex.weekly.map((w: any, wi: number) => {
+                              const wColor = w.rpe >= 8 ? '#dc2626' : w.rpe >= 6 ? '#f97316' : w.rpe >= 4 ? '#eab308' : '#22c55e';
+                              return (
+                                <div key={wi} style={{ background: '#1a1a1a', borderRadius: 6, padding: '4px 8px', textAlign: 'center' }}>
+                                  <div style={{ color: '#6b7280', fontSize: 10 }}>{monthNames[w.month]} S{w.week}</div>
+                                  <div style={{ color: wColor, fontWeight: 700, fontSize: 13 }}>{w.rpe}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     );
                   })}

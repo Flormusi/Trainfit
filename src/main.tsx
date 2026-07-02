@@ -22,6 +22,24 @@ axios.get('/health')
     console.warn('[Startup Health] Failed:', err?.response?.status, err?.message);
   });
 
+// Registrar Service Worker para actualizaciones automáticas
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Hay una nueva versión disponible — recargar automáticamente
+            window.location.reload();
+          }
+        });
+      });
+    });
+  });
+}
+
 const root = document.getElementById('root');
 if (!root) {
   throw new Error('No se encontró el elemento root');

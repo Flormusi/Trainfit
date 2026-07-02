@@ -1045,10 +1045,13 @@ const TrainerClientProgressPage: React.FC = () => {
       {/* Navegación por tabs */}
       <div style={{
         display: 'flex',
-        gap: '16px',
+        gap: '8px',
         marginBottom: '24px',
-        borderBottom: 'none',
         paddingBottom: '16px',
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch' as any,
+        scrollbarWidth: 'none' as any,
+        msOverflowStyle: 'none' as any,
         outline: 'none',
         boxShadow: 'none'
       }}>

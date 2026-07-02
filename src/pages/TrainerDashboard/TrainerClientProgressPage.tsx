@@ -941,6 +941,7 @@ const TrainerClientProgressPage: React.FC = () => {
       backgroundColor: '#0a0a0a',
       minHeight: '100vh',
       padding: '16px',
+      paddingTop: 'max(16px, env(safe-area-inset-top, 16px))',
       color: 'white',
       border: 'none',
       outline: 'none',
@@ -2090,7 +2091,8 @@ const TrainerClientProgressPage: React.FC = () => {
             width: '100%',
             maxHeight: '90vh',
             overflow: 'auto',
-            border: '1px solid #333'
+            border: '1px solid #333',
+            boxSizing: 'border-box'
           }}>
             {/* Header del modal */}
             <div style={{
@@ -2124,7 +2126,7 @@ const TrainerClientProgressPage: React.FC = () => {
             </div>
 
             {/* Contenido del modal */}
-            <div style={{ padding: '30px' }}>
+            <div style={{ padding: '16px' }}>
               {/* Información general */}
               <div style={{ marginBottom: '30px' }}>
                 <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
@@ -2193,7 +2195,7 @@ const TrainerClientProgressPage: React.FC = () => {
                          borderRadius: '12px',
                          border: '1px solid #333'
                        }}>
-                         <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
+                         <div style={{ display: 'flex', gap: '12px', marginBottom: '15px', flexWrap: 'wrap' }}>
                            {/* Imagen del ejercicio */}
                            <div style={{ flexShrink: 0 }}>
                              {(() => {
@@ -2223,12 +2225,12 @@ const TrainerClientProgressPage: React.FC = () => {
                                });
                                
                                return imageUrl ? (
-                                 <img 
-                                   src={imageUrl} 
+                                 <img
+                                   src={imageUrl}
                                    alt={parsedExercise.name || 'Ejercicio'}
                                    style={{
-                                     width: '160px',
-                                     height: '160px',
+                                     width: '100px',
+                                     height: '100px',
                                      objectFit: 'contain',
                                      borderRadius: '8px',
                                      border: '2px solid #dc2626'
@@ -2250,8 +2252,8 @@ const TrainerClientProgressPage: React.FC = () => {
                              
                              {/* Placeholder siempre presente pero oculto si hay imagen */}
                              <div style={{
-                               width: '160px',
-                               height: '160px',
+                               width: '100px',
+                               height: '100px',
                                backgroundColor: '#444',
                                borderRadius: '8px',
                                display: (() => {
@@ -2449,7 +2451,7 @@ const TrainerClientProgressPage: React.FC = () => {
                          {exercise.clientRpe && (
                            <div style={{
                              marginTop: 12,
-                             display: 'inline-flex', alignItems: 'center', gap: 8,
+                             display: 'flex', alignItems: 'center', gap: 8,
                              background: Number(exercise.clientRpe) >= 9 ? 'rgba(220,38,38,0.15)' :
                                          Number(exercise.clientRpe) >= 7 ? 'rgba(234,88,12,0.15)' :
                                          Number(exercise.clientRpe) >= 5 ? 'rgba(202,138,4,0.15)' : 'rgba(22,163,74,0.15)',

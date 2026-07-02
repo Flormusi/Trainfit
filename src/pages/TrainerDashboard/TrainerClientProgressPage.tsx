@@ -1495,7 +1495,8 @@ const TrainerClientProgressPage: React.FC = () => {
                     <div style={{
                       marginTop: '16px',
                       display: 'flex',
-                      gap: '12px',
+                      gap: '8px',
+                      flexWrap: 'wrap',
                       justifyContent: 'flex-end',
                       borderTop: '1px solid #333',
                       paddingTop: '12px'

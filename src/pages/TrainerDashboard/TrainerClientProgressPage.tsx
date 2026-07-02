@@ -1055,85 +1055,34 @@ const TrainerClientProgressPage: React.FC = () => {
         outline: 'none',
         boxShadow: 'none'
       }}>
-        <button 
-          style={{
-            backgroundColor: activeTab === 'resumen' ? '#dc2626' : 'transparent',
-            color: 'white',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            outline: 'none',
-            boxShadow: 'none'
-          }}
-          onClick={() => setActiveTab('resumen')}
-        >
-          Resumen
-        </button>
-        <button 
-          style={{
-            backgroundColor: activeTab === 'rutinas' ? '#dc2626' : 'transparent',
-            color: 'white',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            outline: 'none',
-            boxShadow: 'none'
-          }}
-          onClick={() => setActiveTab('rutinas')}
-        >
-          Rutinas
-        </button>
-        <button 
-          style={{
-            backgroundColor: activeTab === 'pagos' ? '#dc2626' : 'transparent',
-            color: 'white',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            outline: 'none',
-            boxShadow: 'none'
-          }}
-          onClick={() => setActiveTab('pagos')}
-        >
-          Pagos
-        </button>
-        <button 
-          style={{
-            backgroundColor: activeTab === 'notas' ? '#dc2626' : 'transparent',
-            color: 'white',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            outline: 'none',
-            boxShadow: 'none'
-          }}
-          onClick={() => setActiveTab('notas')}
-        >
-          Notas
-        </button>
-        <button
-          style={{
-            backgroundColor: activeTab === 'rpe' ? '#dc2626' : 'transparent',
-            color: 'white', border: 'none', padding: '8px 16px',
-            borderRadius: '6px', cursor: 'pointer', fontSize: '14px',
-            fontWeight: '500', outline: 'none', boxShadow: 'none'
-          }}
-          onClick={() => setActiveTab('rpe')}
-        >
-          🔥 RPE
-        </button>
+        {[
+          { key: 'resumen', label: 'Resumen' },
+          { key: 'rutinas', label: 'Rutinas' },
+          { key: 'pagos', label: 'Pagos' },
+          { key: 'notas', label: 'Notas' },
+          { key: 'rpe', label: '🔥 RPE' },
+        ].map(tab => (
+          <button
+            key={tab.key}
+            style={{
+              flexShrink: 0,
+              backgroundColor: activeTab === tab.key ? '#dc2626' : 'transparent',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              outline: 'none',
+              boxShadow: 'none',
+              whiteSpace: 'nowrap',
+            }}
+            onClick={() => setActiveTab(tab.key as any)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Contenedor de contenido principal para alinear título y secciones */}

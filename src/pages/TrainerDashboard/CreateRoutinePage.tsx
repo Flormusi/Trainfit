@@ -569,6 +569,7 @@ const CreateRoutinePage: React.FC = () => {
                       <th></th>
                       <th></th>
                       <th className="py-2 px-1 font-normal text-center border-l border-[#444]">1-10</th>
+                      <th></th>
                       {WEEK_KEYS.map((_, wi) => (
                         <React.Fragment key={wi}>
                           <th className={`py-2 px-1 font-normal text-center ${wi > 0 ? 'border-l border-[#444]' : ''}`}>Serie</th>

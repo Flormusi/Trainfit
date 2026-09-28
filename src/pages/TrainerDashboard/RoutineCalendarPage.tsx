@@ -40,7 +40,7 @@ const RoutineCalendarPage: React.FC = () => {
         <RoutineCalendar 
           onEventClick={(event) => {
             // Aquí puedes manejar el clic en un evento del calendario
-            console.log('Evento seleccionado:', event);
+            console.log("Evento seleccionado:");
             // Por ejemplo, navegar a la página de detalles de la rutina
             // navigate(`/trainer/routines/${event.routineId}`);
           }}

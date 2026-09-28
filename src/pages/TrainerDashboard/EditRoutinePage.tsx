@@ -144,7 +144,7 @@ const EditRoutinePage: React.FC = () => {
             setSearchTerms(initialSearchTerms);
             setShowDropdowns(new Array(exercises.length).fill(false));
           } catch (routineError) {
-            console.error('Error al cargar la rutina:', routineError);
+            console.error("Error al cargar la rutina:");
             setError('Error al cargar la rutina. Intenta de nuevo más tarde.');
           }
         }
@@ -173,7 +173,7 @@ const EditRoutinePage: React.FC = () => {
         setFilteredExercises(allExercises);
 
       } catch (err: any) {
-        console.error('Error fetching data:', err);
+        console.error("Error fetching data:");
         setError('Error al cargar los datos. Intenta de nuevo más tarde.');
       } finally {
         setLoading(false);
@@ -341,7 +341,7 @@ const EditRoutinePage: React.FC = () => {
         navigate('/trainer-dashboard');
       }, 2000);
     } catch (err: any) {
-      console.error('Error updating routine:', err);
+      console.error("Error updating routine:");
       setError(err.message || 'Error al actualizar la rutina. Intenta de nuevo.');
     }
   };

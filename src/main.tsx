@@ -16,10 +16,10 @@ import axios from './services/axiosConfig';
 // Además, ejecuta un health check al arrancar para verificar conectividad con backend
 axios.get('/health')
   .then((res) => {
-    console.log('[Startup Health] OK:', res.status, res.data);
+    console.log("[Startup Health] OK:");
   })
   .catch((err) => {
-    console.warn('[Startup Health] Failed:', err?.response?.status, err?.message);
+    console.warn("[Startup Health] Failed:");
   });
 
 // Registrar Service Worker para actualizaciones automáticas

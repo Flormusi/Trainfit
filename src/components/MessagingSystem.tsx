@@ -127,7 +127,7 @@ const MessagingSystem: React.FC = () => {
         setConversations(prev => Array.isArray(prev) ? prev : []);
       }
     } catch (error) {
-      console.error('Error al obtener conversaciones:', error);
+      console.error("Error al obtener conversaciones:");
       setConversations([]);
     }
   };
@@ -143,7 +143,7 @@ const MessagingSystem: React.FC = () => {
         setMessages(prev => Array.isArray(prev) ? prev : []);
       }
     } catch (error) {
-      console.error('Error al obtener mensajes:', error);
+      console.error("Error al obtener mensajes:");
       setMessages([]);
     }
   };
@@ -163,7 +163,7 @@ const MessagingSystem: React.FC = () => {
     try {
       await axios.patch(`/messages/mark-read/${userId}`);
     } catch (error) {
-      console.error('Error al marcar mensajes como leídos:', error);
+      console.error("Error al marcar mensajes como leídos:");
     }
   };
 
@@ -174,7 +174,7 @@ const MessagingSystem: React.FC = () => {
       setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
       await fetchConversations();
     } catch (error) {
-      console.error('Error al marcar como leídos:', error);
+      console.error("Error al marcar como leídos:");
     } finally {
       setShowOptionsMenu(false);
     }
@@ -189,7 +189,7 @@ const MessagingSystem: React.FC = () => {
       try {
         localStorage.setItem('mutedConversations', JSON.stringify(next));
       } catch (err) {
-        console.error('No se pudo guardar silencio en localStorage:', err);
+        console.error("No se pudo guardar silencio en localStorage:");
       }
       return next;
     });
@@ -222,7 +222,7 @@ const MessagingSystem: React.FC = () => {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('No se pudo exportar el chat:', err);
+      console.error("No se pudo exportar el chat:");
     }
     setShowOptionsMenu(false);
   };
@@ -245,7 +245,7 @@ const MessagingSystem: React.FC = () => {
         fetchConversations();
       }
     } catch (error) {
-      console.error('Error al enviar mensaje:', error);
+      console.error("Error al enviar mensaje:");
     } finally {
       setLoading(false);
     }
@@ -274,7 +274,7 @@ const MessagingSystem: React.FC = () => {
         fetchConversations();
       }
     } catch (error) {
-      console.error('Error al editar mensaje:', error);
+      console.error("Error al editar mensaje:");
     } finally {
       setEditLoading(false);
     }
@@ -291,7 +291,7 @@ const MessagingSystem: React.FC = () => {
         fetchConversations();
       }
     } catch (error) {
-      console.error('Error al borrar mensaje:', error);
+      console.error("Error al borrar mensaje:");
     } finally {
       setDeleteLoadingId(null);
     }
@@ -342,7 +342,7 @@ const MessagingSystem: React.FC = () => {
       setAvailableClients(items);
       setFilteredClients(items);
     } catch (error) {
-      console.error('Error al obtener clientes:', error);
+      console.error("Error al obtener clientes:");
       setAvailableClients([]);
       setFilteredClients([]);
     } finally {

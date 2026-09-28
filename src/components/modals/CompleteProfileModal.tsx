@@ -84,7 +84,7 @@ const CompleteProfileModal: React.FC<CompleteProfileModalProps> = ({
       toast.success('Perfil actualizado exitosamente');
       onClose();
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:");
       toast.error('Error al actualizar el perfil');
     } finally {
       setLoading(false);

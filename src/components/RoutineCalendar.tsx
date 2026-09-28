@@ -118,7 +118,7 @@ const RoutineCalendar: React.FC<RoutineCalendarProps> = ({ onEventClick }) => {
 
         setEvents(updatedEvents);
       } catch (error) {
-        console.error('Error al cargar el calendario de rutinas:', error);
+        console.error("Error al cargar el calendario de rutinas:");
       } finally {
         setLoading(false);
       }

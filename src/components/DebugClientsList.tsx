@@ -21,7 +21,7 @@ const DebugClientsList: React.FC = () => {
         
         // Obtener directamente de la API para evitar cualquier transformación
         const response = await axios.get('/trainer/clients');
-        console.log('Respuesta directa de la API:', response);
+        console.log("Respuesta directa de la API:");
         setApiResponse(response.data);
         
         // Procesar los clientes según las diferentes estructuras posibles
@@ -30,22 +30,22 @@ const DebugClientsList: React.FC = () => {
         if (response.data && response.data.data && Array.isArray(response.data.data.clients)) {
           // Estructura anidada: response.data.data.clients
           clients = response.data.data.clients;
-          console.log('Clientes extraídos de estructura anidada:', clients);
+          console.log("Clientes extraídos de estructura anidada:");
         } else if (response.data && Array.isArray(response.data)) {
           // Array directo
           clients = response.data;
-          console.log('Clientes extraídos de array directo:', clients);
+          console.log("Clientes extraídos de array directo:");
         } else if (Array.isArray(response.data)) {
           // Solo por si acaso
           clients = response.data;
-          console.log('Clientes extraídos de response.data array:', clients);
+          console.log("Clientes extraídos de response.data array:");
         } else {
           console.log('No se pudo extraer clientes de la respuesta');
         }
         
         setProcessedClients(clients);
       } catch (err) {
-        console.error('Error al obtener clientes:', err);
+        console.error("Error al obtener clientes:");
         setError('Error al cargar los clientes');
       } finally {
         setLoading(false);

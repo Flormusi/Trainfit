@@ -54,7 +54,7 @@ const AllRoutines = () => {
       setError('');
       
       const response = await trainerApi.getRoutines();
-      console.log('[AllRoutines] Rutinas recibidas:', response);
+      console.log("[AllRoutines] Rutinas recibidas:");
 
       // El backend puede devolver el array directo o { data: [...] }
       const data = Array.isArray(response) ? response : response?.data;
@@ -66,7 +66,7 @@ const AllRoutines = () => {
       setRoutines(data);
       toast.success('Rutinas cargadas exitosamente');
     } catch (err: unknown) {
-      console.error('[AllRoutines] Error al cargar las rutinas:', err);
+      console.error("[AllRoutines] Error al cargar las rutinas:");
       const error = err as AxiosError;
       
       if (error.response?.status === 401) {
@@ -104,7 +104,7 @@ const AllRoutines = () => {
       // Actualizar la lista de rutinas
       setRoutines(routines.filter(routine => routine.id !== routineId));
     } catch (error) {
-      console.error('Error al eliminar la rutina:', error);
+      console.error("Error al eliminar la rutina:");
       toast.error('❌ Error al eliminar la rutina. Por favor, inténtalo de nuevo.');
     }
   };

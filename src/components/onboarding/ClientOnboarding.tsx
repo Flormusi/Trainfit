@@ -55,7 +55,7 @@ const ClientOnboarding: React.FC = () => {
         ...prev,
         [name]: value,
       };
-      console.log('Form data after radio change:', newState);
+      console.log("Form data after radio change:");
       return newState;
     });
   };
@@ -94,7 +94,7 @@ const ClientOnboarding: React.FC = () => {
       toast.success('¡Perfil completado exitosamente!');
       navigate(`/client-dashboard/${user.id}`);
     } catch (error) {
-      console.error('Error al guardar datos de onboarding:', error);
+      console.error("Error al guardar datos de onboarding:");
       toast.error('Error al guardar el perfil. Por favor, intente nuevamente.');
     } finally {
       setLoading(false);

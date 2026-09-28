@@ -56,7 +56,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
         setError('Error al cargar las notificaciones');
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error("Error fetching notifications:");
       setError('Error al cargar las notificaciones');
     } finally {
       setLoading(false);
@@ -74,7 +74,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
           : [];
       setReminders(normalized);
     } catch (error) {
-      console.error('Error fetching reminders:', error);
+      console.error("Error fetching reminders:");
       setReminders([]);
     }
   };
@@ -92,7 +92,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
         );
       }
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error("Error marking notification as read:");
     }
   };
 
@@ -106,7 +106,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
         toast.success('Todas las notificaciones marcadas como leídas');
       }
     } catch (error) {
-      console.error('Error marcando todas como leídas:', error);
+      console.error("Error marcando todas como leídas:");
       toast.error('Error al marcar notificaciones como leídas');
     }
   };
@@ -123,7 +123,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
       });
       fetchReminders();
     } catch (error) {
-      console.error('Error creating reminder:', error);
+      console.error("Error creating reminder:");
     }
   };
 
@@ -132,7 +132,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
       await axios.delete(`/reminders/${reminderId}`);
       setReminders(prev => prev.filter(reminder => reminder.id !== reminderId));
     } catch (error) {
-      console.error('Error deleting reminder:', error);
+      console.error("Error deleting reminder:");
     }
   };
 
@@ -206,7 +206,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isVisible, onCl
       }
       onClose();
     } catch (error) {
-      console.error('Error al manejar clic de notificación:', error);
+      console.error("Error al manejar clic de notificación:");
     }
   };
 

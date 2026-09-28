@@ -187,29 +187,26 @@ const TrainerDashboard: React.FC = () => {
       try {
         setLoading(true);
         
-        // Obtener datos del dashboard
-        const dashboardResponse = await trainerApi.getDashboardData();
+        const [dashboardResponse, clientsResponse, analyticsResponse] = await Promise.all([
+          trainerApi.getDashboardData(),
+          trainerApi.getClients(),
+          trainerApi.getAnalytics(selectedPeriod)
+        ]);
         
         if (dashboardResponse?.data) {
           setDashboardData(dashboardResponse.data);
         }
 
-        // Obtener clientes
-        const clientsResponse = await trainerApi.getClients();
-        
         if (clientsResponse?.data) {
           setClients(clientsResponse.data);
         }
 
-        // Obtener analytics
-        const analyticsResponse = await trainerApi.getAnalytics(selectedPeriod);
-        
         if (analyticsResponse?.data) {
           setAnalyticsData(analyticsResponse.data);
         }
 
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:");
 
         // Si hay error de autenticación, redirigir al login
         if ((error as any)?.response?.status === 401) {

@@ -80,7 +80,7 @@ const AddClientPage: React.FC = () => {
             } else {
                 setError(err.response?.data?.message || 'Error al agregar el cliente. Inténtalo de nuevo.');
             }
-            console.error("Error adding client:", err);
+            console.error("Error adding client:");
         } finally {
             setIsLoading(false);
         }

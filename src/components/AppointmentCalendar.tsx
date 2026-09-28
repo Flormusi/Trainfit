@@ -64,7 +64,7 @@ const AppointmentCalendar: React.FC = () => {
       });
       setAppointments(response.data.data);
     } catch (error) {
-      console.error('Error al obtener citas:', error);
+      console.error("Error al obtener citas:");
     }
   };
 
@@ -73,7 +73,7 @@ const AppointmentCalendar: React.FC = () => {
       const response = await axios.get('/clients');
       setClients(response.data.data);
     } catch (error) {
-      console.error('Error al obtener clientes:', error);
+      console.error("Error al obtener clientes:");
     }
   };
 
@@ -104,7 +104,7 @@ const AppointmentCalendar: React.FC = () => {
         fetchAppointments();
       }
     } catch (error) {
-      console.error('Error al crear cita:', error);
+      console.error("Error al crear cita:");
     } finally {
       setLoading(false);
     }
@@ -115,7 +115,7 @@ const AppointmentCalendar: React.FC = () => {
       await axios.patch(`/appointments/${appointmentId}`, { status });
       fetchAppointments();
     } catch (error) {
-      console.error('Error al actualizar cita:', error);
+      console.error("Error al actualizar cita:");
     }
   };
 
@@ -126,7 +126,7 @@ const AppointmentCalendar: React.FC = () => {
       await axios.delete(`/appointments/${appointmentId}`);
       fetchAppointments();
     } catch (error) {
-      console.error('Error al eliminar cita:', error);
+      console.error("Error al eliminar cita:");
     }
   };
 

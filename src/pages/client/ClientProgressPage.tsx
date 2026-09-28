@@ -47,16 +47,15 @@ const ClientProgressPage: React.FC = () => {
     try {
       setLoading(true);
       
-      // Fetch assigned routines
-      const routinesResponse = await clientApi.getAssignedRoutines();
+      const [routinesResponse, paymentResponse] = await Promise.all([
+        clientApi.getAssignedRoutines(),
+        clientApi.getPaymentStatus()
+      ]);
       setRoutines(routinesResponse.data || []);
-      
-      // Fetch payment status
-      const paymentResponse = await clientApi.getPaymentStatus();
       setPaymentStatus(paymentResponse.data);
       
     } catch (err) {
-      console.error('Error fetching progress data:', err);
+      console.error("Error fetching progress data:");
       setError('Error al cargar los datos de progreso');
       
       // Mock data for development
@@ -105,7 +104,7 @@ const ClientProgressPage: React.FC = () => {
       await clientApi.sendMonthlyRoutineEmail(routineId);
       toast.success('Rutina enviada por correo electrónico exitosamente');
     } catch (err) {
-      console.error('Error sending email:', err);
+      console.error("Error sending email:");
       toast.error('Error al enviar la rutina por correo');
     } finally {
       setSendingEmail(false);

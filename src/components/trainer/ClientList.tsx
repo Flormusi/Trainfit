@@ -88,7 +88,7 @@ const ClientList: React.FC = () => {
       setClients(clientsArray);
       setFilteredClients(clientsArray);
     } catch (err: any) {
-      console.error('Error fetching clients:', err);
+      console.error("Error fetching clients:");
       setError(err.response?.data?.message || err.message || 'Failed to fetch clients');
     } finally {
       setLoading(false);
@@ -144,7 +144,7 @@ const ClientList: React.FC = () => {
       setClients(clients.filter(c => c.id !== clientToDelete.id));
       toast.success('Cliente eliminado exitosamente');
     } catch (err: any) {
-      console.error('Error al eliminar cliente:', err);
+      console.error("Error al eliminar cliente:");
       toast.error(err.response?.data?.message || 'Error al eliminar cliente');
     } finally {
       setShowDeleteModal(false);

@@ -27,7 +27,7 @@ const DashboardCharts: React.FC = () => {
         const res = await axios.get('/trainer/analytics/charts');
         setData(res.data);
       } catch (e) {
-        console.error('Error loading charts data:', e);
+        console.error("Error loading charts data:");
       } finally {
         setLoading(false);
       }

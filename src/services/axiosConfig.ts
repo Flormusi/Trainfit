@@ -14,7 +14,7 @@ axios.defaults.withCredentials = true;
 // Interceptor de solicitudes
 axios.interceptors.request.use(
   (config) => {
-    console.log('[Axios] Preparando solicitud:', config.url);
+    console.log("[Axios] Preparando solicitud:");
     const token = authService.getToken();
     if (token) {
       console.log('[Axios] Token encontrado, añadiendo a headers');
@@ -25,7 +25,7 @@ axios.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('[Axios] Error en interceptor de solicitud:', error);
+    console.error("[Axios] Error en interceptor de solicitud:");
     return Promise.reject(error);
   }
 );
@@ -33,11 +33,11 @@ axios.interceptors.request.use(
 // Interceptor de respuestas
 axios.interceptors.response.use(
   (response) => {
-    console.log('[Axios] Respuesta exitosa:', response.status, response.config.url);
+    console.log("[Axios] Respuesta exitosa:");
     return response;
   },
   (error) => {
-    console.error('[Axios] Error en respuesta:', error.response?.status, error.config?.url);
+    console.error("[Axios] Error en respuesta:");
     if (error.response?.status === 401 && !error.config?.url?.includes('/auth/')) {
       console.log('[Axios] Error de autenticación, limpiando sesión');
       authService.logout();

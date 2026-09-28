@@ -44,7 +44,7 @@ const ExerciseLibrary = () => {
         setFilteredExercises(response.data);
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching exercises:', err);
+        console.error("Error fetching exercises:");
         setError('Failed to load exercises');
         setLoading(false);
       }
@@ -111,7 +111,7 @@ const ExerciseLibrary = () => {
         notes: ''
       });
     } catch (err) {
-      console.error('Error creating exercise:', err);
+      console.error("Error creating exercise:");
       setError('Failed to create exercise');
     } finally {
       setLoading(false);

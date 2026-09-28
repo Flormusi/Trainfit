@@ -42,7 +42,7 @@ export const useGoogleCalendar = (): UseGoogleCalendarReturn => {
       window.location.href = authUrl;
     } catch (err) {
       setError('Error al iniciar la autenticación');
-      console.error('Error connecting to Google:', err);
+      console.error("Error connecting to Google:");
     }
   }, []);
 
@@ -58,7 +58,7 @@ export const useGoogleCalendar = (): UseGoogleCalendarReturn => {
     } catch (err) {
       setError('Error al obtener tokens de Google');
       toast.error('Error al conectar con Google Calendar');
-      console.error('Error handling auth callback:', err);
+      console.error("Error handling auth callback:");
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +92,7 @@ export const useGoogleCalendar = (): UseGoogleCalendarReturn => {
     } catch (err) {
       setError('Error al sincronizar entrenamientos');
       toast.error('Error al sincronizar con Google Calendar');
-      console.error('Error syncing trainings:', err);
+      console.error("Error syncing trainings:");
     } finally {
       setIsSyncing(false);
     }
@@ -115,7 +115,7 @@ export const useGoogleCalendar = (): UseGoogleCalendarReturn => {
     } catch (err) {
       setError('Error al crear evento');
       toast.error('Error al crear evento en Google Calendar');
-      console.error('Error creating event:', err);
+      console.error("Error creating event:");
       return null;
     } finally {
       setIsLoading(false);
@@ -138,7 +138,7 @@ export const useGoogleCalendar = (): UseGoogleCalendarReturn => {
       return events;
     } catch (err) {
       setError('Error al obtener eventos de Google Calendar');
-      console.error('Error getting events:', err);
+      console.error("Error getting events:");
       return [];
     } finally {
       setIsLoading(false);

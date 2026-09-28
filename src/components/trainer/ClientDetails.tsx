@@ -33,7 +33,7 @@ const ClientDetails: React.FC = () => {
         const clientData = response.data || response;
         setClient(clientData);
       } catch (error) {
-        console.error('Error fetching client details:', error);
+        console.error("Error fetching client details:");
         setError('Error al cargar los detalles del cliente');
       } finally {
         setLoading(false);

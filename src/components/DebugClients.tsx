@@ -18,10 +18,10 @@ const DebugClients: React.FC = () => {
       try {
         setLoading(true);
         const response = await trainerApi.getClients();
-        console.log('Respuesta completa de getClients:', response);
+        console.log("Respuesta completa de getClients:");
         setClientsData(response);
       } catch (err) {
-        console.error('Error al obtener clientes:', err);
+        console.error("Error al obtener clientes:");
         setError('Error al cargar los clientes');
       } finally {
         setLoading(false);

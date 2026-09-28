@@ -31,15 +31,15 @@ export const useClientRoutines = (): UseClientRoutinesReturn => {
       console.log('🔄 Obteniendo rutinas asignadas...');
       
       const response = await clientApi.getAssignedRoutines();
-      console.log('✅ Rutinas obtenidas:', response);
-      console.log('📊 Datos de rutinas:', response.data);
-      console.log('📈 Cantidad de rutinas:', response.data?.length || 0);
+      console.log("✅ Rutinas obtenidas:");
+      console.log("📊 Datos de rutinas:");
+      console.log("📈 Cantidad de rutinas:");
       
       const routinesData = response.data || response || [];
-      console.log('🎯 Estableciendo rutinas:', routinesData);
+      console.log("🎯 Estableciendo rutinas:");
       setRoutines(Array.isArray(routinesData) ? routinesData : []);
     } catch (err: any) {
-      console.error('❌ Error al obtener rutinas:', err);
+      console.error("❌ Error al obtener rutinas:");
       setError(err.response?.data?.message || 'Error al cargar las rutinas');
     } finally {
       setLoading(false);

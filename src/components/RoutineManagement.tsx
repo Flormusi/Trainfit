@@ -36,7 +36,7 @@ const RoutineManagement: React.FC<RoutineManagementProps> = ({ isOpen, onClose }
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    console.log('🔍 RoutineManagement useEffect - isOpen:', isOpen);
+    console.log("🔍 RoutineManagement useEffect - isOpen:");
     if (isOpen) {
       console.log('🔄 Ejecutando fetchRoutines y fetchPresetRoutines...');
       fetchRoutines();
@@ -45,7 +45,7 @@ const RoutineManagement: React.FC<RoutineManagementProps> = ({ isOpen, onClose }
   }, [isOpen]);
 
   const fetchRoutines = async () => {
-    console.log('🔍 fetchRoutines - user:', user);
+    console.log("🔍 fetchRoutines - user:");
     if (!user || user.role !== 'TRAINER') {
       console.log('❌ Usuario no válido o no es entrenador');
       return;
@@ -56,11 +56,11 @@ const RoutineManagement: React.FC<RoutineManagementProps> = ({ isOpen, onClose }
     try {
       console.log('🔄 Llamando a trainerApi.getRoutines()...');
       const response = await trainerApi.getRoutines();
-      console.log('✅ Respuesta de getRoutines:', response);
-      console.log('✅ Datos de rutinas:', response.data);
+      console.log("✅ Respuesta de getRoutines:");
+      console.log("✅ Datos de rutinas:");
       setMyRoutines(response.data);
     } catch (error) {
-      console.error('❌ Error fetching routines:', error);
+      console.error("❌ Error fetching routines:");
       setError('Error al cargar las rutinas');
       toast.error('Error al cargar las rutinas');
     } finally {
@@ -75,10 +75,10 @@ const RoutineManagement: React.FC<RoutineManagementProps> = ({ isOpen, onClose }
       const response = await axios.get('/routine-templates?includePresets=true');
       if (response.data && response.data.success) {
         setPresetRoutines(response.data.data || []);
-        console.log('✅ Rutinas prediseñadas cargadas:', response.data.data);
+        console.log("✅ Rutinas prediseñadas cargadas:");
       }
     } catch (error) {
-      console.error('❌ Error fetching preset routines:', error);
+      console.error("❌ Error fetching preset routines:");
     }
   };
 
@@ -92,7 +92,7 @@ const RoutineManagement: React.FC<RoutineManagementProps> = ({ isOpen, onClose }
       setMyRoutines(prev => prev.filter(routine => routine.id !== routineId));
       toast.success('Rutina eliminada exitosamente');
     } catch (error) {
-      console.error('Error deleting routine:', error);
+      console.error("Error deleting routine:");
       toast.error('Error al eliminar la rutina');
     }
   };
@@ -125,7 +125,7 @@ const RoutineManagement: React.FC<RoutineManagementProps> = ({ isOpen, onClose }
   ];
 
   const handleSelectPresetRoutine = (routine: any) => {
-    console.log('Rutina prediseñada seleccionada:', routine);
+    console.log("Rutina prediseñada seleccionada:");
     onClose();
     // Navigate to create routine page with preset data
     navigate('/trainer/create-routine', {

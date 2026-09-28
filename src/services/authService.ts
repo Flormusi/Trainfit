@@ -24,7 +24,7 @@ export interface User {
 export const authService = {
   async login(credentials: LoginCredentials): Promise<User> {
     try {
-      console.log('[AuthService] Iniciando login con:', { ...credentials, password: '***' });
+      console.log("[AuthService] Iniciando login con:");
       
       const response = await axios.post('/auth/login', credentials);
       const { success, token, user: userDetails } = response.data;
@@ -51,17 +51,17 @@ export const authService = {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userToStore));
 
-      console.log('[AuthService] Login exitoso para:', userDetails.email);
+      console.log("[AuthService] Login exitoso para:");
       return userToStore;
     } catch (error) {
-      console.error('[AuthService] Error durante el login:', error);
+      console.error("[AuthService] Error durante el login:");
       throw error;
     }
   },
 
   async register(data: RegisterData): Promise<User> {
     try {
-      console.log('[AuthService] Iniciando registro con:', { ...data, password: '***' });
+      console.log("[AuthService] Iniciando registro con:");
       
       const response = await axios.post('/auth/register', data);
       const { token, user: userDetails } = response.data;
@@ -78,10 +78,10 @@ export const authService = {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userToStore));
 
-      console.log('[AuthService] Registro exitoso para:', userDetails.email);
+      console.log("[AuthService] Registro exitoso para:");
       return userToStore;
     } catch (error) {
-      console.error('[AuthService] Error durante el registro:', error);
+      console.error("[AuthService] Error durante el registro:");
       throw error;
     }
   },
@@ -103,7 +103,7 @@ export const authService = {
 
       console.log('[AuthService] Logout completado exitosamente');
     } catch (error) {
-      console.error('[AuthService] Error durante el logout:', error);
+      console.error("[AuthService] Error durante el logout:");
       // No lanzamos el error para asegurar que el logout siempre se complete
     }
   },
@@ -113,7 +113,7 @@ export const authService = {
       const userStr = localStorage.getItem('user');
       return userStr ? JSON.parse(userStr) : null;
     } catch (error) {
-      console.error('[AuthService] Error al obtener usuario actual:', error);
+      console.error("[AuthService] Error al obtener usuario actual:");
       return null;
     }
   },

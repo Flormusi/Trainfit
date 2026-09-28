@@ -8,11 +8,11 @@ const GoogleAuthCallback: React.FC = () => {
   const { handleAuthCallback } = useGoogleCalendar();
 
   useEffect(() => {
-    console.log('🔑 GoogleAuthCallback loaded, search:', location.search);
+    console.log("🔑 GoogleAuthCallback loaded, search:");
     const urlParams = new URLSearchParams(location.search);
     const code = urlParams.get('code');
     const error = urlParams.get('error');
-    console.log('🔑 code:', code ? 'EXISTS' : 'NULL', 'error:', error);
+    console.log("🔑 code:");
 
     if (code) {
       console.log('🔑 Calling handleAuthCallback...');
@@ -21,7 +21,7 @@ const GoogleAuthCallback: React.FC = () => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         navigate('/client-dashboard/' + (user.id || ''), { replace: true });
       }).catch((e) => {
-        console.error('🔑 handleAuthCallback error:', e);
+        console.error("🔑 handleAuthCallback error:");
         navigate(-1);
       });
     } else {

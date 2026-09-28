@@ -56,9 +56,9 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     
     setLoading(true);
     try {
-      console.log('🔍 Cargando rutina con ID:', routineId);
+      console.log("🔍 Cargando rutina con ID:");
       const routineData = await clientApi.getRoutineDetails(routineId);
-      console.log('✅ Rutina cargada:', routineData);
+      console.log("✅ Rutina cargada:");
       
       if (routineData && routineData.id && routineData.name) {
         setRoutine(routineData);
@@ -72,13 +72,13 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
           });
           if (Object.keys(preloaded).length > 0) setEditedExercises(preloaded);
         }
-        console.log('✅ Rutina establecida correctamente:', routineData.name);
+        console.log("✅ Rutina establecida correctamente:");
       } else {
-        console.error('❌ Datos de rutina inválidos:', routineData);
+        console.error("❌ Datos de rutina inválidos:");
         toast.error('Los datos de la rutina no son válidos');
       }
     } catch (error: any) {
-      console.error('❌ Error loading routine details:', error);
+      console.error("❌ Error loading routine details:");
       toast.error('Error al cargar los detalles de la rutina');
     } finally {
       setLoading(false);
@@ -114,7 +114,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
     try {
       setIsSaving(true);
 
-      console.log('💾 editedExercises:', JSON.stringify(editedExercises));
+      console.log("💾 editedExercises:");
       for (const [exerciseKey, changes] of Object.entries(editedExercises)) {
         const exerciseIndex = parseInt(exerciseKey, 10);
         if (isNaN(exerciseIndex)) continue;
@@ -129,7 +129,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       setEditedExercises({});
       loadRoutineDetails();
     } catch (error) {
-      console.error('Error saving changes:', error);
+      console.error("Error saving changes:");
       toast.error('Error al guardar los cambios');
     } finally {
       setIsSaving(false);
@@ -159,7 +159,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.warn('Error loading image:', msg);
+      console.warn("Error loading image:");
       return null;
     }
   };
@@ -459,7 +459,7 @@ const RoutineDetailsModal: React.FC<RoutineDetailsModalProps> = ({
       toast.success('PDF descargado');
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Error downloading PDF:', msg);
+      console.error("Error downloading PDF:");
       toast.error('Error al descargar la rutina');
     }
   };

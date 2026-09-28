@@ -59,7 +59,7 @@ class GoogleCalendarService {
       localStorage.setItem('google_calendar_tokens', JSON.stringify(tokens));
       return tokens;
     } catch (error) {
-      console.error('Error getting tokens:', error);
+      console.error("Error getting tokens:");
       throw error;
     }
   }
@@ -74,7 +74,7 @@ class GoogleCalendarService {
       }
       return false;
     } catch (error) {
-      console.error('Error loading saved tokens:', error);
+      console.error("Error loading saved tokens:");
       return false;
     }
   }
@@ -130,7 +130,7 @@ class GoogleCalendarService {
       this.tokens = { ...this.tokens, ...newTokens };
       localStorage.setItem('google_calendar_tokens', JSON.stringify(this.tokens));
     } catch (error) {
-      console.error('Error refreshing token:', error);
+      console.error("Error refreshing token:");
       throw error;
     }
   }
@@ -174,7 +174,7 @@ class GoogleCalendarService {
       const result = await response.json();
       return result.id;
     } catch (error) {
-      console.error('Error creating calendar event:', error);
+      console.error("Error creating calendar event:");
       throw error;
     }
   }
@@ -208,7 +208,7 @@ class GoogleCalendarService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('Error updating calendar event:', error);
+      console.error("Error updating calendar event:");
       throw error;
     }
   }
@@ -227,7 +227,7 @@ class GoogleCalendarService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('Error deleting calendar event:', error);
+      console.error("Error deleting calendar event:");
       throw error;
     }
   }
@@ -253,7 +253,7 @@ class GoogleCalendarService {
       const result = await response.json();
       return result.items || [];
     } catch (error) {
-      console.error('Error getting calendar events:', error);
+      console.error("Error getting calendar events:");
       throw error;
     }
   }
@@ -282,7 +282,7 @@ class GoogleCalendarService {
         await this.createEvent(event);
         success++;
       } catch (error) {
-        console.error('Error syncing training:', training, error);
+        console.error("Error syncing training:");
         errors++;
       }
     }

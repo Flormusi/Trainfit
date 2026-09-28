@@ -51,7 +51,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       });
       onClose();
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:");
     } finally {
       setIsLoading(false);
     }

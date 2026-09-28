@@ -57,7 +57,7 @@ const CheckoutForm: React.FC<{ selectedPlan: string; onSuccess: () => void }> = 
       toast.success('¡Suscripción creada exitosamente!');
       onSuccess();
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error("Error:");
       toast.error(error.message || 'Error al procesar el pago');
     } finally {
       setLoading(false);
@@ -117,7 +117,7 @@ const SubscriptionPage: React.FC = () => {
       const subscription = await paymentService.getCurrentSubscription();
       setSubscription(subscription);
     } catch (error) {
-      console.error('Error fetching subscription:', error);
+      console.error("Error fetching subscription:");
       toast.error('Error al cargar la suscripción');
     } finally {
       setLoading(false);
@@ -129,7 +129,7 @@ const SubscriptionPage: React.FC = () => {
       const payments = await paymentService.getPaymentHistory();
       setPayments(payments);
     } catch (error) {
-      console.error('Error fetching payment history:', error);
+      console.error("Error fetching payment history:");
       toast.error('Error al cargar el historial de pagos');
     }
   };
@@ -152,7 +152,7 @@ const SubscriptionPage: React.FC = () => {
       
       toast.success('Suscripción cancelada. Se mantendrá activa hasta el final del período actual.');
     } catch (error) {
-      console.error('Error canceling subscription:', error);
+      console.error("Error canceling subscription:");
       toast.error('Error al cancelar la suscripción');
     } finally {
       setLoading(false);

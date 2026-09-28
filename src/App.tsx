@@ -80,7 +80,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 
   componentDidCatch(error: any, info: any) {
-    console.error('[ErrorBoundary] Caught error:', error, info);
+    console.error("[ErrorBoundary] Caught error:");
   }
 
   render() {

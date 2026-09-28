@@ -70,7 +70,7 @@ export const useSocket = () => {
       });
 
       socket.on('connect_error', (error) => {
-        console.error('❌ Error de conexión WebSocket:', error);
+        console.error("❌ Error de conexión WebSocket:");
       });
     }
 

@@ -27,7 +27,7 @@ export const workoutPlanService = {
     try {
       console.log('[WorkoutPlanService] Solicitando ejercicios al servidor...');
       const response = await axios.get('/trainer/workout-plans');
-      console.log('[WorkoutPlanService] Respuesta del servidor:', response.data);
+      console.log("[WorkoutPlanService] Respuesta del servidor:");
       
       if (!response.data) {
         throw new Error('La respuesta del servidor no contiene datos');
@@ -35,7 +35,7 @@ export const workoutPlanService = {
       
       return response.data;
     } catch (error) {
-      console.error('[WorkoutPlanService] Error al obtener ejercicios:', error);
+      console.error("[WorkoutPlanService] Error al obtener ejercicios:");
       throw error;
     }
   },
@@ -45,7 +45,7 @@ export const workoutPlanService = {
       const response = await axios.post('/trainer/workout-plans', workoutPlan);
       return response.data;
     } catch (error) {
-      console.error('[WorkoutPlanService] Error al crear plan de ejercicios:', error);
+      console.error("[WorkoutPlanService] Error al crear plan de ejercicios:");
       throw error;
     }
   },
@@ -54,7 +54,7 @@ export const workoutPlanService = {
     try {
       await axios.delete(`/trainer/workout-plans/${id}`);
     } catch (error) {
-      console.error('[WorkoutPlanService] Error al eliminar plan de ejercicios:', error);
+      console.error("[WorkoutPlanService] Error al eliminar plan de ejercicios:");
       throw error;
     }
   },
@@ -67,7 +67,7 @@ export const workoutPlanService = {
       });
       return response.data;
     } catch (error) {
-      console.error('[WorkoutPlanService] Error al asignar plan de ejercicios:', error);
+      console.error("[WorkoutPlanService] Error al asignar plan de ejercicios:");
       throw error;
     }
   },
@@ -77,7 +77,7 @@ export const workoutPlanService = {
       const response = await axios.put(`/trainer/workout-plans/${id}`, workoutPlan);
       return response.data;
     } catch (error) {
-      console.error('[WorkoutPlanService] Error al actualizar plan de ejercicios:', error);
+      console.error("[WorkoutPlanService] Error al actualizar plan de ejercicios:");
       throw error;
     }
   },
@@ -87,7 +87,7 @@ export const workoutPlanService = {
       const response = await axios.get('/trainer/workout-assignments/client');
       return response.data;
     } catch (error) {
-      console.error('[WorkoutPlanService] Error al obtener planes asignados:', error);
+      console.error("[WorkoutPlanService] Error al obtener planes asignados:");
       throw error;
     }
   },
@@ -97,7 +97,7 @@ export const workoutPlanService = {
       const response = await axios.get('/trainer/workout-plans/unassigned');
       return response.data;
     } catch (error) {
-      console.error('[WorkoutPlanService] Error al obtener planes no asignados:', error);
+      console.error("[WorkoutPlanService] Error al obtener planes no asignados:");
       throw error;
     }
   },

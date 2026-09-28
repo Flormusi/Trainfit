@@ -88,7 +88,7 @@ const RoutineLibraryPage: React.FC = () => {
           }));
         } catch (e) {
           // Si falla, continuar solo con prediseñadas
-          console.warn('No se pudieron cargar rutinas personales:', e);
+          console.warn("No se pudieron cargar rutinas personales:");
         }
 
         // Prediseñadas
@@ -107,7 +107,7 @@ const RoutineLibraryPage: React.FC = () => {
             type: 'preset',
           }));
         } catch (e: any) {
-          console.error('Error cargando rutinas prediseñadas:', e?.response?.data || e);
+          console.error("Error cargando rutinas prediseñadas:");
           throw new Error(e?.response?.data?.message || 'Error al cargar rutinas prediseñadas');
         }
 

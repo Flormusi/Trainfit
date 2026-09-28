@@ -106,7 +106,7 @@ export const trainerApi = {
   getDashboardData: async () => {
     try {
       const response = await axios.get('/trainer/dashboard');
-      console.log('Dashboard API response:', response.data);
+      console.log("Dashboard API response:");
       
       // Asegurarse de que la respuesta tenga la estructura esperada
       if (response && response.data && response.data.data) {
@@ -129,7 +129,7 @@ export const trainerApi = {
         };
       }
     } catch (error) {
-      console.error('Error al obtener datos del dashboard:', error);
+      console.error("Error al obtener datos del dashboard:");
       // Devolver valores por defecto en caso de error
       return {
         data: {
@@ -145,14 +145,14 @@ export const trainerApi = {
   getClients: async () => {
     try {
       const response = await axios.get('/trainer/clients');
-      console.log('API getClients response:', response);
+      console.log("API getClients response:");
       
       // Verificar si la respuesta tiene la estructura esperada con datos anidados
       if (response && response.data && response.data.data && response.data.data.clients) {
         console.log('Estructura anidada detectada, devolviendo clients desde data.data.clients');
         // Devolver directamente el array de clientes para que el componente pueda usarlo
         const clients = response.data.data.clients;
-        console.log('Clientes extraídos:', clients);
+        console.log("Clientes extraídos:");
         return {
           data: clients
         };
@@ -170,7 +170,7 @@ export const trainerApi = {
         };
       }
     } catch (error) {
-      console.error('Error en getClients:', error);
+      console.error("Error en getClients:");
       return {
         data: []
       };
@@ -269,7 +269,7 @@ export const trainerApi = {
   getRoutineAssignments: async (year: number, month: number) => {
     try {
       const response = await axios.get(`/trainer/routines/assignments?year=${year}&month=${month}`);
-      console.log('Respuesta de getRoutineAssignments:', response);
+      console.log("Respuesta de getRoutineAssignments:");
       
       // Verificar la estructura de la respuesta
       if (response && response.data) {
@@ -280,14 +280,14 @@ export const trainerApi = {
           // Nueva estructura: { success, message, data: [...] }
           return { data: response.data.data };
         } else {
-          console.error('Estructura de respuesta inesperada en getRoutineAssignments:', response);
+          console.error("Estructura de respuesta inesperada en getRoutineAssignments:");
           return { data: [] };
         }
       } else {
         return { data: [] };
       }
     } catch (error) {
-      console.error('Error en getRoutineAssignments:', error);
+      console.error("Error en getRoutineAssignments:");
       return { data: [] };
     }
   },
@@ -314,7 +314,7 @@ export const trainerApi = {
       const response = await axios.delete(`/trainer/routines/assignments/${assignmentId}`);
       return response.data;
     } catch (error) {
-      console.error('Error al eliminar la asignación de rutina:', error);
+      console.error("Error al eliminar la asignación de rutina:");
       throw error;
     }
   },
@@ -629,16 +629,16 @@ export const clientApi = {
   
   updateProfile: async (clientId: string, profileData: any) => {
     console.log('🚀 [clientApi.updateProfile] Iniciando solicitud PUT');
-    console.log('📋 [clientApi.updateProfile] ClientId:', clientId);
-    console.log('📋 [clientApi.updateProfile] ProfileData:', profileData);
-    console.log('📋 [clientApi.updateProfile] URL completa:', `/clients/${clientId}/profile`);
+    console.log("📋 [clientApi.updateProfile] ClientId:");
+    console.log("📋 [clientApi.updateProfile] ProfileData:");
+    console.log("📋 [clientApi.updateProfile] URL completa:");
     
     try {
       const response = await axios.put(`/clients/${clientId}/profile`, profileData);
-      console.log('✅ [clientApi.updateProfile] Respuesta exitosa:', response.status, response.data);
+      console.log("✅ [clientApi.updateProfile] Respuesta exitosa:");
       return response.data;
     } catch (error) {
-      console.error('❌ [clientApi.updateProfile] Error en solicitud:', error);
+      console.error("❌ [clientApi.updateProfile] Error en solicitud:");
       throw error;
     }
   },

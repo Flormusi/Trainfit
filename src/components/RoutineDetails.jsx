@@ -120,7 +120,7 @@ const RoutineDetails = () => {
         navigate(-1); // Volver a la página anterior
       }
     } catch (error) {
-      console.error('Error al eliminar la rutina:', error);
+      console.error("Error al eliminar la rutina:");
       alert('❌ Error al eliminar la rutina. Por favor, inténtalo de nuevo.');
     }
   };

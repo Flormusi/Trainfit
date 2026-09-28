@@ -230,7 +230,7 @@ const UnifiedCalendar: React.FC = () => {
 
       setEvents([...routines, ...sessions, ...consultations]);
     } catch (error) {
-      console.error('Error al obtener eventos:', error);
+      console.error("Error al obtener eventos:");
       setEvents([]);
     }
   };
@@ -255,7 +255,7 @@ const UnifiedCalendar: React.FC = () => {
 
       setClients(normalized);
     } catch (error) {
-      console.error('Error al obtener clientes:', error);
+      console.error("Error al obtener clientes:");
       setClients([]);
     }
   };
@@ -297,7 +297,7 @@ const UnifiedCalendar: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error al crear evento:', error);
+      console.error("Error al crear evento:");
       toast.error('Error al procesar la acción', {
         duration: 3000,
         style: { background: '#2d2d2d', color: '#fff' }
@@ -330,7 +330,7 @@ const UnifiedCalendar: React.FC = () => {
         fetchEvents();
       }
     } catch (error) {
-      console.error('Error al actualizar evento:', error);
+      console.error("Error al actualizar evento:");
     }
   };
 
@@ -358,7 +358,7 @@ const UnifiedCalendar: React.FC = () => {
         fetchEvents();
       }
     } catch (error) {
-      console.error('Error al guardar cambios del evento:', error);
+      console.error("Error al guardar cambios del evento:");
     } finally {
       setSaving(false);
     }
@@ -388,7 +388,7 @@ const UnifiedCalendar: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error al eliminar evento:', error);
+      console.error("Error al eliminar evento:");
       toast.error('Error al procesar la acción', {
         duration: 3000,
         style: { background: '#2d2d2d', color: '#fff' }
@@ -544,7 +544,7 @@ const UnifiedCalendar: React.FC = () => {
       setSelectedDate(start);
       setShowCreateModal(true);
     } catch (e) {
-      console.error('Error al seleccionar slot:', e);
+      console.error("Error al seleccionar slot:");
       setShowCreateModal(true);
     }
   };

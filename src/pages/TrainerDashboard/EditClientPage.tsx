@@ -43,8 +43,8 @@ const EditClientPage: React.FC = () => {
                 const clientData = response.data || response;
                 const profile = clientData.clientProfile || {};
                 
-                console.log('Datos del cliente recibidos:', clientData);
-                console.log('Perfil del cliente:', profile);
+                console.log("Datos del cliente recibidos:");
+                console.log("Perfil del cliente:");
                 
                 setFormData({
                     name: clientData.name || '',
@@ -65,7 +65,7 @@ const EditClientPage: React.FC = () => {
                     nickname: profile.nickname || clientData.nickname || ''
                 });
             } catch (err: any) {
-                console.error('Error loading client data:', err);
+                console.error("Error loading client data:");
                 setError('Error al cargar los datos del cliente');
             } finally {
                 setIsLoadingData(false);
@@ -95,8 +95,8 @@ const EditClientPage: React.FC = () => {
         setIsLoading(true);
 
         console.log('🚀 Iniciando actualización de cliente...');
-        console.log('📋 FormData actual:', formData);
-        console.log('🆔 ClientId:', clientId);
+        console.log("📋 FormData actual:");
+        console.log("🆔 ClientId:");
 
         if (!formData.name || !formData.email) {
             setError('Por favor, completa todos los campos requeridos.');
@@ -130,28 +130,28 @@ const EditClientPage: React.FC = () => {
                 nickname: formData.nickname
             };
 
-            console.log('📤 Datos a enviar:', clientData);
+            console.log("📤 Datos a enviar:");
             
             const response = await trainerApi.updateClientInfo(clientId!, clientData);
-            console.log('✅ Respuesta del servidor:', response);
+            console.log("✅ Respuesta del servidor:");
 
             if (response) {
                 console.log('🎉 Actualización exitosa, preparando redirección...');
                 setSuccess('Cliente actualizado exitosamente.');
                 const redirectUrl = `/trainer/clients/${clientId}?updated=true`;
-                console.log('🔄 Redirigiendo a:', redirectUrl);
+                console.log("🔄 Redirigiendo a:");
                 // Redirección más rápida para mejor UX
                 setTimeout(() => {
                     console.log('⏰ Ejecutando redirección...');
                     navigate(redirectUrl);
                 }, 1000);
             } else {
-                console.log('❌ Respuesta no exitosa:', response);
+                console.log("❌ Respuesta no exitosa:");
                 setError('Error al actualizar el cliente. Respuesta no exitosa.');
             }
         } catch (err: any) {
-            console.error("💥 Error updating client:", err);
-            console.error("💥 Error response:", err.response);
+            console.error("💥 Error updating client:");
+            console.error("💥 Error response:");
             setError(err.response?.data?.message || 'Error al actualizar el cliente. Inténtalo de nuevo.');
         } finally {
             setIsLoading(false);

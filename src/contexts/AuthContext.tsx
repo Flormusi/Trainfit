@@ -27,13 +27,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const currentUser = authService.getCurrentUser();
       if (currentUser) {
-        console.log('[AuthContext] Current user found in localStorage:', currentUser);
+        console.log("[AuthContext] Current user found in localStorage:");
         setUser(currentUser);
       } else {
         console.log('[AuthContext] No current user in localStorage');
       }
     } catch (error) {
-      console.error("[AuthContext] Error loading current user from localStorage:", error);
+      console.error("[AuthContext] Error loading current user from localStorage:");
       localStorage.removeItem('user');
       localStorage.removeItem('token');
     }
@@ -41,9 +41,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const navigateBasedOnRole = useCallback((user: User) => {
-    console.log('[AuthContext] Navigating based on role for user:', user);
+    console.log("[AuthContext] Navigating based on role for user:");
     const normalizedUserRole = user.role.toUpperCase() === 'TRAINER' ? 'trainer' : 'client';
-    console.log('[AuthContext] Normalized user role:', normalizedUserRole);
+    console.log("[AuthContext] Normalized user role:");
     
     if (normalizedUserRole === 'client') {
       if (!user.hasCompletedOnboarding) {
@@ -54,23 +54,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } else if (normalizedUserRole === 'trainer') {
       navigate('/trainer-dashboard', { replace: true });
     } else {
-      console.error('[AuthContext] Invalid user role:', user.role);
+      console.error("[AuthContext] Invalid user role:");
       toast.error('Error: Rol de usuario inválido');
       navigate('/login', { replace: true });
     }
   }, [navigate]);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<void> => {
-    console.log('[AuthContext] Attempting login with credentials:', credentials);
+    console.log("[AuthContext] Attempting login with credentials:");
     setLoading(true);
     try {
       const userData = await authService.login(credentials);
-      console.log('[AuthContext] Login successful, user data:', userData);
+      console.log("[AuthContext] Login successful, user data:");
       if (userData && userData.token) {
         setUser(userData);
         localStorage.setItem('token', userData.token);
         localStorage.setItem('user', JSON.stringify(userData));
-        console.log('[AuthContext] User and token set. User state:', userData);
+        console.log("[AuthContext] User and token set. User state:");
         toast.success('¡Inicio de sesión exitoso!');
         console.log('[AuthContext] Navigating based on role...');
         navigateBasedOnRole(userData);
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         toast.error('Error de inicio de sesión: Respuesta inválida del servidor.');
       }
     } catch (error) {
-      console.error('[AuthContext] Login error caught:', error);
+      console.error("[AuthContext] Login error caught:");
       let errorMessage = 'Error al iniciar sesión. Por favor, intente nuevamente.';
       if (axios.isAxiosError(error) && error.response) {
         errorMessage = error.response.data?.message || errorMessage;
@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const isAuthenticated = useCallback(() => {
     const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
-    console.log('[AuthContext] Checking authentication - Token:', !!token, 'User:', !!storedUser);
+    console.log("[AuthContext] Checking authentication - Token:");
     return !!token && !!storedUser;
   }, []);
 
@@ -115,7 +115,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (enabled) {
       const hasSession = isAuthenticated();
       if (!hasSession && email && password) {
-        console.log('[AuthContext] Dev auto-login enabled. Attempting login for:', email);
+        console.log("[AuthContext] Dev auto-login enabled. Attempting login for:");
         // Usa el mismo flujo de login para mantener navegación y toasts
         login({ email, password });
       }
@@ -123,7 +123,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [login, isAuthenticated]);
 
   const saveOnboardingData = useCallback(async (data: any) => {
-    console.log('[AuthContext] Saving onboarding data:', data);
+    console.log("[AuthContext] Saving onboarding data:");
     try {
       if (!user) {
         throw new Error('Usuario no encontrado');
@@ -140,7 +140,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         data
       );
 
-      console.log('[AuthContext] Onboarding data saved successfully:', response.data);
+      console.log("[AuthContext] Onboarding data saved successfully:");
 
       // Actualizar el estado local con la respuesta del servidor
       const updatedUser = { ...user, hasCompletedOnboarding: true };
@@ -150,7 +150,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       toast.success('Datos de onboarding guardados exitosamente');
       navigateBasedOnRole(updatedUser);
     } catch (error) {
-      console.error('[AuthContext] Error saving onboarding data:', error);
+      console.error("[AuthContext] Error saving onboarding data:");
       let errorMessage = 'Error al guardar los datos de onboarding';
       if (axios.isAxiosError(error) && error.response) {
         errorMessage = error.response.data?.message || errorMessage;

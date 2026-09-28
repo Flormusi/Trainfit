@@ -142,10 +142,10 @@ const TrainerClientProgressPage: React.FC = () => {
 
   // Detectar cuando se regresa de la edición y recargar datos
   useEffect(() => {
-    console.log('🔍 useEffect triggered - location.search:', location.search);
+    console.log("🔍 useEffect triggered - location.search:");
     const urlParams = new URLSearchParams(location.search);
     const updatedParam = urlParams.get('updated');
-    console.log('🔍 Updated param value:', updatedParam);
+    console.log("🔍 Updated param value:");
     
     if (updatedParam === 'true') {
       console.log('🔄 Cliente actualizado detectado, recargando datos...');
@@ -155,7 +155,7 @@ const TrainerClientProgressPage: React.FC = () => {
       fetchClientData();
       // Limpiar el parámetro de la URL sin recargar la página
       const newUrl = window.location.pathname;
-      console.log('🔄 Limpiando URL de:', window.location.href, 'a:', newUrl);
+      console.log("🔄 Limpiando URL de:");
       window.history.replaceState({}, '', newUrl);
     }
   }, [location.search]);
@@ -170,10 +170,11 @@ const TrainerClientProgressPage: React.FC = () => {
   const fetchClientData = async () => {
     try {
       setLoading(true);
-      const [clientResponse, routinesResponse, customExercisesResponse] = await Promise.all([
+      const [clientResponse, routinesResponse, customExercisesResponse, paymentResponse] = await Promise.all([
         trainerApi.getClientDetails(clientId!),
         trainerApi.getClientRoutines(clientId!),
-        trainerApi.getExercises().catch(() => ({ data: [] }))
+        trainerApi.getExercises().catch(() => ({ data: [] })),
+        trainerApi.getClientPaymentStatus(clientId!).catch(() => null)
       ]);
 
       setClient(clientResponse);
@@ -202,37 +203,16 @@ const TrainerClientProgressPage: React.FC = () => {
 
       setRoutines(uniqueRoutines);
       
-      // Debug logs detallados
-      console.log('🔍 === DATOS DEL CLIENTE RECIBIDOS ===');
-      console.log('🔍 Client data completo:', JSON.stringify(clientResponse, null, 2));
-      console.log('🔍 Client Profile:', clientResponse?.clientProfile);
-      console.log('🔍 Age (profile):', clientResponse?.clientProfile?.age);
-      console.log('🔍 Age (direct):', clientResponse?.age);
-      console.log('🔍 Gender (profile):', clientResponse?.clientProfile?.gender);
-      console.log('🔍 Gender (direct):', clientResponse?.gender);
-      console.log('🔍 Fitness Level (profile):', clientResponse?.clientProfile?.fitnessLevel);
-      console.log('🔍 Fitness Level (direct):', clientResponse?.fitnessLevel);
-      console.log('🔍 === FIN DATOS DEL CLIENTE ===');
-      console.log('🔍 Raw routines data:', rawRoutines);
-      console.log('🔍 Unique routines after filter:', uniqueRoutines);
-      console.log('🔍 Duplicates removed:', rawRoutines.length - uniqueRoutines.length);
-      
-      // Cargar payment status real desde la DB
-      try {
-        const paymentResponse = await trainerApi.getClientPaymentStatus(clientId!);
-        if (paymentResponse?.success && paymentResponse?.data) {
-          setPaymentStatus({
-            status: paymentResponse.data.status || 'pending',
-            amount: paymentResponse.data.amount || 0,
-            dueDate: paymentResponse.data.dueDate || new Date().toISOString(),
-            lastPayment: paymentResponse.data.lastPayment || new Date().toISOString()
-          });
-        }
-      } catch {
-        // Si no hay pago registrado, dejar en null
+      if (paymentResponse?.success && paymentResponse?.data) {
+        setPaymentStatus({
+          status: paymentResponse.data.status || 'pending',
+          amount: paymentResponse.data.amount || 0,
+          dueDate: paymentResponse.data.dueDate || new Date().toISOString(),
+          lastPayment: paymentResponse.data.lastPayment || new Date().toISOString()
+        });
       }
     } catch (error) {
-      console.error('Error fetching client data:', error);
+      console.error("Error fetching client data:");
       setError('Error al cargar los datos del cliente');
       toast.error('Error al cargar los datos del cliente');
     } finally {
@@ -255,7 +235,7 @@ const TrainerClientProgressPage: React.FC = () => {
       setIsCompleteProfileModalOpen(false);
       fetchClientData();
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:");
       toast.error('Error al actualizar el perfil');
     }
   };
@@ -265,7 +245,7 @@ const TrainerClientProgressPage: React.FC = () => {
       // Simular envío de recordatorio
       toast.success('Recordatorio enviado correctamente');
     } catch (error) {
-      console.error('Error sending reminder:', error);
+      console.error("Error sending reminder:");
       toast.error('Error al enviar recordatorio');
     }
   };
@@ -277,7 +257,7 @@ const TrainerClientProgressPage: React.FC = () => {
         return;
       }
 
-      console.log('Enviando recordatorio de pago al cliente:', client?.name);
+      console.log("Enviando recordatorio de pago al cliente:");
       
       // Importar el servicio de notificaciones dinámicamente
       const { default: notificationService } = await import('../../services/notificationService');
@@ -290,7 +270,7 @@ const TrainerClientProgressPage: React.FC = () => {
         toast.error(result.message || 'Error al enviar recordatorio de pago');
       }
     } catch (error: any) {
-      console.error('Error enviando recordatorio:', error);
+      console.error("Error enviando recordatorio:");
       toast.error('Error al enviar recordatorio de pago');
     }
   };
@@ -334,7 +314,7 @@ const TrainerClientProgressPage: React.FC = () => {
       toast.success('Información de pago actualizada correctamente');
       setIsEditPaymentModalOpen(false);
     } catch (error: any) {
-      console.error('Error updating payment:', error);
+      console.error("Error updating payment:");
       toast.error('Error al actualizar la información de pago');
     }
   };
@@ -450,7 +430,7 @@ const TrainerClientProgressPage: React.FC = () => {
     try {
       // Validar URL
       if (!imageUrl || typeof imageUrl !== 'string') {
-        console.warn('URL de imagen inválida:', imageUrl);
+        console.warn("URL de imagen inválida:");
         return null;
       }
 
@@ -469,7 +449,7 @@ const TrainerClientProgressPage: React.FC = () => {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        console.warn(`Error al cargar imagen: ${response.status} ${response.statusText}`);
+        console.warn("Frontend diagnostic");
         return null;
       }
 
@@ -477,7 +457,7 @@ const TrainerClientProgressPage: React.FC = () => {
       
       // Verificar que sea una imagen válida
       if (!blob.type.startsWith('image/')) {
-        console.warn('El archivo no es una imagen válida:', blob.type);
+        console.warn("El archivo no es una imagen válida:");
         return null;
       }
       
@@ -485,7 +465,7 @@ const TrainerClientProgressPage: React.FC = () => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
         reader.onerror = (error) => {
-          console.error('Error al leer archivo:', error);
+          console.error("Error al leer archivo:");
           resolve(null);
         };
         reader.readAsDataURL(blob);
@@ -493,9 +473,9 @@ const TrainerClientProgressPage: React.FC = () => {
     } catch (error: unknown) {
       const err = error as any;
       if (err?.name === 'AbortError') {
-        console.warn('Timeout al cargar imagen:', imageUrl);
+        console.warn("Timeout al cargar imagen:");
       } else {
-        console.error('Error converting image to base64:', err);
+        console.error("Error converting image to base64:");
       }
       return null;
     }
@@ -611,7 +591,7 @@ const TrainerClientProgressPage: React.FC = () => {
         try {
           exercises = JSON.parse(exercises);
         } catch (e) {
-          console.error('Error parsing exercises:', e);
+          console.error("Error parsing exercises:");
           exercises = [];
         }
       }
@@ -629,7 +609,7 @@ const TrainerClientProgressPage: React.FC = () => {
             try {
               imageBase64 = await getImageAsBase64(imageUrl);
             } catch (error) {
-              console.warn(`Error cargando imagen para ejercicio ${exercise.name}:`, error);
+              console.warn("Frontend diagnostic");
               imageBase64 = null;
             }
           }
@@ -762,7 +742,7 @@ const TrainerClientProgressPage: React.FC = () => {
 
             pdf.addImage(imgEl, 'JPEG', imgX, imgY, targetW, targetH, undefined, 'MEDIUM');
           } catch (error) {
-            console.error('Error adding image to PDF:', error);
+            console.error("Error adding image to PDF:");
             // Si falla la imagen, mostrar texto alternativo
             pdf.setFontSize(8);
             pdf.setTextColor(180, 180, 180);
@@ -889,7 +869,7 @@ const TrainerClientProgressPage: React.FC = () => {
       toast.success('PDF con diseño Trainfit generado correctamente');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error('Error generando PDF:', message);
+      console.error("Error generando PDF:");
       
       // Mensajes de error más específicos
       if (message.includes('fetch')) {
@@ -1465,7 +1445,7 @@ const TrainerClientProgressPage: React.FC = () => {
                             setRoutines(prev => prev.filter(r => r.id !== routine.id));
                             toast.success('Rutina eliminada exitosamente');
                           } catch (error) {
-                            console.error('Error al eliminar la rutina:', error);
+                            console.error("Error al eliminar la rutina:");
                             toast.error('Error al eliminar la rutina');
                           }
                         }}
@@ -1498,11 +1478,11 @@ const TrainerClientProgressPage: React.FC = () => {
                         onClick={async (e) => {
                           e.stopPropagation();
                           try {
-                            console.log('📧 Enviando email, clientId:', clientId, 'routineId:', routine.id);
+                            console.log("📧 Enviando email, clientId:");
                             await trainerApi.resendRoutineEmail(clientId!, routine.id);
                             toast.success('Email enviado correctamente');
                           } catch (err: any) {
-                            console.error('Error enviando email:', err);
+                            console.error("Error enviando email:");
                             toast.error(err?.response?.data?.message || 'Error al enviar el email');
                           }
                         }}
@@ -1541,7 +1521,7 @@ const TrainerClientProgressPage: React.FC = () => {
                             try {
                               processedRoutine.exercises = JSON.parse(routine.exercises);
                             } catch (e) {
-                              console.error('Error parsing routine exercises:', e);
+                              console.error("Error parsing routine exercises:");
                               processedRoutine.exercises = [];
                             }
                           }
@@ -2158,7 +2138,7 @@ const TrainerClientProgressPage: React.FC = () => {
                                  try {
                                    parsedExercise = JSON.parse(exercise);
                                  } catch (e) {
-                                   console.error('Error parsing exercise for image:', e);
+                                   console.error("Error parsing exercise for image:");
                                    parsedExercise = exercise;
                                  }
                                }
@@ -2171,11 +2151,7 @@ const TrainerClientProgressPage: React.FC = () => {
                                               parsedExercise.photo ||
                                               parsedExercise.picture;
                                
-                               console.log('Exercise image data:', {
-                                 exerciseName: parsedExercise.name,
-                                 imageUrl: imageUrl,
-                                 allProps: Object.keys(parsedExercise)
-                               });
+                               console.log("Exercise image data:");
                                
                                return imageUrl ? (
                                  <img
@@ -2189,7 +2165,7 @@ const TrainerClientProgressPage: React.FC = () => {
                                      border: '2px solid #dc2626'
                                    }}
                                    onError={(e) => {
-                                     console.error('Error loading image:', imageUrl);
+                                     console.error("Error loading image:");
                                      // Si falla la imagen, mostrar placeholder
                                      const target = e.target as HTMLImageElement;
                                      target.style.display = 'none';
@@ -2197,7 +2173,7 @@ const TrainerClientProgressPage: React.FC = () => {
                                      if (placeholder) placeholder.style.display = 'flex';
                                    }}
                                    onLoad={() => {
-                                     console.log('Image loaded successfully:', imageUrl);
+                                     console.log("Image loaded successfully:");
                                    }}
                                  />
                                ) : null;
@@ -2332,7 +2308,7 @@ const TrainerClientProgressPage: React.FC = () => {
                                try {
                                  parsedExercise = JSON.parse(exercise);
                                } catch (e) {
-                                 console.error('Error parsing exercise:', e);
+                                 console.error("Error parsing exercise:");
                                  parsedExercise = exercise;
                                }
                              }

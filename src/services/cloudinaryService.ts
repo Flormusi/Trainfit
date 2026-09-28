@@ -24,7 +24,7 @@ export const getOptimizedImageUrl = (publicId: string, width = 300, height = 200
     
     return image.toURL();
   } catch (error) {
-    console.error('Error generating Cloudinary URL:', error);
+    console.error("Error generating Cloudinary URL:");
     return '/images/exercises/placeholder.svg';
   }
 };
@@ -52,7 +52,7 @@ export const uploadImage = async (file: File, folder = 'exercises'): Promise<str
     const data = await response.json();
     return data.secure_url;
   } catch (error) {
-    console.error('Error uploading image:', error);
+    console.error("Error uploading image:");
     return null;
   }
 };

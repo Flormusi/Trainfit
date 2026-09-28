@@ -48,7 +48,7 @@ const Register: React.FC = () => {
     } catch (error: any) {
       // AuthContext.register ya maneja los toasts de error.
       // Puedes dejar este console.error para debugging si lo deseas.
-      console.error('Error en el componente Register durante el handleSubmit:', error);
+      console.error("Error en el componente Register durante el handleSubmit:");
       // toast.error(error.message || 'Error en el registro.'); // No es necesario duplicar el toast
     } finally {
       setLoading(false);

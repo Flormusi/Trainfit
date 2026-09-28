@@ -59,7 +59,7 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
       const notifications = data?.notifications || data?.data?.notifications || [];
       setNotifications(Array.isArray(notifications) ? notifications : []);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error("Error fetching notifications:");
     } finally {
       setLoading(false);
     }
@@ -75,7 +75,7 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
       setNotifications([]);
       toast.success('Todas las notificaciones eliminadas');
     } catch (error) {
-      console.error('Error en clearAllNotifications:', error);
+      console.error("Error en clearAllNotifications:");
       toast.error('Error al eliminar todas las notificaciones');
     }
   };
@@ -83,12 +83,12 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
   // Eliminar notificación individual
   const deleteNotification = async (notificationId: string) => {
     try {
-      console.log('Eliminando notificación', notificationId);
+      console.log("Eliminando notificación");
       await axios.delete(`/clients/notifications/${notificationId}`);
       setNotifications(prev => prev.filter(n => String(n._id || n.id) !== String(notificationId)));
       toast.success('Notificación eliminada');
     } catch (error) {
-      console.error('Error al eliminar notificación:', error);
+      console.error("Error al eliminar notificación:");
       toast.error('Error al eliminar notificación');
     }
   };
@@ -107,10 +107,10 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
           )
         );
       } else {
-        console.error('Error marking notification as read:', response.status);
+        console.error("Error marking notification as read:");
       }
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error("Error marking notification as read:");
     }
   };
 
@@ -183,7 +183,7 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
       // Cerrar modal tras navegar
       onClose();
     } catch (error) {
-      console.error('Error al manejar clic de notificación:', error);
+      console.error("Error al manejar clic de notificación:");
     }
   };
 
@@ -233,7 +233,7 @@ const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> = ({ isO
 
   // Log de depuración para cambios en notificaciones
   useEffect(() => {
-    console.log('Notificaciones actualizadas. length=', notifications.length);
+    console.log("Notificaciones actualizadas. length=");
   }, [notifications]);
 
   if (!isOpen) return null;

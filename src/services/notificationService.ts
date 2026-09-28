@@ -90,7 +90,7 @@ class NotificationService {
       const response = await this.getNotifications({ limit: 1, unreadOnly: true });
       return response.data.unreadCount;
     } catch (error) {
-      console.error('Error obteniendo conteo de notificaciones:', error);
+      console.error("Error obteniendo conteo de notificaciones:");
       return 0;
     }
   }

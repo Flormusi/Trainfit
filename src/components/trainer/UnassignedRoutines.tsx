@@ -65,7 +65,7 @@ const UnassignedRoutines = () => {
       // Actualizar la lista de rutinas
       fetchUnassignedPlans();
     } catch (error) {
-      console.error('Error al eliminar la rutina:', error);
+      console.error("Error al eliminar la rutina:");
       toast.error('❌ Error al eliminar la rutina. Por favor, inténtalo de nuevo.');
     }
   };

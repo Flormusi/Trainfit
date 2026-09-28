@@ -14,9 +14,9 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log('[Login] Checking authentication state - User:', user, 'IsAuthenticated:', isAuthenticated);
+    console.log("[Login] Checking authentication state - User:");
     if (isAuthenticated() && user) {
-      console.log('[Login] User is authenticated, redirecting based on role:', user.role);
+      console.log("[Login] User is authenticated, redirecting based on role:");
       const role = user.role.toUpperCase();
       if (role === 'CLIENT') {
         if (!user.hasCompletedOnboarding) {
@@ -45,13 +45,13 @@ const Login: React.FC = () => {
     }
 
     setLoading(true);
-    console.log('[Login] Attempting login with email:', credentials.email);
+    console.log("[Login] Attempting login with email:");
 
     try {
       await login(credentials);
       // No necesitamos mostrar toast aquí ya que AuthContext lo maneja
     } catch (error: any) {
-      console.error('[Login] Error during login:', error);
+      console.error("[Login] Error during login:");
       toast.error(
         error.response?.data?.message ||
         'Error al iniciar sesión. Por favor, verifica tus credenciales e inténtalo de nuevo.'

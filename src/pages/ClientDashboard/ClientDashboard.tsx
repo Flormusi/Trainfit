@@ -382,7 +382,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
           ...consultations
         ]);
       } catch (error) {
-        console.error('Error al cargar eventos del servidor:', error);
+        console.error("Error al cargar eventos del servidor:");
         setServerEvents([]);
       }
     };
@@ -405,7 +405,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
         const { count } = await clientApi.getUnreadNotificationCount(id);
         setUnreadNotifications(count || 0);
       } catch (error) {
-        console.error('Error obteniendo conteo de notificaciones:', error);
+        console.error("Error obteniendo conteo de notificaciones:");
       }
     };
 
@@ -453,13 +453,13 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
   const loadDashboardData = async () => {
     try {
         setIsLoadingData(true);
+        const targetId = clientId || user?.id || '';
+        const profileRequest = clientApi.getProfile(targetId);
+        const paymentRequest = clientApi.getPaymentStatus().catch(() => null);
         
         // Cargar datos del perfil del usuario
         try {
-          // Usar clientId para consistencia con handleUpdateProfile
-          const targetId = clientId || user?.id || '';
-          
-          const profileResponse = await clientApi.getProfile(targetId);
+          const profileResponse = await profileRequest;
           const profileData = profileResponse.data || profileResponse;
           
           // Actualizar métricas de progreso con datos reales
@@ -489,7 +489,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
         }
         
       } catch (profileError) {
-        console.error('Error cargando perfil del usuario:', profileError);
+        console.error("Error cargando perfil del usuario:");
         // Usar valores por defecto si no se puede cargar el perfil
         const defaultMetrics = {
           weight: 'No registrado',
@@ -509,7 +509,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
 
       // Cargar estado de pago real desde la DB
       try {
-        const paymentResponse = await clientApi.getPaymentStatus();
+        const paymentResponse = await paymentRequest;
         if (paymentResponse?.success && paymentResponse?.paymentStatus) {
           const ps = paymentResponse.paymentStatus;
           setPaymentStatus({
@@ -525,7 +525,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
       }
       
     } catch (error) {
-      console.error('Error cargando datos del dashboard:', error);
+      console.error("Error cargando datos del dashboard:");
       toast.error('Error al cargar los datos del dashboard');
     } finally {
       setIsLoadingData(false);
@@ -735,7 +735,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
         getEvents(startOfMonth, endOfMonth);
       }
     } catch (error) {
-      console.error('Error al actualizar entrenamiento:', error);
+      console.error("Error al actualizar entrenamiento:");
       toast.error('Error al actualizar el entrenamiento');
     }
   };
@@ -771,7 +771,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
         getEvents(startOfMonth, endOfMonth);
       }
     } catch (error) {
-      console.error('Error al crear entrenamiento:', error);
+      console.error("Error al crear entrenamiento:");
       toast.error('Error al crear el entrenamiento');
     }
   };
@@ -820,7 +820,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
       
       toast.success('Perfil actualizado exitosamente');
     } catch (error) {
-      console.error('❌ Error al actualizar perfil:', error);
+      console.error("❌ Error al actualizar perfil:");
       toast.error('Error al actualizar el perfil');
       throw error;
     }
@@ -885,7 +885,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
       setProfileImage(response.data?.profileImage || response.profileImage);
       toast.success('Imagen de perfil actualizada');
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:");
       toast.error('Error al subir la imagen');
     } finally {
       setIsUploadingImage(false);
@@ -899,7 +899,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
       setIsEditingNickname(false);
       toast.success('Nickname actualizado');
     } catch (error) {
-      console.error('Error updating nickname:', error);
+      console.error("Error updating nickname:");
       toast.error('Error al actualizar el nickname');
     }
   };
@@ -960,7 +960,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
       setSelectedDayEvents({ localTrainings, googleEvents: dayGoogleEvents, serverEvents: dayServerEvents });
       setIsModalOpen(true);
     } catch (err) {
-      console.error('Error abriendo modal de entrenamientos:', err);
+      console.error("Error abriendo modal de entrenamientos:");
       setIsModalOpen(true);
     }
   };
@@ -1806,7 +1806,7 @@ const [lastMessagePreview, setLastMessagePreview] = useState<{ trainerName: stri
               const { count } = await clientApi.getUnreadNotificationCount(id);
               setUnreadNotifications(count || 0);
             } catch (error) {
-              console.error('Error refrescando conteo de notificaciones:', error);
+              console.error("Error refrescando conteo de notificaciones:");
             }
           })();
         }}

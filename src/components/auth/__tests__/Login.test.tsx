@@ -17,9 +17,9 @@ const renderLogin = () => {
 describe('Login Component', () => {
   test('renders login form', () => {
     renderLogin();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toHaveValue('');
+    expect(screen.getByLabelText(/contraseña/i)).toHaveValue('');
+    expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeInTheDocument();
   });
 
   test('handles form submission', async () => {
@@ -28,14 +28,14 @@ describe('Login Component', () => {
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
       target: { value: 'password123' },
     });
     
-    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    fireEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
     
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /sign in/i })).not.toBeDisabled();
+      expect(screen.getByRole('button', { name: /iniciar sesión/i })).not.toBeDisabled();
     });
   });
 });

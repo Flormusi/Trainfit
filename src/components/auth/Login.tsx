@@ -7,9 +7,9 @@ import { useAuth } from '../../contexts/AuthContext';
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login, user, isAuthenticated, loading: authLoading } = useAuth();
-  const [credentials, setCredentials] = useState({ 
-    email: 'test.trainer@trainfit.com', 
-    password: 'test123' 
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -70,10 +70,12 @@ const Login: React.FC = () => {
       <img src="/images/logo-trainfit.png" alt="TrainFit Logo" className="login-logo" />
       <h1 className="login-title">INICIAR SESIÓN</h1>
 
-      <form onSubmit={handleSubmit} className="login-form">
+      <form onSubmit={handleSubmit} className="login-form" autoComplete="on">
         <input
           type="email"
           name="email"
+          aria-label="Email"
+          autoComplete="username"
           placeholder="Email"
           value={credentials.email}
           onChange={handleChange}
@@ -83,6 +85,8 @@ const Login: React.FC = () => {
         <input
           type="password"
           name="password"
+          aria-label="Contraseña"
+          autoComplete="current-password"
           placeholder="Contraseña"
           value={credentials.password}
           onChange={handleChange}

@@ -50,6 +50,32 @@ export interface ExerciseData {
 const WEEK_KEYS = ['week1', 'week2', 'week3', 'week4'] as const;
 const emptyWeek = (): WeekData => ({ series: '', reps: '', peso: '' });
 
+const asText = (value: unknown): string =>
+  value === undefined || value === null ? '' : String(value);
+
+const normalizeWeek = (week: any): WeekData => ({
+  series: asText(week?.series ?? week?.sets),
+  reps: asText(week?.reps ?? week?.repetitions),
+  peso: asText(week?.peso ?? week?.weight),
+});
+
+const normalizeExerciseWeeks = (exercise: any) => {
+  const source = exercise?.weeks;
+  const normalized = {} as Record<typeof WEEK_KEYS[number], WeekData>;
+
+  WEEK_KEYS.forEach((weekKey, index) => {
+    const week = Array.isArray(source) ? source[index] : source?.[weekKey];
+    normalized[weekKey] = normalizeWeek(week);
+  });
+
+  // Las rutinas antiguas guardaban solo la primera semana en campos planos.
+  if (!normalized.week1.series) normalized.week1.series = asText(exercise?.series ?? exercise?.sets);
+  if (!normalized.week1.reps) normalized.week1.reps = asText(exercise?.reps);
+  if (!normalized.week1.peso) normalized.week1.peso = asText(exercise?.peso ?? exercise?.weight);
+
+  return normalized;
+};
+
 export interface RoutineData {
   name: string;
   clientId: string;
@@ -126,9 +152,12 @@ const EditRoutinePage: React.FC = () => {
             const routine = routineResponse.data;
 
             // Merge imageUrl de ejercicios custom
-            const exercises = (routine.exercises || []).map((ex: any) => ({
+            const exercises = (routine.exercises || []).map((ex: any, index: number) => ({
               ...ex,
+              id: ex.id || ex.exerciseId || `routine_exercise_${index}`,
+              exerciseId: ex.exerciseId || ex.id || ex.name || `routine_exercise_${index}`,
               image_url: ex.image_url || customExerciseMap[ex.name?.toLowerCase()] || '',
+              weeks: normalizeExerciseWeeks(ex),
             }));
 
             setRoutineData({
@@ -335,7 +364,21 @@ const EditRoutinePage: React.FC = () => {
     }
 
     try {
-      await trainerApi.updateRoutine(routineId!, routineData);
+      const payload = {
+        ...routineData,
+        exercises: routineData.exercises.map(exercise => {
+          const weeks = normalizeExerciseWeeks(exercise);
+          return {
+            ...exercise,
+            weeks,
+            // Mantener compatibilidad con las vistas y rutinas antiguas.
+            series: weeks.week1.series,
+            reps: weeks.week1.reps,
+            weight: weeks.week1.peso,
+          };
+        }),
+      };
+      await trainerApi.updateRoutine(routineId!, payload);
       setSuccessMessage('✅ Rutina actualizada exitosamente!');
       setTimeout(() => {
         navigate('/trainer-dashboard');
